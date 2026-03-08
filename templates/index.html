@@ -1,82 +1,126 @@
-function showPaymentModal(productId, productName) {
-currentProductId = productId;
-document.getElementById('mTitle').innerText = productName;
-document.getElementById('mBody').innerHTML = `
-<label style="font-weight:bold; font-size:14px;">Select Secure Payment Gateway:</label>
-<select id="networkSelect" onchange="handleNetworkChange()"
-    style="width: 100%; padding: 12px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc;">
-    <option value="safaricom">Lipa na M-Pesa (STK Push)</option>
-    <option value="binance">Binance Pay (USDT - BEP20)</option>
-</select>
+<!DOCTYPE html>
+<html lang="en">
 
-<div id="safaricom-flow">
-    <input type="text" id="mInput" placeholder="Safaricom Number (e.g. 07XXXXXXXX)"
-        style="width: 100%; padding: 12px; border: 1px solid #ccc; box-sizing: border-box;">
-</div>
+<head>
+    <meta charset="UTF-8">
+    <title>FESWIDE SOCIETY</title>
+    <style>
+        :root {
+            --navy: #002b5e;
+            --maroon: #8b0000;
+            --white: #ffffff;
+            --grey: #f4f4f4;
+        }
 
-<div id="binance-flow"
-    style="display: none; background: #fff8e1; padding: 15px; border: 1px solid #fcd535; font-size: 13px;">
-    <p style="color: #000; font-weight: bold; margin-top:0;">Pay Anonymously with Crypto (USDT)</p>
-    <p>The Exact KES amount will automatically be converted to USDT. You will be redirected securely to the Binance
-        Checkout Portal.</p>
-</div>
-`;
+        body {
+            font-family: sans-serif;
+            background: var(--grey);
+            margin: 0;
+        }
 
-let confirmBtn = document.getElementById('mConfirm');
-confirmBtn.style.display = 'block';
-confirmBtn.innerText = "PROCEED TO M-PESA CHECKOUT";
-confirmBtn.style.backgroundColor = 'var(--navy)';
-confirmBtn.style.color = 'white';
-confirmBtn.onclick = processPaymentRoute;
+        .header {
+            background: var(--navy);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 5px solid var(--maroon);
+        }
 
-document.getElementById('global-modal').style.display = 'flex';
-}
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border: 1px solid #ccc;
+        }
 
-function handleNetworkChange() {
-let network = document.getElementById('networkSelect').value;
-document.getElementById('safaricom-flow').style.display = network === 'safaricom' ? 'block' : 'none';
-document.getElementById('binance-flow').style.display = network === 'binance' ? 'block' : 'none';
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
 
-let btn = document.getElementById('mConfirm');
-if (network === 'binance') {
-btn.style.backgroundColor = '#fcd535';
-btn.style.color = 'black';
-btn.innerText = 'PAY WITH BINANCE (USDT)';
-} else {
-btn.style.backgroundColor = 'var(--navy)';
-btn.style.color = 'white';
-btn.innerText = 'PROCEED TO M-PESA CHECKOUT';
-}
-}
+        .card {
+            border: 1px solid #000;
+            padding: 15px;
+        }
 
-function processPaymentRoute() {
-let network = document.getElementById('networkSelect').value;
-if (network === 'safaricom') {
-let phone = document.getElementById('mInput').value;
-if(!phone) return alert('Safaricom number required.');
-triggerSTKPush(phone);
-} else if (network === 'binance') {
-triggerBinancePay();
-}
-}
+        .btn {
+            background: var(--navy);
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
-async function triggerBinancePay() {
-document.getElementById('mConfirm').style.display = 'none';
-document.getElementById('mBody').innerHTML = `<p style="font-weight:bold; color: #002b5e;">GENERATING SECURE BINANCE
-    PORTAL...</p>`;
-try {
-let res = await fetch('/binance-pay', { method: 'POST', headers: {'Content-Type': 'application/json'}, body:
-JSON.stringify({product_id: currentProductId}) });
-let data = await res.json();
-if(data.status === 'success') {
-// Start polling the server to wait for Binance payment confirmation in the background
-pollPayment(data.checkout_id);
-// Open Binance Pay portal in a new tab
-window.open(data.checkout_url, '_blank');
-document.getElementById('mBody').innerHTML += `<p style="color: #8b0000; font-weight:bold;">Awaiting Binance
-    confirmation on the blockchain. Do not close this window.</p>`;
-} else { document.getElementById('mBody').innerHTML = `<p style="color: #8b0000; font-weight: bold;">ERROR:
-    ${data.error}</p>`; }
-} catch(e) { document.getElementById('mBody').innerHTML = `<p style="color: #8b0000;">Network Error connecting to
-    Binance.</p>`; }
-}
+        #global-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            width: 350px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>FESWIDE SOCIETY</h1>
+    </div>
+    <div class="container">
+        <h3>{{ config.get('hero_text') }}</h3>
+        <div class="grid">
+            {% for p in products %}
+            <div class="card">
+                <h4>{{ p.name }}</h4>
+                <p>KES {{ p.price }}</p>
+                <button class="btn" onclick="openPayment('{{ p.id }}', '{{ p.name }}')">PURCHASE</button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="global-modal">
+        <div class="modal-content">
+            <h3 id="mTitle"></h3>
+            <select id="method" onchange="toggleInputs()" style="width:100%; padding:10px; margin-bottom:10px;">
+                <option value="mpesa">Lipa na M-Pesa</option>
+                <option value="binance">Binance Pay (USDT)</option>
+            </select>
+            <input type="text" id="phone" placeholder="07XXXXXXXX" style="width:94%; padding:10px; margin-bottom:10px;">
+            <button class="btn" onclick="pay()">PROCEED</button>
+            <button onclick="document.getElementById('global-modal').style.display='none'"
+                style="width:100%; background:none; border:none; margin-top:10px;">CANCEL</button>
+        </div>
+    </div>
+
+    <script>
+        let curId = null;
+        function openPayment(id, name) { curId = id; document.getElementById('mTitle').innerText = name; document.getElementById('global-modal').style.display = 'flex'; }
+        function toggleInputs() { document.getElementById('phone').style.display = document.getElementById('method').value === 'mpesa' ? 'block' : 'none'; }
+        async function pay() {
+            let m = document.getElementById('method').value;
+            let route = m === 'mpesa' ? '/stk-push' : '/binance-pay';
+            let body = { product_id: curId, phone: document.getElementById('phone').value };
+            let res = await fetch(route, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            let data = await res.json();
+            if (data.checkout_url) window.location.href = data.checkout_url;
+            else if (data.status === 'success') alert("Check phone for STK Prompt!");
+            else alert("Error: " + data.error);
+        }
+    </script>
+</body>
+
+</html>

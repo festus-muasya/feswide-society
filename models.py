@@ -20,17 +20,11 @@ class UserUpload(db.Model):
     status = db.Column(db.String(50), default='Pending Review')
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-class ProjectRequest(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    project_name = db.Column(db.String(100), nullable=False)
-    platform = db.Column(db.String(50), nullable=False)
-    status = db.Column(db.String(50), default='Logged')
-
 class AdminUser(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(20), nullable=False)
+    role = db.Column(db.String(20), nullable=False) # superadmin/subadmin
     is_active = db.Column(db.Boolean, default=True)
 
 class ActivityLog(db.Model):
@@ -42,12 +36,12 @@ class ActivityLog(db.Model):
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     checkout_request_id = db.Column(db.String(100), unique=True, nullable=False)
-    phone = db.Column(db.String(20), nullable=False)
+    phone = db.Column(db.String(50), nullable=True)
     amount = db.Column(db.Float, nullable=False)
     product_id = db.Column(db.Integer, nullable=False)
+    payment_method = db.Column(db.String(20), default='M-Pesa') # M-Pesa or Binance
     status = db.Column(db.String(50), default='Pending')
     download_token = db.Column(db.String(100), default=lambda: str(uuid.uuid4()), unique=True)
-    download_count = db.Column(db.Integer, default=0)
     ip_address = db.Column(db.String(50), nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
