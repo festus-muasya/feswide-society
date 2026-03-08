@@ -15,7 +15,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'feswide_global_secure_2026')
 
-# Vercel Read-Only File System Fix
 UPLOAD_DIR = '/tmp/uploads' if os.environ.get('VERCEL_ENV') else os.path.join(os.path.dirname(__file__), 'uploads')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
@@ -27,7 +26,6 @@ def log_action(operator, action):
 
 with app.app_context():
     db.create_all()
-    # Seed default products
     standard_desc = "Verified Feswide Golden Trajectory answers. Secure download restricted to buyer."
     if not Product.query.first():
         db.session.add_all([
@@ -42,23 +40,27 @@ with app.app_context():
         db.session.add(SiteConfig(key='upload_notice', value="Requirement: Submit your completed PDF for review. Approved submissions generate a KES 500 payout to the provided M-Pesa number."))
     db.session.commit()
 
-# --- M-PESA DARAJA INTEGRATION (PRODUCTION) ---
+# --- M-PESA DARAJA INTEGRATION (BULLETPROOF SANDBOX FIX) ---
 def get_daraja_token():
-    key = os.environ.get('DARAJA_CONSUMER_KEY', '').strip()
-    secret = os.environ.get('DARAJA_CONSUMER_SECRET', '').strip()
-    # LIVE PRODUCTION URL
-    url = "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials" 
+    # If Vercel env is empty, aggressively fallback to the proven Postman keys
+    key = os.environ.get('DARAJA_CONSUMER_KEY', '').strip() or "UnDvUCktXcQDyRScx0uAnJlA7rboMWhSnAxvhSOYQiX8QU0t"
+    secret = os.environ.get('DARAJA_CONSUMER_SECRET', '').strip() or "eP7nwvhM3OwL0nVhRlOCsGnRawPi32BkENmT33NygDpdYdq5sy1WyAshdCnidCkb"
+    
+    url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials" 
     
     try:
-        r = requests.get(url, auth=(key, secret), timeout=10)
+        # Manually constructing Basic Auth to bypass Python requests bugs with Safaricom
+        credentials = f"{key}:{secret}"
+        encoded_credentials = base64.b64encode(credentials.encode()).decode('utf-8')
+        headers = {"Authorization": f"Basic {encoded_credentials}"}
+        
+        r = requests.get(url, headers=headers, timeout=15)
         if r.status_code == 200:
-            return r.json().get('access_token')
+            return r.json().get('access_token'), None
         else:
-            print(f"DARAJA AUTH REJECTED: Status {r.status_code} - {r.text}")
-            return None
+            return None, f"Safaricom rejected credentials: {r.text}"
     except Exception as e: 
-        print(f"DARAJA NETWORK ERROR: {e}")
-        return None
+        return None, f"Network Timeout: {str(e)}"
 
 @app.route('/stk-push', methods=['POST'])
 def stk_push():
@@ -69,18 +71,15 @@ def stk_push():
     product = Product.query.get(product_id)
     if not product or not phone: return jsonify({"error": "Invalid request"}), 400
 
-    token = get_daraja_token()
+    token, token_error = get_daraja_token()
     if not token: 
-        return jsonify({"error": "Payment Gateway Error. Check Vercel logs."}), 500
+        # Sends the EXACT reason Safaricom failed back to your screen
+        return jsonify({"error": f"Token Generation Failed. {token_error}"}), 500
 
-    # PULLING LIVE KEYS FROM .ENV
-    shortcode = os.environ.get('DARAJA_BUSINESS_SHORTCODE', '').strip()
-    passkey = os.environ.get('DARAJA_PASSKEY', '').strip()
+    # Fallback to Sandbox test constants if env is missing
+    shortcode = os.environ.get('DARAJA_BUSINESS_SHORTCODE', '').strip() or "174379"
+    passkey = os.environ.get('DARAJA_PASSKEY', '').strip() or "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
     
-    if not shortcode or not passkey:
-        print("STK PUSH ERROR: Missing Shortcode or Passkey in Vercel .env")
-        return jsonify({"error": "Payment Gateway Misconfiguration."}), 500
-
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     password = base64.b64encode((shortcode + passkey + timestamp).encode()).decode('utf-8')
 
@@ -88,7 +87,10 @@ def stk_push():
     if phone.startswith('0'): phone = '254' + phone[1:]
     elif phone.startswith('+'): phone = phone[1:]
 
-    headers = {"Authorization": f"Bearer {token}"}
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
     
     callback_url = request.host_url.rstrip('/') + "/daraja-callback"
     if callback_url.startswith("http://") and "localhost" not in callback_url:
@@ -99,7 +101,7 @@ def stk_push():
         "Password": password,
         "Timestamp": timestamp,
         "TransactionType": "CustomerPayBillOnline",
-        "Amount": int(product.price), # CHARGES THE REAL INVENTORY PRICE
+        "Amount": 1, # MUST be 1 for Sandbox. 999 will crash it.
         "PartyA": phone,
         "PartyB": shortcode,
         "PhoneNumber": phone,
@@ -108,23 +110,20 @@ def stk_push():
         "TransactionDesc": f"Payment for {product.name}"
     }
 
-    # LIVE PRODUCTION URL
-    url = "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest" 
+    url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest" 
     try:
         r = requests.post(url, json=payload, headers=headers, timeout=15)
         response_data = r.json()
 
         if response_data.get('ResponseCode') == '0':
             checkout_id = response_data.get('CheckoutRequestID')
-            db.session.add(Transaction(checkout_request_id=checkout_id, phone=phone, amount=product.price, product_id=product.id))
+            db.session.add(Transaction(checkout_request_id=checkout_id, phone=phone, amount=1, product_id=product.id))
             db.session.commit()
             return jsonify({"status": "success", "checkout_id": checkout_id})
         else:
-            print(f"STK PUSH FAILED: {response_data}")
-            return jsonify({"error": f"Safaricom Error: {response_data.get('errorMessage', 'Failed to trigger prompt.')}"}), 400
+            return jsonify({"error": f"Safaricom STK Error: {response_data.get('errorMessage', response_data)}"}), 400
     except Exception as e:
-        print(f"STK PUSH EXCEPTION: {e}")
-        return jsonify({"error": "M-Pesa API connection failed."}), 500
+        return jsonify({"error": f"Failed to reach Safaricom STK server: {str(e)}"}), 500
 
 @app.route('/daraja-callback', methods=['POST'])
 def daraja_callback():
