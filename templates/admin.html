@@ -3,26 +3,22 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FESWIDE COMMAND CENTER</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>COMMAND CENTER | Feswide Society</title>
     <style>
         :root {
             --navy: #0a192f;
             --maroon: #800000;
-            --orange: #ffcc80;
             --white: #ffffff;
-            --light-grey: #f4f7f9;
+            --bg: #f4f7f9;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--light-grey);
+            background: var(--bg);
             margin: 0;
             color: #333;
         }
 
-        /* Sidebar & Header */
         .header {
             background: var(--navy);
             color: white;
@@ -31,30 +27,13 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 4px solid var(--maroon);
-            position: sticky;
+            sticky;
             top: 0;
-            z-index: 1000;
+            z-index: 100;
         }
 
-        .header h2 {
-            margin: 0;
-            font-size: 20px;
-            letter-spacing: 1px;
-        }
-
-        .logout-btn {
-            background: var(--maroon);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 12px;
-        }
-
-        /* Main Layout */
-        .main-container {
-            padding: 30px 5%;
+        .container {
+            padding: 30px;
             max-width: 1400px;
             margin: auto;
         }
@@ -62,38 +41,32 @@
         .panel {
             background: white;
             border: 1px solid #ddd;
-            border-radius: 8px;
             padding: 25px;
             margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .panel h3 {
             margin-top: 0;
             color: var(--navy);
-            border-bottom: 2px solid var(--light-grey);
+            border-bottom: 2px solid var(--bg);
             padding-bottom: 10px;
             margin-bottom: 20px;
+            font-size: 14px;
             text-transform: uppercase;
-            font-size: 16px;
-        }
-
-        /* Table Styles */
-        .table-container {
-            overflow-x: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         th {
             background: #f8f9fa;
-            color: #666;
-            text-align: left;
             padding: 12px;
+            text-align: left;
             border-bottom: 2px solid #eee;
         }
 
@@ -105,8 +78,8 @@
         .badge {
             padding: 4px 8px;
             border-radius: 4px;
-            font-size: 11px;
             font-weight: bold;
+            font-size: 10px;
             text-transform: uppercase;
         }
 
@@ -115,20 +88,8 @@
             color: #234e52;
         }
 
-        .pending {
-            background: #fffaf0;
-            color: #7b341e;
-        }
-
-        /* Superadmin Specific Styles */
         .super-only {
-            border-left: 6px solid var(--maroon);
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            border-left: 8px solid var(--maroon);
         }
 
         input,
@@ -142,38 +103,21 @@
             box-sizing: border-box;
         }
 
-        .action-btn {
-            padding: 10px 20px;
+        .btn {
             background: var(--navy);
             color: white;
             border: none;
+            padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 13px;
             margin-top: 10px;
         }
 
-        .delete-btn {
+        .btn-del {
             background: #e53e3e;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
-            cursor: pointer;
             font-size: 11px;
-        }
-
-        /* Maintenance Alert Box */
-        .alert-box {
-            background: #fff5f5;
-            border: 1px solid #feb2b2;
-            padding: 15px;
-            border-radius: 6px;
-            color: #c53030;
-            font-weight: bold;
-            margin-bottom: 20px;
-            display: none;
+            padding: 5px 10px;
         }
     </style>
 </head>
@@ -183,91 +127,90 @@
     <div class="header">
         <h2>FESWIDE TERMINAL [{{ role|upper }}]</h2>
         <div>
-            <span style="font-size: 14px; margin-right: 15px;">Active ID: <b>{{ username }}</b></span>
-            <a href="/logout" class="logout-btn">TERMINATE SESSION</a>
+            <span style="font-size: 13px; margin-right: 15px;">Operator: <b>{{ username }}</b></span>
+            <a href="/logout" style="color:white; font-weight:bold; text-decoration:none; font-size:12px;">[LOGOUT]</a>
         </div>
     </div>
 
-    <div class="main-container">
+    <div class="container">
+        {% if role == 'superadmin' %}
+        <div class="panel super-only">
+            <h3 style="color: var(--maroon);">Broadcast Maintenance Message</h3>
+            <form action="/admin/update-config" method="POST" style="display:flex; gap:10px;">
+                <input name="hero_text" value="{{ config_text }}" placeholder="Enter site-wide alert message...">
+                <button type="submit" class="btn" style="background: var(--maroon); margin-top:5px;">UPDATE
+                    SITE</button>
+            </form>
+        </div>
+        {% endif %}
 
         <div class="panel">
-            <h3>Payment Gateway Logs (M-Pesa / Binance)</h3>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Request ID</th>
-                            <th>Platform</th>
-                            <th>Price</th>
-                            <th>Status</th>
-                            <th>Timestamp</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for t in txns %}
-                        <tr>
-                            <td><code>{{ t.checkout_request_id }}</code></td>
-                            <td>{{ t.payment_method }}</td>
-                            <td>KES {{ t.amount }}</td>
-                            <td><span class="badge {% if t.status == 'Paid' %}paid{% else %}pending{% endif %}">{{
-                                    t.status }}</span></td>
-                            <td>{{ t.timestamp.strftime('%d %b, %H:%M') }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            <h3>Live Payment Logs (M-Pesa & Binance)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Request ID</th>
+                        <th>Method</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in txns %}
+                    <tr>
+                        <td><code>{{ t.checkout_request_id }}</code></td>
+                        <td>{{ t.payment_method }}</td>
+                        <td>KES {{ t.amount }}</td>
+                        <td><span class="badge {% if t.status == 'Paid' %}paid{% endif %}">{{ t.status }}</span></td>
+                        <td>{{ t.timestamp.strftime('%H:%M | %d %b') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel">
+            <h3 style="color: #d69e2e;">Support Tickets (Agent John)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>WhatsApp Contact</th>
+                        <th>Error Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr>
+                        <td>{{ ticket.timestamp.strftime('%H:%M') }}</td>
+                        <td><a href="https://wa.me/{{ ticket.whatsapp }}" target="_blank"
+                                style="color:green; font-weight:bold;">{{ ticket.whatsapp }}</a></td>
+                        <td>{{ ticket.error_desc }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 
         {% if role == 'superadmin' %}
         <div class="panel super-only">
-            <h3 style="color: var(--maroon);">Broadcast System Message</h3>
-            <form action="/admin/update-config" method="POST">
-                <div class="form-grid">
-                    <div>
-                        <label>Entire Page Message (Hero Text)</label>
-                        <input name="hero_text" value="{{ config_text }}"
-                            placeholder="Enter message to display on storefront...">
-                    </div>
-                    <div style="display: flex; align-items: flex-end;">
-                        <button type="submit" class="action-btn" style="background: var(--maroon);">UPDATE SITE
-                            CONTENT</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        <div class="panel super-only">
-            <h3 style="color: var(--maroon);">Staff Access Control</h3>
-            <form action="/admin/create-subadmin" method="POST">
-                <div class="form-grid">
-                    <input name="username" placeholder="Staff Username" required>
-                    <input name="password" type="password" placeholder="Assign Passkey" required>
-                    <button type="submit" class="action-btn">CREATE SUB-ADMIN</button>
-                </div>
-            </form>
-        </div>
-
-        <div class="panel super-only">
-            <h3 style="color: var(--maroon);">Inventory Management</h3>
+            <h3 style="color: var(--maroon);">Module Management</h3>
             <form action="/admin/add-product" method="POST" enctype="multipart/form-data">
-                <div class="form-grid">
-                    <input name="name" placeholder="Module Title" required>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:15px;">
+                    <input name="name" placeholder="Title" required>
                     <input name="price" placeholder="Price (KES)" required>
                     <input type="file" name="file" accept=".pdf" required>
                 </div>
-                <textarea name="description" placeholder="Short accuracy description..."
-                    style="height: 60px; margin-top: 15px;"></textarea>
-                <button type="submit" class="action-btn" style="width: 100%;">PUBLISH NEW MODULE</button>
+                <textarea name="description" placeholder="Description (e.g. Tested and 100% accurate)"></textarea>
+                <button type="submit" class="btn">PUBLISH MODULE</button>
             </form>
-
-            <h4 style="margin-top: 30px; font-size: 13px; color: #888;">CURRENT MODULE REPOSITORY</h4>
+            <hr style="margin:20px 0;">
             <table>
                 <thead>
                     <tr>
-                        <th>Module Name</th>
+                        <th>Module</th>
                         <th>Price</th>
-                        <th>Filesystem</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -276,11 +219,9 @@
                     <tr>
                         <td>{{ p.name }}</td>
                         <td>KES {{ p.price }}</td>
-                        <td><code>{{ p.filename }}</code></td>
                         <td>
-                            <form action="/admin/delete-product/{{ p.id }}" method="POST"
-                                onsubmit="return confirm('Secure Delete?')">
-                                <button type="submit" class="delete-btn">REMOVE</button>
+                            <form action="/admin/delete-product/{{ p.id }}" method="POST">
+                                <button type="submit" class="btn-del">REMOVE</button>
                             </form>
                         </td>
                     </tr>
@@ -288,21 +229,22 @@
                 </tbody>
             </table>
         </div>
-        {% endif %}
 
+        <div class="panel super-only">
+            <h3 style="color: var(--maroon);">Staff Access Control</h3>
+            <form action="/admin/create-subadmin" method="POST" style="display:flex; gap:10px;">
+                <input name="username" placeholder="Staff Username" required>
+                <input name="password" type="password" placeholder="Passkey" required>
+                <button type="submit" class="btn">CREATE LOGIN</button>
+            </form>
+        </div>
+        {% endif %}
     </div>
 
     <script>
-        /**
-         * OPSEC: HARDENED SOURCE PROTECTION
-         * Disables DevTools and View Source functionality
-         */
+        // OPSEC: Hardened Source Protection
         document.onkeydown = function (e) {
-            if (event.keyCode == 123) return false;
-            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
-            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
-            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
-            if (e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false;
+            if (event.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73) || (e.ctrlKey && e.keyCode == 85)) return false;
         };
     </script>
 </body>

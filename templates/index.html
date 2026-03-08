@@ -4,19 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FESWIDE SOCIETY</title>
+    <title>FESWIDE SOCIETY | GLOBAL INDEX</title>
     <style>
         :root {
             --navy: #0a192f;
             --maroon: #800000;
             --orange: #ffcc80;
             --white: #ffffff;
+            --grey: #f4f4f4;
         }
 
         body {
             font-family: sans-serif;
-            background: #f4f4f4;
+            background: var(--grey);
             margin: 0;
+            padding: 0;
         }
 
         .header {
@@ -27,6 +29,9 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 4px solid var(--maroon);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .opp-btn {
@@ -35,17 +40,38 @@
             border: none;
             padding: 12px 20px;
             font-weight: bold;
+            border-radius: 5px;
             cursor: pointer;
             text-transform: uppercase;
+            font-size: 13px;
         }
 
         .container {
             padding: 20px 5%;
         }
 
+        .tab-nav {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 20px;
+            background: white;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .tab.active {
+            color: var(--navy);
+            border-bottom: 4px solid var(--navy);
+        }
+
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 20px;
         }
 
@@ -54,20 +80,108 @@
             border: 1px solid #ddd;
             padding: 20px;
             border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
-        .tab-btn {
-            padding: 10px 20px;
-            cursor: pointer;
-            background: none;
+        .btn-purchase {
+            background: var(--navy);
+            color: white;
             border: none;
-            border-bottom: 3px solid transparent;
+            padding: 12px;
+            width: 100%;
             font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            border-radius: 4px;
         }
 
-        .tab-btn.active {
-            border-bottom-color: var(--navy);
-            color: var(--navy);
+        /* CHATBOT JOHN */
+        .chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--maroon);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--white);
+            z-index: 1000;
+        }
+
+        .chat-box {
+            display: none;
+            position: fixed;
+            bottom: 85px;
+            right: 20px;
+            width: 320px;
+            background: white;
+            border: 2px solid var(--navy);
+            border-radius: 8px;
+            z-index: 1000;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-header {
+            background: var(--navy);
+            color: white;
+            padding: 12px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chat-body {
+            height: 280px;
+            padding: 15px;
+            overflow-y: auto;
+            font-size: 14px;
+            background: #f9f9f9;
+        }
+
+        .chat-input {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            outline: none;
+        }
+
+        #modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            width: 400px;
+            border-radius: 10px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
         }
 
         .hidden {
@@ -78,75 +192,156 @@
 
 <body oncontextmenu="return false;">
     <div class="header">
-        <h1>FESWIDE SOCIETY</h1>
-        <button class="opp-btn" onclick="openSubmit()">Submit Answers (KES 500/=)</button>
+        <h1 style="margin:0">FESWIDE SOCIETY</h1>
+        <button class="opp-btn" onclick="openSection('opportunities')">Opportunities (Get KES 500/=)</button>
     </div>
 
     <div class="container">
-        <div style="margin-bottom:20px; border-bottom:1px solid #ddd;">
-            <button class="tab-btn active" onclick="showTab('store', this)">MODULES</button>
-            <button class="tab-btn" onclick="showTab('hiring', this)">HIRING</button>
-            <button class="tab-btn" onclick="showTab('taskers', this)">TASKERS</button>
+        <div class="tab-nav">
+            <div class="tab active" onclick="switchTab('modules', this)">MODULES</div>
+            <div class="tab" onclick="switchTab('hiring', this)">HIRING BOARD</div>
+            <div class="tab" onclick="switchTab('taskers', this)">TASKER DIRECTORY</div>
         </div>
 
-        <div id="tab-store">
-            <p style="border-left: 5px solid var(--navy); padding-left: 10px; font-weight: bold;">{{
-                config.get('hero_text') }}</p>
+        <div id="section-modules" class="tab-content">
             <div class="grid">
                 {% for p in products %}
                 <div class="card">
                     <h3 style="margin-top:0; color:var(--navy)">{{ p.name }}</h3>
-                    <p>{{ p.description }}</p>
+                    <p style="font-size:13px; color:#555">{{ p.description }}</p>
                     <div style="font-size:24px; font-weight:bold; color:var(--maroon)">KES {{ p.price }}</div>
-                    <button class="opp-btn"
-                        style="width:100%; margin-top:15px; background:var(--navy); color:white;">PURCHASE</button>
+                    <button class="btn-purchase" onclick="alert('Starting secure payment...')">PURCHASE</button>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
-        <div id="tab-hiring" class="hidden">
+        <div id="section-hiring" class="tab-content hidden">
+            <div class="card" style="margin-bottom:20px; border-left: 5px solid var(--maroon);">
+                <h4 style="margin-top:0">Post a Hiring Request</h4>
+                <form action="/post-opp" method="POST">
+                    <input type="hidden" name="type" value="Hiring">
+                    <select name="platform">
+                        <option>Outlier AI</option>
+                        <option>Handshake AI</option>
+                    </select>
+                    <input name="rate" placeholder="Commission % or Salary (e.g. 40% Commission)" required>
+                    <input name="whatsapp" placeholder="WhatsApp Contact" required>
+                    <textarea name="desc" placeholder="Brief job description..."></textarea>
+                    <button class="opp-btn" style="width:100%">Post Publicly</button>
+                </form>
+            </div>
             <div class="grid">
                 {% for h in hiring %}
                 <div class="card">
-                    <span style="background:#e3f2fd; padding:3px 8px; border-radius:4px; font-size:12px;">{{ h.platform
-                        }}</span>
-                    <h3>Looking for Tasker</h3>
-                    <p>Rate: {{ h.rate }}</p>
-                    <a href="https://wa.me/{{ h.whatsapp }}" style="color:#25d366; font-weight:bold;">WhatsApp →</a>
+                    <b style="color:var(--navy)">{{ h.platform }}</b>
+                    <h3>HIRING TASKER</h3>
+                    <p>{{ h.description }}</p>
+                    <p>Rate: <b>{{ h.rate }}</b></p>
+                    <a href="https://wa.me/{{ h.whatsapp }}" style="color:green; font-weight:bold;">Message on WhatsApp
+                        →</a>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
-        <div id="tab-taskers" class="hidden">
+        <div id="section-taskers" class="tab-content hidden">
+            <div class="card" style="margin-bottom:20px; border-left: 5px solid var(--navy);">
+                <h4 style="margin-top:0">Register as a Tasker</h4>
+                <form action="/post-opp" method="POST">
+                    <input type="hidden" name="type" value="Tasker">
+                    <select name="platform">
+                        <option>Outlier AI</option>
+                        <option>Handshake AI</option>
+                    </select>
+                    <input name="whatsapp" placeholder="WhatsApp Contact" required>
+                    <textarea name="desc" placeholder="Describe your skills (e.g. 1yr Coder in Outlier)"></textarea>
+                    <button class="opp-btn" style="width:100%; background:var(--navy); color:white">List My
+                        Profile</button>
+                </form>
+            </div>
             <div class="grid">
                 {% for t in taskers %}
                 <div class="card">
-                    <span style="background:#e8f5e9; padding:3px 8px; border-radius:4px; font-size:12px;">{{ t.platform
-                        }}</span>
-                    <h3>I am a Tasker</h3>
-                    <a href="https://wa.me/{{ t.whatsapp }}" style="color:#25d366; font-weight:bold;">Contact →</a>
+                    <b style="color:var(--maroon)">{{ t.platform }}</b>
+                    <h3>AVAILABLE TASKER</h3>
+                    <p>{{ t.description }}</p>
+                    <a href="https://wa.me/{{ t.whatsapp }}" style="color:green; font-weight:bold;">Contact Tasker →</a>
                 </div>
                 {% endfor %}
             </div>
         </div>
     </div>
 
+    <div id="modal">
+        <div class="modal-content">
+            <h2 style="margin-top:0">Submit Verified Answers</h2>
+            <p style="font-size:14px; color:#666">Get paid KES 500 after 48hr verification period.</p>
+            <form action="/submit-answers" method="POST" enctype="multipart/form-data">
+                <select name="platform">
+                    <option>Outlier AI</option>
+                    <option>Handshake AI</option>
+                </select>
+                <input name="project" placeholder="Project Name (e.g. Aether Multilingual)" required>
+                <input name="payment_id" placeholder="M-Pesa Number / Binance UID" required>
+                <input type="file" name="file" required>
+                <button class="opp-btn" style="width:100%; background:var(--maroon); color:white">Submit for KES
+                    500</button>
+            </form>
+            <button onclick="document.getElementById('modal').style.display='none'"
+                style="width:100%; background:none; border:none; margin-top:15px; cursor:pointer;">Close</button>
+        </div>
+    </div>
+
+    <div class="chat-toggle" onclick="toggleJohn()">CHAT WITH JOHN</div>
+    <div class="chat-box" id="johnBox">
+        <div class="chat-header"><span>John | Feswide Assistant</span><span onclick="toggleJohn()"
+                style="cursor:pointer">✖</span></div>
+        <div class="chat-body" id="johnBody"></div>
+        <div class="chat-input">
+            <input type="text" id="johnIn" placeholder="Type here...">
+            <button onclick="sendJohn()"
+                style="background:var(--navy); color:white; border:none; padding:10px;">Send</button>
+        </div>
+    </div>
+
     <script>
-        function showTab(tab, btn) {
-            document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
-            document.getElementById('tab-' + tab).classList.remove('hidden');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        function switchTab(t, btn) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.getElementById('section-' + t).classList.remove('hidden');
+            document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         }
-        function openSubmit() { alert("Submission feature: Submit answers to verify and earn KES 500."); }
+        function openSection(type) { document.getElementById('modal').style.display = 'flex'; }
+
+        function toggleJohn() { let b = document.getElementById('johnBox'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
+
+        let isErrorReporting = false;
+        async function sendJohn() {
+            let input = document.getElementById('johnIn');
+            let body = document.getElementById('johnBody');
+            if (!input.value) return;
+            let val = input.value;
+            body.innerHTML += `<div style="text-align:right; margin:10px 0;">${val}</div>`;
+            input.value = '';
+
+            let payload = { message: val };
+            if (isErrorReporting) {
+                payload.is_error = true;
+                payload.whatsapp = val;
+                isErrorReporting = false;
+            }
+
+            let res = await fetch('/api/john', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            let data = await res.json();
+            if (data.ask_error) isErrorReporting = true;
+            body.innerHTML += `<div style="color:var(--navy); margin:10px 0;"><b>John:</b> ${data.reply}</div>`;
+            body.scrollTop = body.scrollHeight;
+        }
 
         // OPSEC PROTECT
         document.onkeydown = function (e) {
-            if (event.keyCode == 123) return false;
-            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
-            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+            if (event.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) return false;
         };
     </script>
 </body>
