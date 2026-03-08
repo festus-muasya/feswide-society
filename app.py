@@ -1,41 +1,62 @@
+import os
 from flask import Flask, render_template, request, jsonify, send_from_directory, abort
 from models import db, Transaction, UserUpload, User
-import os
 
 app = Flask(__name__)
 
-# --- DATABASE CONFIGURATION FOR VERCEL & LOCAL TESTING ---
-# Looks for a DATABASE_URL environment variable (used in production on Vercel).
-# If it doesn't exist, it falls back to a local SQLite database for your testing.
+# ==========================================
+# 1. DATABASE CONFIGURATION 
+# ==========================================
+# Pulls your encoded Supabase string from Vercel. 
+# Falls back to local SQLite if you test on your own computer.
 database_url = os.environ.get('DATABASE_URL', 'sqlite:///feswide.db')
 
-# Vercel/SQLAlchemy requires PostgreSQL URLs to start with 'postgresql://' instead of 'postgres://'
+# SQLAlchemy requires 'postgresql://' instead of 'postgres://'
 if database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_secure_fallback_key')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# --- FILE STORAGE CONFIGURATION ---
-# Note: On Vercel, these local folders will reset. You will eventually want to 
-# swap this logic out for a cloud storage solution like Amazon S3 or Supabase Storage.
-SECURE_ANSWERS_DIR = os.path.abspath('secure_answers')
-USER_UPLOADS_DIR = os.path.abspath('user_uploads')
+# ==========================================
+# 2. SECURITY & API CREDENTIALS
+# ==========================================
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback_secret_key_for_local_testing')
 
-# Ensure directories exist locally
-os.makedirs(SECURE_ANSWERS_DIR, exist_ok=True)
+# Daraja Credentials (Ready for when you set them in Vercel)
+DARAJA_CONSUMER_KEY = os.environ.get('DARAJA_CONSUMER_KEY', '')
+DARAJA_CONSUMER_SECRET = os.environ.get('DARAJA_CONSUMER_SECRET', '')
+DARAJA_PASSKEY = os.environ.get('DARAJA_PASSKEY', '')
+DARAJA_BUSINESS_SHORTCODE = os.environ.get('DARAJA_BUSINESS_SHORTCODE', '')
+
+# ==========================================
+# 3. FILE STORAGE (VERCEL READ-ONLY FIX)
+# ==========================================
+# Secure answers are part of your GitHub repo, so they live in the main folder
+SECURE_ANSWERS_DIR = os.path.join(os.path.dirname(__file__), 'secure_answers')
+
+# User uploads MUST go to the temporary /tmp folder when running on Vercel
+if os.environ.get('VERCEL_ENV') or os.environ.get('VERCEL_URL'):
+    USER_UPLOADS_DIR = '/tmp/user_uploads'
+else:
+    USER_UPLOADS_DIR = os.path.join(os.path.dirname(__file__), 'user_uploads')
+
+# Create the upload directory if it doesn't exist
 os.makedirs(USER_UPLOADS_DIR, exist_ok=True)
 
-# Initialize Database
+
+# ==========================================
+# 4. INITIALIZE DATABASE
+# ==========================================
 db.init_app(app)
 
 with app.app_context():
+    # Creates tables in Supabase if they don't exist yet
     db.create_all()
 
 
 # ==========================================
-# PUBLIC & STOREFRONT ROUTES
+# 5. PUBLIC & STOREFRONT ROUTES
 # ==========================================
 
 @app.route('/')
@@ -49,11 +70,16 @@ def pay_stk():
     item = data.get('item')
     amount = data.get('amount')
     
-    # TODO: Insert actual Daraja API STK Push request logic here
+    # Placeholder for actual Daraja STK Push logic
     mock_checkout_id = "ws_CO_1234567890" 
     
     # Save pending transaction to the database
-    new_txn = Transaction(checkout_request_id=mock_checkout_id, phone=phone, amount=amount, document_name=item)
+    new_txn = Transaction(
+        checkout_request_id=mock_checkout_id, 
+        phone=phone, 
+        amount=amount, 
+        document_name=item
+    )
     db.session.add(new_txn)
     db.session.commit()
     
@@ -64,9 +90,7 @@ def daraja_callback():
     # Daraja API hits this route automatically after the user enters their PIN
     callback_data = request.json
     
-    # TODO: Parse callback_data to check if payment was successful
-    # Example logic: Update Transaction status in DB to 'Paid'
-    
+    # Placeholder for checking if payment was successful and updating the DB
     return jsonify({"ResultCode": 0, "ResultDesc": "Accepted"})
 
 @app.route('/download/<checkout_id>')
@@ -83,11 +107,11 @@ def download_document(checkout_id):
         }
         actual_file = filename_map.get(txn.document_name)
         
-        # Serve the file securely from outside the public folder
+        # Serve the file securely
         if actual_file:
             return send_from_directory(SECURE_ANSWERS_DIR, actual_file, as_attachment=True)
         else:
-            abort(404, description="File not found.")
+            abort(404, description="File not found in system.")
     else:
         abort(403, description="Payment not completed or unauthorized.")
 
@@ -101,7 +125,7 @@ def upload_answer():
         filepath = os.path.join(USER_UPLOADS_DIR, file.filename)
         file.save(filepath)
         
-        # Save record to DB (In a real app, grab the uploader's phone/ID from their session)
+        # Save upload record to DB
         new_upload = UserUpload(uploader_phone="Current User", filename=file.filename)
         db.session.add(new_upload)
         db.session.commit()
@@ -110,18 +134,15 @@ def upload_answer():
 
 
 # ==========================================
-# ADMIN DASHBOARD ROUTES
+# 6. ADMIN DASHBOARD ROUTES
 # ==========================================
 
 @app.route('/admin')
 def admin_dashboard():
-    # TODO: In production, add session verification to check if the user is a superadmin/subadmin.
-    
-    # Fetch all records from the database
+    # Fetch all records from the database to display in the HTML tables
     all_uploads = UserUpload.query.order_by(UserUpload.id.desc()).all()
     all_users = User.query.all()
     
-    # Pass the database records to the HTML template
     return render_template('admin.html', uploads=all_uploads, users=all_users)
 
 @app.route('/admin/upload/<int:upload_id>/<action>', methods=['POST'])
@@ -131,7 +152,7 @@ def manage_upload(upload_id, action):
     
     if action == 'approve':
         upload.status = 'Approved'
-        # TODO: Trigger M-Pesa B2C (Business to Customer) API here to pay the user automatically
+        # Placeholder for triggering M-Pesa B2C payout
     elif action == 'reject':
         upload.status = 'Rejected'
     else:
