@@ -12,12 +12,12 @@
             --maroon: #800000;
             --orange: #ff9800;
             --milky-white: #fdfcf0;
-            /* Extra Milky White */
+            /* Extra Milky White Theme */
             --pure-white: #ffffff;
             --green: #2e7d32;
         }
 
-        /* GLOBAL STYLES */
+        /* GLOBAL STYLES & OPSEC */
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--milky-white);
@@ -25,7 +25,6 @@
             padding: 0;
             color: #333;
             user-select: none;
-            /* OPSEC Protection */
         }
 
         .header {
@@ -60,7 +59,7 @@
             padding: 0 20px;
         }
 
-        /* BROADCAST BOX (No "System Status" Prefix) */
+        /* BROADCAST BOX (Removed "System Status" Prefix) */
         .broadcast-box {
             background: var(--pure-white);
             border: 2px solid #000;
@@ -108,7 +107,7 @@
             justify-content: space-between;
         }
 
-        /* GREEN PRICING */
+        /* GREEN PRICING LABEL */
         .price {
             font-size: 28px;
             font-weight: bold;
@@ -127,8 +126,9 @@
             text-transform: uppercase;
         }
 
-        /* MPESA MODAL */
-        #payment-modal {
+        /* MODAL & MPESA CARD STYLES */
+        #payment-modal,
+        #modal-submission {
             display: none;
             position: fixed;
             top: 0;
@@ -155,7 +155,7 @@
             margin-bottom: 25px;
         }
 
-        /* AGENT JOHN UI */
+        /* CHATBOT UI */
         .john-toggle {
             position: fixed;
             bottom: 20px;
@@ -183,6 +183,16 @@
         .hidden {
             display: none;
         }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #000;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 
@@ -190,8 +200,7 @@
 
     <div class="header">
         <h1>FESWIDE SOCIETY</h1>
-        <button class="opp-btn"
-            onclick="switchTab('hiring', document.querySelector('.tab:nth-child(2)'))">Opportunities</button>
+        <button class="opp-btn" onclick="openSubmissionModal()">Opportunities</button>
     </div>
 
     <div class="container">
@@ -233,12 +242,9 @@
                         <option>Outlier AI</option>
                         <option>Handshake AI</option>
                     </select>
-                    <input name="rate" placeholder="Commission % or Salary" required
-                        style="width:100%; padding:10px; margin:10px 0;">
-                    <input name="whatsapp" placeholder="WhatsApp (254...)" required
-                        style="width:100%; padding:10px; margin:10px 0;">
-                    <textarea name="desc" placeholder="Details..." required
-                        style="width:100%; padding:10px; margin:10px 0;"></textarea>
+                    <input name="rate" placeholder="Commission % or Salary" required>
+                    <input name="whatsapp" placeholder="WhatsApp (254...)" required>
+                    <textarea name="desc" placeholder="Brief details about the task..." required></textarea>
                     <button class="opp-btn" style="width:100%">Post Publicly</button>
                 </form>
             </div>
@@ -246,11 +252,11 @@
                 {% for h in hiring %}
                 <div class="card">
                     <b style="color:var(--maroon)">{{ h.platform }}</b>
-                    <h3>Looking for Tasker</h3>
+                    <h3>Hiring for Project</h3>
                     <p>{{ h.description }}</p>
                     <p>Rate: <b>{{ h.rate }}</b></p>
                     <a href="https://wa.me/{{ h.whatsapp }}" target="_blank"
-                        style="color:var(--green); font-weight:bold; text-decoration:none;">Contact on WhatsApp →</a>
+                        style="color:var(--green); font-weight:bold; text-decoration:none;">Contact →</a>
                 </div>
                 {% endfor %}
             </div>
@@ -265,10 +271,8 @@
                         <option>Outlier AI</option>
                         <option>Handshake AI</option>
                     </select>
-                    <input name="whatsapp" placeholder="WhatsApp Number" required
-                        style="width:100%; padding:10px; margin:10px 0;">
-                    <textarea name="desc" placeholder="Describe your skills..." required
-                        style="width:100%; padding:10px; margin:10px 0;"></textarea>
+                    <input name="whatsapp" placeholder="WhatsApp Number" required>
+                    <textarea name="desc" placeholder="Describe your expertise and platforms..." required></textarea>
                     <button class="opp-btn" style="width:100%; background:var(--navy); color:white">Register
                         Profile</button>
                 </form>
@@ -291,9 +295,8 @@
         <div class="mpesa-card">
             <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" class="mpesa-logo">
             <h3>Lipa na M-Pesa</h3>
-            <p style="font-size: 13px; color: #666;">Enter your number for the payment prompt.</p>
-            <input type="text" id="phone" placeholder="07XXXXXXXX" required
-                style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc;">
+            <p style="font-size: 13px; color: #666;">Enter your number below for the STK prompt.</p>
+            <input type="text" id="phone" placeholder="07XXXXXXXX" required>
             <button onclick="triggerPayment()"
                 style="background:#4caf50; color:white; border:none; padding:15px; width:100%; font-weight:bold; cursor:pointer; border-radius:4px;">PROCEED
                 TO PAY</button>
@@ -302,14 +305,35 @@
         </div>
     </div>
 
+    <div id="modal-submission">
+        <div class="mpesa-card" style="width:400px; border-bottom-color: var(--orange);">
+            <h2 style="margin-top:0">Submit Verified Answers</h2>
+            <p style="font-size: 13px;">Earn <b>KES 500/=</b> per verified answer trajectory.</p>
+            <form id="ansForm">
+                <select name="platform">
+                    <option>Outlier AI</option>
+                    <option>Handshake AI</option>
+                </select>
+                <input name="project" placeholder="Exact Project Name" required>
+                <input name="payment_id" placeholder="M-Pesa Number for KES 500" required>
+                <input type="file" name="file" required>
+                <button type="button" onclick="submitAnswers()" class="opp-btn" style="width:100%">SUBMIT FOR KES
+                    500</button>
+            </form>
+            <button onclick="closeSubmissionModal()"
+                style="background:none; border:none; margin-top:15px; cursor:pointer;">CLOSE</button>
+        </div>
+    </div>
+
     <div class="john-toggle" onclick="toggleJohn()">CHAT WITH JOHN</div>
     <div class="john-win" id="johnWin">
-        <div
-            style="background:var(--navy); color:white; padding:12px; font-weight:bold; display:flex; justify-content:space-between;">
-            <span>John Assistant</span><span onclick="toggleJohn()" style="cursor:pointer">✖</span></div>
-        <div id="chatBody" style="height:250px; padding:15px; overflow-y:auto; background:#fafafa; font-size:14px;">
+        <div class="chat-header"><span>John Assistant</span><span onclick="toggleJohn()" style="cursor:pointer">✖</span>
         </div>
-        <div id="chatInputArea" style="display:flex; border-top:1px solid #000;">
+        <div class="chat-body" id="chatBody">
+            <p><b>John:</b> Hello. I can help with pricing, opportunities, or technical errors. How can I assist you
+                today?</p>
+        </div>
+        <div class="chat-input" id="chatInputArea">
             <input type="text" id="chatIn" placeholder="Type here...">
             <button onclick="sendChat()"
                 style="background:var(--navy); color:white; border:none; padding:0 15px; cursor:pointer;">SEND</button>
@@ -333,9 +357,12 @@
             btn.classList.add('active');
         }
 
+        function openSubmissionModal() { document.getElementById('modal-submission').style.display = 'flex'; }
+        function closeSubmissionModal() { document.getElementById('modal-submission').style.display = 'none'; }
         function openPayment(id) { currentProdId = id; document.getElementById('payment-modal').style.display = 'flex'; }
         function toggleJohn() { let w = document.getElementById('johnWin'); w.style.display = w.style.display === 'block' ? 'none' : 'block'; }
 
+        // M-PESA TRIGGER
         async function triggerPayment() {
             try {
                 let res = await fetch('/stk-push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: currentProdId, phone: document.getElementById('phone').value }) });
@@ -345,6 +372,18 @@
             } catch { alert("API under maintenance"); }
         }
 
+        // SUBMISSION LOGIC
+        async function submitAnswers() {
+            const formData = new FormData(document.getElementById('ansForm'));
+            try {
+                const res = await fetch('/submit-answers', { method: 'POST', body: formData });
+                const result = await res.json();
+                alert(result.message || result.error);
+                if (res.ok) { closeSubmissionModal(); document.getElementById('ansForm').reset(); }
+            } catch { alert("Submission failed."); }
+        }
+
+        // JOHN ASSISTANT
         async function sendChat(choice = null) {
             let input = document.getElementById('chatIn');
             let body = document.getElementById('chatBody');
@@ -366,7 +405,7 @@
             body.scrollTop = body.scrollHeight;
         }
 
-        // OPSEC PROTECT
+        // OPSEC PROTECTION
         document.onkeydown = function (e) { if (event.keyCode == 123 || (e.ctrlKey && e.keyCode == 85)) return false; };
     </script>
 </body>
