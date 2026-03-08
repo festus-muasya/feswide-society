@@ -7,32 +7,38 @@ from supabase import create_client, Client
 
 app = Flask(__name__)
 
-# --- DATABASE CONFIG ---
+# --- DATABASE & SECURITY CONFIG ---
 database_url = os.environ.get('DATABASE_URL', 'sqlite:////tmp/feswide.db')
 if database_url.startswith("postgres://"): 
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'feswide_global_2026')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fesfast_wide_networks')
 db.init_app(app)
 
-# --- SUPABASE STORAGE ---
-sb_url = os.environ.get("SUPABASE_URL", "")
-sb_key = os.environ.get("SUPABASE_KEY", "")
-supabase: Client = create_client(sb_url, sb_key) if sb_url and sb_key else None
+# --- SUPABASE FILE STORAGE ---
+supabase: Client = create_client(os.environ.get("SUPABASE_URL", ""), os.environ.get("SUPABASE_KEY", "")) if os.environ.get("SUPABASE_URL") else None
 
+# --- AUTO-SEED DATABASE ON BOOT ---
 with app.app_context():
     try:
         db.create_all()
         if not AdminUser.query.first():
             db.session.add(AdminUser(username='superadmin', password='FeswideMaster2026!', role='superadmin'))
-        if not SiteConfig.query.filter_by(key='hero_text').first():
-            db.session.add(SiteConfig(key='hero_text', value="Feswide Society Index. Secure OPSEC Modules."))
-            db.session.add(SiteConfig(key='upload_notice', value="Requirement: Submit your completed PDF for review."))
+        
+        # This fixes the "Inventory Empty" issue by adding default products
+        if not Product.query.first():
+            desc = "Verified Feswide Golden Trajectory answers. Secure download restricted to buyer."
+            db.session.add_all([
+                Product(name="AETHER MULTILINGUAL QUALITY CHECK", price=999.0, filename="aether.pdf", description=desc),
+                Product(name="AETHER CODER SCREENING", price=999.0, filename="coder.pdf", description=desc),
+                Product(name="KOBRA CLIPS", price=999.0, filename="kobra.pdf", description=desc),
+                Product(name="GRAND PRIX", price=999.0, filename="gp.pdf", description=desc)
+            ])
         db.session.commit()
     except Exception as e: print(f"Init Error: {e}")
 
-# --- M-PESA LOGIC ---
+# --- M-PESA DARAJA PRODUCTION LOGIC ---
 DARAJA_ENV = os.environ.get('DARAJA_ENV', 'sandbox').lower()
 DARAJA_BASE_URL = "https://sandbox.safaricom.co.ke" if DARAJA_ENV == 'sandbox' else "https://api.safaricom.co.ke"
 
@@ -49,7 +55,7 @@ def stk_push():
     data = request.json
     product = Product.query.get(data.get('product_id'))
     token, err = get_daraja_token()
-    if not token: return jsonify({"error": "Auth Failed"}), 500
+    if not token: return jsonify({"error": f"Safaricom Rejected Keys: {err}"}), 500
     
     shortcode = os.environ.get('DARAJA_BUSINESS_SHORTCODE', '174379')
     passkey = os.environ.get('DARAJA_PASSKEY', 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919')
@@ -63,7 +69,7 @@ def stk_push():
         "TransactionType": "CustomerPayBillOnline", "Amount": 1 if DARAJA_ENV == 'sandbox' else int(product.price),
         "PartyA": phone, "PartyB": shortcode, "PhoneNumber": phone,
         "CallBackURL": request.host_url.replace("http", "https") + "daraja-callback",
-        "AccountReference": f"FW_{product.id}", "TransactionDesc": "Payment"
+        "AccountReference": f"FW_{product.id}", "TransactionDesc": "Feswide Module"
     }
     r = requests.post(f"{DARAJA_BASE_URL}/mpesa/stkpush/v1/processrequest", json=payload, headers={"Authorization": f"Bearer {token}"})
     res = r.json()
@@ -71,9 +77,9 @@ def stk_push():
         db.session.add(Transaction(checkout_request_id=res.get('CheckoutRequestID'), phone=phone, amount=product.price, product_id=product.id, ip_address=request.remote_addr))
         db.session.commit()
         return jsonify({"status": "success", "checkout_id": res.get('CheckoutRequestID')})
-    return jsonify({"error": "STK Failed"}), 400
+    return jsonify({"error": res.get('errorMessage', 'STK Trigger Failed')}), 400
 
-# --- BINANCE PAY LOGIC ---
+# --- BINANCE PAY USDT CALCULATION ---
 @app.route('/binance-pay', methods=['POST'])
 def binance_pay():
     data = request.json
@@ -81,11 +87,12 @@ def binance_pay():
     api_key, secret_key = os.environ.get('BINANCE_API_KEY', ''), os.environ.get('BINANCE_SECRET_KEY', '')
     
     merchant_trade_no = f"FW_{product.id}_{int(time.time())}"
-    usdt_amount = round(product.price / 130.0, 2) # Manual conversion
+    # DYNAMIC CALCULATION: KES to USDT (Rate: 130)
+    usdt_amount = round(product.price / 130.0, 2)
     
     payload = {
         "env": {"terminalType": "WEB"}, "merchantTradeNo": merchant_trade_no,
-        "orderAmount": usdt_amount, "currency": "USDT",
+        "orderAmount": float(usdt_amount), "currency": "USDT",
         "goods": {"goodsType": "02", "goodsCategory": "Z000", "referenceGoodsId": str(product.id), "goodsName": product.name[:30]}
     }
     
@@ -103,30 +110,9 @@ def binance_pay():
         db.session.add(Transaction(checkout_request_id=merchant_trade_no, payment_method='Binance', amount=product.price, product_id=product.id, ip_address=request.remote_addr))
         db.session.commit()
         return jsonify({"status": "success", "checkout_url": res['data']['checkoutUrl'], "checkout_id": merchant_trade_no})
-    return jsonify({"error": "Binance Failed"}), 400
+    return jsonify({"error": "Binance Order Failed"}), 400
 
-# --- UTILITY ROUTES ---
-@app.route('/check-payment/<checkout_id>')
-def check_payment(checkout_id):
-    txn = Transaction.query.filter_by(checkout_request_id=checkout_id).first()
-    if txn and txn.status == 'Paid': return jsonify({"status": "Paid", "download_token": txn.download_token})
-    return jsonify({"status": txn.status if txn else "Pending"})
-
-@app.route('/secure-download/<token>')
-def secure_download(token):
-    txn = Transaction.query.filter_by(download_token=token).first()
-    if not txn or txn.status != 'Paid' or txn.ip_address != request.remote_addr: abort(403)
-    product = Product.query.get(txn.product_id)
-    if supabase:
-        res = supabase.storage.from_('feswide-pdfs').create_signed_url(product.filename, 60)
-        return redirect(res['signedURL'])
-    return "Error", 500
-
-@app.route('/')
-def index():
-    config = {c.key: c.value for c in SiteConfig.query.all()}
-    return render_template('index.html', products=Product.query.all(), config=config)
-
+# --- ADMIN ROUTES ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -135,13 +121,29 @@ def login():
         if admin:
             session['role'], session['username'] = admin.role, admin.username
             return redirect(url_for('admin'))
+        return render_template('login.html', error="ACCESS DENIED.")
     return render_template('login.html')
 
 @app.route('/admin')
 def admin():
     if 'role' not in session: return redirect(url_for('login'))
-    config = {c.key: c.value for c in SiteConfig.query.all()}
-    return render_template('admin.html', uploads=UserUpload.query.all(), products=Product.query.all(), txns=Transaction.query.all(), role=session['role'], username=session['username'], config=config)
+    return render_template('admin.html', uploads=UserUpload.query.all(), products=Product.query.all(), txns=Transaction.query.order_by(Transaction.id.desc()).all(), role=session['role'], username=session['username'])
+
+@app.route('/admin/add-product', methods=['POST'])
+def add_product():
+    if session.get('role') != 'superadmin': abort(403)
+    file = request.files.get('file')
+    if file and file.filename.endswith('.pdf'):
+        fname = secure_filename(file.filename)
+        if supabase: supabase.storage.from_("feswide-pdfs").upload(fname, file.read())
+        db.session.add(Product(name=request.form.get('name'), price=float(request.form.get('price')), description=request.form.get('description'), filename=fname))
+        db.session.commit()
+    return redirect(url_for('admin'))
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
