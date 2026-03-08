@@ -3,12 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOGIN | FESWIDE SOCIETY</title>
+    <title>Terminal Access</title>
+    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
     <style>
         body {
-            background: #e0e0e0;
-            font-family: Arial, sans-serif;
+            font-family: 'Space Mono', monospace;
+            background: #050505;
+            color: #00ff00;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -16,87 +17,46 @@
             margin: 0;
         }
 
-        .login-box {
-            background: #FFFFFF;
-            border: 4px solid #003366;
+        .box {
+            border: 2px solid #00ff00;
             padding: 40px;
             text-align: center;
-            box-shadow: 10px 10px 0px #000000;
-            width: 100%;
-            max-width: 400px;
         }
 
-        h2 {
-            color: #800000;
-            margin-bottom: 25px;
-            font-weight: bold;
-            text-transform: uppercase;
-            border-bottom: 2px solid #ccc;
-            padding-bottom: 10px;
-        }
-
-        .form-control {
+        input {
+            display: block;
             width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 2px solid #000;
-            outline: none;
-            font-size: 14px;
+            margin: 10px 0;
+            padding: 10px;
+            background: black;
+            border: 1px solid #00ff00;
+            color: #00ff00;
             box-sizing: border-box;
-            font-weight: bold;
         }
 
-        .form-control:focus {
-            border-color: #003366;
-        }
-
-        .btn {
-            background: #003366;
-            color: #FFFFFF;
-            padding: 15px;
+        button {
             width: 100%;
-            border: 2px solid #000;
+            padding: 10px;
+            background: #00ff00;
+            color: black;
+            font-weight: bold;
+            border: none;
             cursor: pointer;
-            font-weight: bold;
-            font-size: 15px;
-            text-transform: uppercase;
-        }
-
-        .btn:hover {
-            background: #800000;
-        }
-
-        .error {
-            background: #fff3cd;
-            color: #856404;
-            padding: 15px;
-            border: 2px solid #856404;
-            margin-bottom: 20px;
-            font-size: 13px;
-            font-weight: bold;
-            text-transform: uppercase;
         }
     </style>
 </head>
 
-<body oncontextmenu="preventInspect(event)">
-    <div class="login-box">
-        <h2>SECURE TERMINAL</h2>
-        {% if error %}<div class="error">{{ error }}</div>{% endif %}
-        <form method="POST" action="/login">
-            <input type="text" name="username" class="form-control" placeholder="Operator ID" required>
-            <input type="password" name="password" class="form-control" placeholder="Passkey" required>
-            <button type="submit" class="btn">AUTHENTICATE</button>
+<body>
+    <div class="box">
+        <h2>FESWIDE SOCIETY</h2>
+        <p>SECURE TERMINAL LOGIN</p>
+        {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+        <form method="POST">
+            <input type="text" name="username" placeholder="Operator ID" required>
+            <input type="password" name="password" placeholder="Passkey" required>
+            <button type="submit">INITIALIZE SESSION</button>
         </form>
     </div>
-    <script>
-        function preventInspect(e) { e.preventDefault(); alert("Access Denied"); return false; }
-        document.addEventListener('keydown', function (e) {
-            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
-                e.preventDefault(); alert("Access Denied"); return false;
-            }
-        });
-    </script>
 </body>
 
 </html>

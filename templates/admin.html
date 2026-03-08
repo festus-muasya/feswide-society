@@ -3,237 +3,132 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADMIN TERMINAL | FESWIDE SOCIETY</title>
+    <title>Feswide Terminal</title>
+    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
     <style>
-        :root {
-            --navy: #003366;
-            --maroon: #800000;
-            --white: #FFFFFF;
-            --bg: #e0e0e0;
-            --black: #000000;
-        }
-
         body {
-            background: var(--bg);
-            font-family: Arial, sans-serif;
+            font-family: 'Space Mono', monospace;
+            background: #050505;
+            color: #00ff00;
             padding: 20px;
-            margin: 0;
-            color: var(--black);
-        }
-
-        .header {
-            background: var(--navy);
-            color: var(--white);
-            padding: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 4px solid var(--black);
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 20px;
-            text-transform: uppercase;
-        }
-
-        .btn {
-            padding: 10px 18px;
-            border: 2px solid var(--black);
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 13px;
-            text-decoration: none;
-            display: inline-block;
-            color: white;
-            text-transform: uppercase;
-        }
-
-        .btn-logout {
-            background: var(--maroon);
-        }
-
-        .btn-blue {
-            background: var(--navy);
-        }
-
-        .btn-red {
-            background: var(--maroon);
-        }
-
-        .btn-green {
-            background: #155724;
-        }
-
-        .panel {
-            background: var(--white);
-            padding: 30px;
-            border: 4px solid var(--black);
-            margin-bottom: 30px;
-            box-shadow: 8px 8px 0px var(--black);
-        }
-
-        .panel h2 {
-            color: var(--navy);
-            border-bottom: 3px solid var(--maroon);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-            font-size: 18px;
-            text-transform: uppercase;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
-            font-size: 13px;
+            margin-top: 15px;
+            border: 1px solid #00ff00;
         }
 
         th,
         td {
-            border: 2px solid var(--black);
-            padding: 12px;
+            border: 1px solid #00ff00;
+            padding: 8px;
             text-align: left;
         }
 
-        th {
-            background: var(--navy);
-            color: var(--white);
+        .panel {
+            border: 1px solid #00ff00;
+            padding: 20px;
+            margin-bottom: 20px;
         }
 
-        tr:nth-child(even) {
-            background: #f0f0f0;
-        }
-
-        .form-control {
-            padding: 10px;
-            border: 2px solid var(--black);
-            margin-bottom: 10px;
-            width: 100%;
-            font-family: inherit;
-            font-size: 13px;
-            outline: none;
+        button,
+        input {
+            background: black;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 5px;
         }
     </style>
 </head>
 
-<body oncontextmenu="return false;">
+<body>
+    <h2>FESWIDE SECURE TERMINAL [Logged in as: {{ username }} | Role: {{ role|upper }}]</h2>
+    <a href="/logout" style="color:red;">[TERMINATE SESSION]</a>
 
-    <div class="header">
-        <h1>FESWIDE ADMINISTRATIVE TERMINAL</h1>
-        <div>
-            <span style="margin-right: 25px; font-weight: bold; font-size: 14px;">OPERATOR: {{ username | upper }} |
-                LEVEL: {{ role | upper }}</span>
-            <a href="/logout" class="btn btn-logout">TERMINATE SESSION</a>
-        </div>
+    <div class="panel">
+        <h3>1. Pending Transactions (M-Pesa / Airtel)</h3>
+        <table>
+            <tr>
+                <th>TXN ID</th>
+                <th>Phone/Network</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            {% for t in txns %}
+            <tr>
+                <td>{{ t.checkout_request_id }}</td>
+                <td>{{ t.phone }}</td>
+                <td>{{ t.status }}</td>
+                <td>
+                    {% if t.status == 'Pending Manual' %}
+                    <button onclick="approveTxn({{ t.id }})">APPROVE PAYMENT</button>
+                    {% else %} - {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="panel">
+        <h3>2. Contributor Uploads</h3>
+        <table>
+            <tr>
+                <th>Project</th>
+                <th>Platform</th>
+                <th>File</th>
+            </tr>
+            {% for u in uploads %}
+            <tr>
+                <td>{{ u.project_name }}</td>
+                <td>{{ u.platform }}</td>
+                <td>{{ u.filename }}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
 
     {% if role == 'superadmin' %}
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-        <div class="panel">
-            <h2>EDIT SITE MESSAGES</h2>
-            <form action="/admin/update-config" method="POST">
-                <label style="font-size:12px; font-weight:bold;">Homepage Hero Text:</label>
-                <textarea name="hero_text" class="form-control" rows="3">{{ config.hero_text }}</textarea>
+    <div class="panel" style="border-color: yellow; color: yellow;">
+        <h3>SUPERADMIN CLEARANCE ONLY</h3>
+        <h4>A. Manage Staff</h4>
+        <form action="/admin/create-subadmin" method="POST">
+            <input name="username" placeholder="New Username" required>
+            <input name="password" type="password" placeholder="Passkey" required>
+            <button type="submit">CREATE SUB-ADMIN</button>
+        </form>
+        <table style="border-color: yellow;">
+            <tr>
+                <th>Staff Member</th>
+                <th>Role</th>
+                <th>Status</th>
+            </tr>
+            {% for a in admins %}
+            <tr>
+                <td>{{ a.username }}</td>
+                <td>{{ a.role }}</td>
+                <td>{{ 'Active' if a.is_active else 'Suspended' }}</td>
+            </tr>
+            {% endfor %}
+        </table>
 
-                <label style="font-size:12px; font-weight:bold;">Upload Notice Text:</label>
-                <textarea name="upload_notice" class="form-control" rows="2">{{ config.upload_notice }}</textarea>
-
-                <button type="submit" class="btn btn-blue">SAVE CHANGES</button>
-            </form>
-        </div>
-
-        <div class="panel">
-            <h2>SECURE DOWNLOAD TRACKING</h2>
-            <p style="font-size: 12px; font-weight: bold; margin-bottom: 10px;">Unique ID maps authorized buyers to
-                limit file sharing.</p>
-            <div style="max-height: 250px; overflow-y: auto;">
-                <table>
-                    <tr>
-                        <th>Buyer Phone</th>
-                        <th>Unique Request ID</th>
-                        <th>Status</th>
-                    </tr>
-                    {% for t in txns %}
-                    <tr>
-                        <td><strong>{{ t.phone }}</strong></td>
-                        <td style="font-size: 11px;">{{ t.checkout_request_id }}</td>
-                        <td
-                            style="color: {% if t.status == 'Paid' %}#155724{% else %}var(--maroon){% endif %}; font-weight:bold;">
-                            {{ t.status }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
+        <h4>B. Edit Site Config</h4>
+        <form action="/admin/update-config" method="POST">
+            <p>Hero Text:</p><input name="hero_text" value="{{ config.get('hero_text') }}" style="width:100%;">
+            <p>Notice:</p><input name="upload_notice" value="{{ config.get('upload_notice') }}" style="width:100%;">
+            <button type="submit" style="margin-top:10px;">UPDATE SITE</button>
+        </form>
     </div>
     {% endif %}
 
-    <div class="panel">
-        <h2>STORE INVENTORY CONTROL</h2>
-        {% if role == 'superadmin' %}
-        <div style="background: #e0e0e0; padding: 20px; border: 2px solid var(--black); margin-bottom: 25px;">
-            <form action="/admin/add-product" method="POST" enctype="multipart/form-data"
-                style="display: flex; gap: 10px; align-items: center;">
-                <input type="text" name="name" class="form-control" placeholder="Module Title" required
-                    style="margin-bottom:0;">
-                <input type="number" name="price" class="form-control" placeholder="Price" value="999" required
-                    style="width:100px; margin-bottom:0;">
-                <input type="file" name="file" class="form-control" accept=".pdf" required style="margin-bottom:0;">
-                <button type="submit" class="btn btn-blue">PUBLISH</button>
-            </form>
-        </div>
-        {% endif %}
-
-        <div style="overflow-x: auto;">
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Price</th>
-                    <th>Action</th>
-                </tr>
-                {% for p in products %}
-                <tr>
-                    <td><strong>{{ p.name }}</strong></td>
-                    <td>
-                        {% if role == 'superadmin' %}
-                        <form action="/admin/edit-product/{{ p.id }}" method="POST" style="display: flex; gap: 10px;">
-                            <input type="text" name="description" value="{{ p.description }}" class="form-control"
-                                style="margin-bottom:0; flex: 2;">
-                            <input type="number" name="price" value="{{ p.price }}" class="form-control"
-                                style="margin-bottom:0; width:80px;">
-                            <button type="submit" class="btn btn-green">SAVE</button>
-                        </form>
-                        {% else %}
-                        {{ p.description }}
-                        {% endif %}
-                    </td>
-                    <td>KES {{ p.price }}</td>
-                    <td>
-                        {% if role == 'superadmin' %}
-                        <button class="btn btn-red" onclick="deleteProd({{ p.id }})">DELETE</button>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-    </div>
-
     <script>
-        async function deleteProd(id) {
-            if (!confirm("Permanently delete this module?")) return;
-            const res = await fetch('/admin/delete-product/' + id, { method: 'POST' });
-            if (res.ok) location.reload();
-        }
-        document.addEventListener('keydown', function (e) {
-            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
-                e.preventDefault(); alert("Access Denied"); return false;
+        async function approveTxn(id) {
+            if (confirm("Verify manual Airtel payment?")) {
+                await fetch('/admin/approve-manual/' + id, { method: 'POST' });
+                location.reload();
             }
-        });
+        }
     </script>
 </body>
 
