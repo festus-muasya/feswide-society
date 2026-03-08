@@ -59,20 +59,20 @@ function showPaymentModal(productId, productName) {
     document.getElementById('mTitle').innerText = productName;
     document.getElementById('mBody').innerHTML = `
         <label style="font-weight:bold; font-size:14px;">Select Network Provider:</label>
-        <select id="networkSelect" onchange="handleNetworkChange()">
+        <select id="networkSelect" onchange="handleNetworkChange()" style="width: 100%; padding: 12px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc;">
             <option value="safaricom">Safaricom (M-Pesa)</option>
             <option value="airtel">Airtel Money</option>
         </select>
         
         <div id="safaricom-flow">
-            <input type="text" id="mInput" placeholder="Safaricom Number (07XXXXXXXX)">
+            <input type="text" id="mInput" placeholder="Safaricom Number (07XXXXXXXX)" style="width: 100%; padding: 12px; border: 1px solid #ccc; box-sizing: border-box;">
         </div>
         
         <div id="airtel-flow" style="display: none; background: #f8f9fa; padding: 15px; border: 1px solid #ccc; font-size: 13px;">
             <p style="color: #8b0000; font-weight: bold; margin-top:0;">STK Push is unsupported for Airtel.</p>
             <p>1. Go to Airtel Money -> Send Money -> To M-Pesa.</p>
-            <p>2. Till: <b>Enter Feswide Till</b></p>
-            <input type="text" id="aInput" placeholder="Enter Airtel Transaction ID" style="margin-top:10px;">
+            <p>2. Till: <b>Use Feswide Till</b></p>
+            <input type="text" id="aInput" placeholder="Enter Airtel Transaction ID" style="width: 100%; padding: 12px; margin-top:10px; border: 1px solid #ccc; box-sizing: border-box;">
         </div>
     `;
 

@@ -6,77 +6,19 @@
     <title>Feswide Terminal</title>
     <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: #f1f1f1;
-            color: #000;
-            padding: 20px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 3px solid #002b5e;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            background: white;
-            border: 1px solid #ccc;
-        }
-
-        th,
-        td {
-            border: 1px solid #ccc;
-            padding: 12px;
-            text-align: left;
-        }
-
-        th {
-            background: #002b5e;
-            color: white;
-        }
-
-        .panel {
-            background: white;
-            border: 1px solid #ccc;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        button,
-        input {
-            padding: 10px;
-            border: 1px solid #ccc;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        button {
-            background: #002b5e;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
-<body>
-    <div class="header">
+<body style="padding: 20px;">
+    <div
+        style="display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #002b5e; padding-bottom: 10px; margin-bottom: 20px;">
         <h2>FESWIDE SECURE TERMINAL [Logged in as: {{ username }} | Role: {{ role|upper }}]</h2>
         <a href="/logout" style="color:#8b0000; font-weight:bold; text-decoration:none;">[TERMINATE SESSION]</a>
     </div>
 
-    <div class="panel">
+    <div class="admin-panel">
         <h3>1. Pending Transactions (M-Pesa / Airtel)</h3>
-        <table>
+        <table class="admin-table">
             <tr>
                 <th>TXN ID</th>
                 <th>Phone/Network</th>
@@ -89,11 +31,11 @@
                 <td>{{ t.checkout_request_id }}</td>
                 <td>{{ t.phone }}</td>
                 <td>{{ t.product_id }}</td>
-                <td style="font-weight:bold; color:{% if t.status == 'Paid' %}green{% else %}red{% endif %};">{{
-                    t.status }}</td>
+                <td class="{% if t.status == 'Paid' %}text-green{% else %}text-red{% endif %}">{{ t.status }}</td>
                 <td>
                     {% if t.status == 'Pending Manual' %}
-                    <button onclick="approveTxn({{ t.id }})" style="background:#155724;">APPROVE PAYMENT</button>
+                    <button class="admin-btn" onclick="approveTxn('{{ t.id }}')" style="background:#155724;">APPROVE
+                        PAYMENT</button>
                     {% else %} - {% endif %}
                 </td>
             </tr>
@@ -101,9 +43,9 @@
         </table>
     </div>
 
-    <div class="panel">
+    <div class="admin-panel">
         <h3>2. Contributor Uploads</h3>
-        <table>
+        <table class="admin-table">
             <tr>
                 <th>Project</th>
                 <th>Platform</th>
@@ -120,36 +62,36 @@
     </div>
 
     {% if role == 'superadmin' %}
-    <div class="panel" style="border-left: 5px solid #8b0000;">
+    <div class="admin-panel" style="border-left: 5px solid #8b0000;">
         <h3 style="color: #8b0000;">SUPERADMIN CLEARANCE ONLY</h3>
 
         <h4>A. Add New Feswide Module</h4>
         <form action="/admin/add-product" method="POST" enctype="multipart/form-data">
             <input type="text" name="name" placeholder="Module Title" required
-                style="width:100%; margin-bottom:10px; box-sizing:border-box;">
+                style="width:100%; margin-bottom:10px; padding:10px; box-sizing:border-box;">
             <input type="text" name="description" placeholder="Description" required
-                style="width:100%; margin-bottom:10px; box-sizing:border-box;">
+                style="width:100%; margin-bottom:10px; padding:10px; box-sizing:border-box;">
             <input type="number" name="price" placeholder="Price (KES)" required
-                style="width:100%; margin-bottom:10px; box-sizing:border-box;">
+                style="width:100%; margin-bottom:10px; padding:10px; box-sizing:border-box;">
             <input type="file" name="file" accept=".pdf" required
-                style="width:100%; margin-bottom:10px; box-sizing:border-box;">
-            <button type="submit">UPLOAD TO STORE</button>
+                style="width:100%; margin-bottom:10px; padding:10px; box-sizing:border-box;">
+            <button type="submit" class="admin-btn">UPLOAD TO STORE</button>
         </form>
 
         <h4 style="margin-top:30px;">B. Manage Staff Accounts</h4>
         <form action="/admin/create-subadmin" method="POST">
-            <input name="username" placeholder="New Username" required>
-            <input name="password" type="password" placeholder="Passkey" required>
-            <button type="submit">CREATE SUB-ADMIN</button>
+            <input name="username" placeholder="New Username" required style="padding:10px;">
+            <input name="password" type="password" placeholder="Passkey" required style="padding:10px;">
+            <button type="submit" class="admin-btn">CREATE SUB-ADMIN</button>
         </form>
 
         <h4 style="margin-top:30px;">C. Edit Site Configuration</h4>
         <form action="/admin/update-config" method="POST">
             <p>Hero Text:</p><input name="hero_text" value="{{ config.get('hero_text') }}"
-                style="width:100%; box-sizing:border-box;">
+                style="width:100%; padding:10px; box-sizing:border-box;">
             <p>Upload Notice:</p><input name="upload_notice" value="{{ config.get('upload_notice') }}"
-                style="width:100%; box-sizing:border-box;">
-            <button type="submit" style="margin-top:10px;">UPDATE SITE TEXT</button>
+                style="width:100%; padding:10px; box-sizing:border-box;">
+            <button type="submit" class="admin-btn" style="margin-top:10px;">UPDATE SITE TEXT</button>
         </form>
     </div>
     {% endif %}
