@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FESWIDE SOCIETY // ADMIN TERMINAL</title>
+    <style>
+        body {
+            background: #c0c0c0;
+            font-family: "Courier New", Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-box {
+            background: #ffffff;
+            border: 4px solid #002b5c;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 10px 10px 0px #000000;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            color: #6b0000;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #002b5c;
+            padding-bottom: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #000000;
+            outline: none;
+            font-family: inherit;
+            font-weight: bold;
+        }
+
+        button {
+            background: #002b5c;
+            color: #ffffff;
+            padding: 15px;
+            width: 100%;
+            border: 2px solid #000000;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #6b0000;
+        }
+    </style>
+</head>
+
+<body oncontextmenu="return false;">
+    <div class="login-box">
+        <h2>SECURE TERMINAL ACCESS</h2>
+        <form method="POST" action="/login">
+            <input type="text" name="username" placeholder="OPERATOR ID" required>
+            <input type="password" name="password" placeholder="PASSKEY" required>
+            <button type="submit">AUTHENTICATE</button>
+        </form>
+        <p style="font-size: 11px; margin-top: 20px; font-weight: bold;">UNAUTHORIZED ACCESS IS STRICTLY PROHIBITED.</p>
+    </div>
+</body>
+
+</html>
