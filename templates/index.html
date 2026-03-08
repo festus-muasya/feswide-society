@@ -8,7 +8,6 @@
     <style>
         :root {
             --navy: #0a192f;
-            --maroon: #800000;
             --orange: #ff9800;
             --milky: #fdfcf0;
             --green: #2e7d32;
@@ -16,7 +15,7 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Times New Roman', serif;
             background: var(--milky);
             margin: 0;
             user-select: none;
@@ -24,12 +23,12 @@
 
         .header {
             background: var(--navy);
-            color: var(--white);
+            color: #fff;
             padding: 15px 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 5px solid var(--maroon);
+            border-bottom: 5px solid #800000;
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -53,7 +52,7 @@
         }
 
         .broadcast-box {
-            background: var(--white);
+            background: #fff;
             border: 2px solid #000;
             padding: 15px;
             margin-bottom: 25px;
@@ -65,7 +64,6 @@
             display: flex;
             border-bottom: 2px solid #000;
             margin-bottom: 30px;
-            overflow-x: auto;
         }
 
         .tab {
@@ -73,7 +71,6 @@
             cursor: pointer;
             font-weight: bold;
             color: #555;
-            white-space: nowrap;
         }
 
         .tab.active {
@@ -88,7 +85,7 @@
         }
 
         .card {
-            background: var(--white);
+            background: #fff;
             border: 2px solid #000;
             padding: 25px;
             box-shadow: 6px 6px 0 #000;
@@ -103,13 +100,12 @@
 
         .purchase-btn {
             background: var(--navy);
-            color: var(--white);
+            color: #fff;
             border: none;
             padding: 15px;
             width: 100%;
             font-weight: bold;
             cursor: pointer;
-            text-transform: uppercase;
         }
 
         #payment-modal {
@@ -126,36 +122,12 @@
         }
 
         .mpesa-card {
-            background: var(--white);
+            background: #fff;
             padding: 40px;
             border-radius: 12px;
-            width: 350px;
+            width: 320px;
             text-align: center;
             border-bottom: 10px solid #4caf50;
-        }
-
-        .john-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--maroon);
-            color: var(--white);
-            padding: 15px 25px;
-            border-radius: 50px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 1000;
-        }
-
-        .john-window {
-            display: none;
-            position: fixed;
-            bottom: 85px;
-            right: 20px;
-            width: 320px;
-            background: var(--white);
-            border: 2px solid #000;
-            z-index: 1000;
         }
 
         .hidden {
@@ -166,110 +138,94 @@
 
 <body oncontextmenu="return false;">
     <div class="header">
-        <h1 style="margin:0; font-size: 20px;">FESWIDE SOCIETY</h1>
-        <button class="opp-btn" onclick="openModal('opp')">Opportunities</button>
+        <h1>FESWIDE SOCIETY</h1>
+        <button class="opp-btn"
+            onclick="switchTab('hiring', document.querySelector('.tab:nth-child(2)'))">OPPORTUNITIES</button>
     </div>
-
     <div class="container">
         {% if config_text %}<div class="broadcast-box">{{ config_text }}</div>{% endif %}
-
         <div class="tab-nav">
             <div class="tab active" onclick="switchTab('modules', this)">Repository</div>
             <div class="tab" onclick="switchTab('hiring', this)">Hiring Board</div>
             <div class="tab" onclick="switchTab('taskers', this)">Tasker Directory</div>
         </div>
-
         <div id="section-modules" class="tab-content">
             <div class="grid">
                 {% for p in products %}
                 <div class="card">
                     <h3 style="text-transform:uppercase; margin-top:0;">{{ p.name }}</h3>
-                    <p style="font-size: 14px; color: #555;">{{ p.description }}</p>
+                    <p style="font-size:14px; color:#555;">{{ p.description }}</p>
                     <div class="price">KES {{ p.price }}</div>
                     <button class="purchase-btn" onclick="openPayment('{{ p.id }}')">Purchase</button>
                 </div>
                 {% endfor %}
             </div>
         </div>
-
+        <div id="section-hiring" class="tab-content hidden">
+            <div class="card" style="margin-bottom:25px; border-left: 10px solid var(--maroon);">
+                <h3>Post a Task Request</h3>
+                <form action="/post-opportunity" method="POST">
+                    <input type="hidden" name="type" value="Hiring">
+                    <select name="platform">
+                        <option>Outlier AI</option>
+                        <option>Handshake AI</option>
+                    </select>
+                    <input name="rate" placeholder="Commission % or Salary" required>
+                    <input name="whatsapp" placeholder="WhatsApp Number" required>
+                    <textarea name="desc" placeholder="Details..."></textarea>
+                    <button class="opp-btn" style="width:100%">Post Publicly</button>
+                </form>
+            </div>
+            <div class="grid">
+                {% for h in hiring %}<div class="card"><b>{{ h.platform }}</b>
+                    <p>{{ h.description }}</p>
+                    <p>Rate: {{ h.rate }}</p><a href="https://wa.me/{{ h.whatsapp }}"
+                        style="color:var(--green); font-weight:bold;">WhatsApp →</a>
+                </div>{% endfor %}
+            </div>
+        </div>
     </div>
-
     <div id="payment-modal">
         <div class="mpesa-card">
             <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" width="120"
                 style="margin-bottom:20px;">
             <h3>Lipa na M-Pesa</h3>
-            <input type="text" id="phone" placeholder="07XXXXXXXX" required>
+            <input type="text" id="phone" placeholder="07XXXXXXXX"
+                style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc;">
             <button onclick="triggerPayment()"
-                style="background:#4caf50; color:white; padding:15px; width:100%; border:none; font-weight:bold; cursor:pointer;">PROCEED
+                style="background:#4caf50; color:#fff; padding:15px; width:100%; border:none; font-weight:bold; cursor:pointer;">PROCEED
                 TO PAY</button>
             <button onclick="document.getElementById('payment-modal').style.display='none'"
-                style="background:none; border:none; margin-top:15px; cursor:pointer; font-size:12px;">CANCEL</button>
+                style="background:none; border:none; margin-top:10px; cursor:pointer; font-size:12px;">Cancel</button>
         </div>
     </div>
-
-    <div class="john-toggle" onclick="toggleJohn()">CHAT WITH JOHN</div>
-    <div class="john-window" id="johnWin">
-        <div
-            style="background:var(--navy); color:white; padding:12px; font-weight:bold; display:flex; justify-content:space-between;">
-            <span>John Assistant</span><span onclick="toggleJohn()" style="cursor:pointer">✖</span></div>
-        <div id="chatBody" style="height:250px; padding:15px; overflow-y:auto; background:#fafafa; font-size:14px;">
-        </div>
+    <div class="john-toggle" onclick="toggleJohn()"
+        style="position:fixed; bottom:20px; right:20px; background:#800000; color:#fff; padding:15px; border-radius:50px; cursor:pointer;">
+        John Assistant</div>
+    <div class="john-window" id="johnWin"
+        style="display:none; position:fixed; bottom:85px; right:20px; width:300px; background:#fff; border:2px solid #000; z-index:1000;">
+        <div style="background:var(--navy); color:#fff; padding:10px;">John Assistant</div>
+        <div id="chatBody" style="height:200px; padding:10px; overflow-y:auto; font-size:13px;"></div>
         <div id="chatInputArea" style="display:flex; border-top:1px solid #000;">
-            <input type="text" id="chatIn" placeholder="Type here..."
-                style="flex:1; border:none; padding:12px; outline:none;">
+            <input type="text" id="chatIn" placeholder="Type..." style="flex:1; border:none; padding:10px;">
             <button onclick="sendChat()"
-                style="background:var(--navy); color:white; border:none; padding:0 15px; cursor:pointer;">SEND</button>
+                style="background:var(--navy); color:#fff; border:none; padding:10px;">Send</button>
         </div>
         <div id="chatControls" class="hidden" style="display:flex; border-top:1px solid #000;">
             <button onclick="sendChat('yes')"
-                style="flex:1; padding:10px; background:var(--green); color:white; border:none;">YES</button>
+                style="flex:1; padding:10px; background:var(--green); color:#fff; border:none;">YES</button>
             <button onclick="sendChat('no')"
-                style="flex:1; padding:10px; background:var(--maroon); color:white; border:none;">NO</button>
+                style="flex:1; padding:10px; background:#800000; color:#fff; border:none;">NO</button>
         </div>
     </div>
-
     <script>
         let currentProdId = null;
         let johnState = { awaiting_wa: false, error_context: "", confirm_end: false };
-
-        function switchTab(t, btn) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            document.getElementById('section-' + t).classList.remove('hidden');
-            document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
-
-        function openModal(id) { document.getElementById('modal-' + id).style.display = 'flex'; }
+        function switchTab(t, btn) { document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden')); document.getElementById('section-' + t).classList.remove('hidden'); document.querySelectorAll('.tab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
         function openPayment(id) { currentProdId = id; document.getElementById('payment-modal').style.display = 'flex'; }
         function toggleJohn() { let w = document.getElementById('johnWin'); w.style.display = w.style.display === 'block' ? 'none' : 'block'; }
-
-        async function triggerPayment() {
-            try {
-                let res = await fetch('/stk-push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: currentProdId, phone: document.getElementById('phone').value }) });
-                let data = await res.json();
-                if (data.error) alert(data.error);
-                else alert("Prompt sent.");
-            } catch { alert("API under maintenance"); }
-        }
-
-        async function sendChat(choice = null) {
-            let input = document.getElementById('chatIn');
-            let body = document.getElementById('chatBody');
-            let val = choice ? choice : input.value;
-            if (!val) return;
-            body.innerHTML += `<div style="text-align:right; margin:10px 0;"><b>You:</b> ${val}</div>`;
-            input.value = "";
-            let res = await fetch('/api/john', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: val, ...johnState }) });
-            let data = await res.json();
-            if (data.ask_wa) johnState.awaiting_wa = true;
-            if (data.ask_desc) johnState.error_context = val;
-            if (data.ask_end) { johnState.confirm_end = true; document.getElementById('chatInputArea').classList.add('hidden'); document.getElementById('chatControls').classList.remove('hidden'); }
-            if (data.close) { toggleJohn(); return; }
-            body.innerHTML += `<div style="color:var(--navy); margin:10px 0;"><b>John:</b> ${data.reply}</div>`;
-            body.scrollTop = body.scrollHeight;
-        }
-
+        async function triggerPayment() { try { let res = await fetch('/stk-push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: currentProdId, phone: document.getElementById('phone').value }) }); let data = await res.json(); if (data.error) alert(data.error); else alert("Prompt sent."); } catch { alert("API under maintenance"); } }
+        async function sendChat(choice = null) { let input = document.getElementById('chatIn'); let body = document.getElementById('chatBody'); let val = choice ? choice : input.value; if (!val) return; body.innerHTML += `<div><b>You:</b> ${val}</div>`; input.value = ""; let res = await fetch('/api/john', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: val, ...johnState }) }); let data = await res.json(); if (data.ask_wa) johnState.awaiting_wa = true; if (data.ask_desc) johnState.error_context = val; if (data.ask_end) { johnState.confirm_end = true; document.getElementById('chatInputArea').classList.add('hidden'); document.getElementById('chatControls').classList.remove('hidden'); } if (data.close) { toggleJohn(); return; } body.innerHTML += `<div><b>John:</b> ${data.reply}</div>`; body.scrollTop = body.scrollHeight; }
         document.onkeydown = function (e) { if (event.keyCode == 123 || (e.ctrlKey && e.keyCode == 85)) return false; };
     </script>
 </body>

@@ -66,16 +66,15 @@
         <h2>FESWIDE TERMINAL [{{ role|upper }}]</h2>
         <a href="/logout" style="color:#ff9b9b; text-decoration:none; font-weight:bold;">[LOGOUT]</a>
     </div>
-
     <div class="panel" style="border-left: 8px solid var(--maroon); margin-top:20px;">
-        <h3>Broadcast Storefront Update</h3>
+        <h3>Broadcast Alert</h3>
         <form action="/admin/update-config" method="POST" style="display:flex; gap:10px;">
             <input name="hero_text" value="{{ config_text }}" style="flex:1; padding:10px; border:1px solid #ccc;">
             <button type="submit"
-                style="background:var(--maroon); color:#fff; border:none; padding:10px 20px; cursor:pointer;">Broadcast</button>
+                style="background:var(--maroon); color:#fff; border:none; padding:10px 20px; cursor:pointer;">Update
+                Store</button>
         </form>
     </div>
-
     <div class="panel">
         <h3>Marketplace Moderator (Delete Posts)</h3>
         <table>

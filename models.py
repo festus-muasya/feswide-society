@@ -48,7 +48,7 @@ class SiteConfig(db.Model):
 
 class Opportunity(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String(20))
+    type = db.Column(db.String(20)) # 'Hiring' or 'Tasker'
     platform = db.Column(db.String(50))
     rate = db.Column(db.String(100))
     whatsapp = db.Column(db.String(50))
