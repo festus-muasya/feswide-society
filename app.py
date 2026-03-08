@@ -9,13 +9,14 @@ app = Flask(__name__)
 
 # --- CONFIG & DATABASE ---
 database_url = os.environ.get('DATABASE_URL', 'sqlite:////tmp/feswide.db')
-if database_url.startswith("postgres://"): database_url = database_url.replace("postgres://", "postgresql://", 1)
+if database_url.startswith("postgres://"): 
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fesfast_wide_networks')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'feswide_global_2026')
 db.init_app(app)
 
-# --- SUPABASE STORAGE ---
+# --- SUPABASE STORAGE CONFIG ---
 sb_url = os.environ.get("SUPABASE_URL", "")
 sb_key = os.environ.get("SUPABASE_KEY", "")
 supabase: Client = create_client(sb_url, sb_key) if sb_url and sb_key else None
@@ -46,39 +47,45 @@ def get_daraja_token():
 
 @app.route('/stk-push', methods=['POST'])
 def stk_push():
-    data = request.json
-    phone, product_id = data.get('phone'), data.get('product_id')
-    product = Product.query.get(product_id)
-    token, err = get_daraja_token()
-    if not token: return jsonify({"error": f"Safaricom Auth Failed: {err}"}), 500
-
-    shortcode = os.environ.get('DARAJA_BUSINESS_SHORTCODE', '174379').strip()
-    passkey = os.environ.get('DARAJA_PASSKEY', 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919').strip()
-    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-    password = base64.b64encode((shortcode + passkey + timestamp).encode()).decode('utf-8')
-
-    if phone.startswith('0'): phone = '254' + phone[1:]
-    
-    cb_url = request.host_url.rstrip('/') + "/daraja-callback"
-    cb_url = cb_url.replace("http://", "https://") if "localhost" not in cb_url else cb_url
-
-    payload = {
-        "BusinessShortCode": shortcode, "Password": password, "Timestamp": timestamp,
-        "TransactionType": "CustomerPayBillOnline", "Amount": 1, 
-        "PartyA": phone, "PartyB": shortcode, "PhoneNumber": phone,
-        "CallBackURL": cb_url, "AccountReference": f"FW_{product.id}", "TransactionDesc": "Feswide Module"
-    }
-
     try:
+        data = request.json
+        phone, product_id = data.get('phone'), data.get('product_id')
+        product = Product.query.get(product_id)
+        
+        token, err = get_daraja_token()
+        if not token: 
+            return jsonify({"error": f"Safaricom Auth Failed: {err}"}), 500
+
+        shortcode = os.environ.get('DARAJA_BUSINESS_SHORTCODE', '174379').strip()
+        passkey = os.environ.get('DARAJA_PASSKEY', 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919').strip()
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        password = base64.b64encode((shortcode + passkey + timestamp).encode()).decode('utf-8')
+
+        if phone.startswith('0'): 
+            phone = '254' + phone[1:]
+        
+        cb_url = request.host_url.rstrip('/') + "/daraja-callback"
+        cb_url = cb_url.replace("http://", "https://") if "localhost" not in cb_url else cb_url
+
+        payload = {
+            "BusinessShortCode": shortcode, "Password": password, "Timestamp": timestamp,
+            "TransactionType": "CustomerPayBillOnline", "Amount": 1, 
+            "PartyA": phone, "PartyB": shortcode, "PhoneNumber": phone,
+            "CallBackURL": cb_url, "AccountReference": f"FW_{product.id}", "TransactionDesc": "Feswide Module"
+        }
+
         r = requests.post("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", json=payload, headers={"Authorization": f"Bearer {token}"}, timeout=15)
         res = r.json()
+        
         if res.get('ResponseCode') == '0':
-            # LOG IP ADDRESS FOR SECURITY
+            # LOG IP ADDRESS FOR SECURITY/ANTI-SCAM
             db.session.add(Transaction(checkout_request_id=res.get('CheckoutRequestID'), phone=phone, amount=1, product_id=product.id, ip_address=request.remote_addr))
             db.session.commit()
             return jsonify({"status": "success", "checkout_id": res.get('CheckoutRequestID')})
+            
         return jsonify({"error": res.get('errorMessage', 'Failed to trigger STK')}), 400
-    except Exception as e: return jsonify({"error": str(e)}), 500
+    except Exception as e: 
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/verify-manual', methods=['POST'])
 def verify_manual():
@@ -101,18 +108,21 @@ def daraja_callback():
 @app.route('/check-payment/<checkout_id>')
 def check_payment(checkout_id):
     txn = Transaction.query.filter_by(checkout_request_id=checkout_id).first()
-    if txn and txn.status == 'Paid': return jsonify({"status": "Paid", "download_token": txn.download_token})
+    if txn and txn.status == 'Paid': 
+        return jsonify({"status": "Paid", "download_token": txn.download_token})
     return jsonify({"status": txn.status if txn else "Pending"})
 
 @app.route('/secure-download/<token>')
 def secure_download(token):
     txn = Transaction.query.filter_by(download_token=token).first()
-    if not txn or txn.status != 'Paid': abort(403)
+    if not txn or txn.status != 'Paid': 
+        abort(403)
     
     # ANTI-SCAM IP LOCK
     if txn.ip_address and txn.ip_address != request.remote_addr:
         return "SECURITY BREACH DETECTED: IP Address mismatch. Link invalidated.", 403
-    if txn.download_count >= 3: return "ACCESS DENIED: Download limit reached.", 403
+    if txn.download_count >= 3: 
+        return "ACCESS DENIED: Download limit reached.", 403
     
     product = Product.query.get(txn.product_id)
     txn.download_count += 1
@@ -142,7 +152,7 @@ def upload_answer():
             db.session.commit()
             return jsonify({"status": "success", "message": "Uploaded securely to Supabase."})
         return jsonify({"status": "error", "message": "Supabase not configured."}), 500
-    return jsonify({"status": "error", "message": "Invalid file."}), 400
+    return jsonify({"status": "error", "message": "Invalid file. PDFs only."}), 400
 
 @app.route('/api/chat', methods=['POST'])
 def faith_chat():
