@@ -15,14 +15,44 @@ class UserUpload(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     platform = db.Column(db.String(50))
     project_name = db.Column(db.String(100))
-    payment_id = db.Column(db.String(100)) # M-Pesa or Binance UID
+    payment_id = db.Column(db.String(100))
     filename = db.Column(db.String(255))
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+class AdminUser(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(20), default='subadmin')
+    is_active = db.Column(db.Boolean, default=True)
+
+class ActivityLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    operator = db.Column(db.String(50), nullable=False)
+    action = db.Column(db.String(255), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Transaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    checkout_request_id = db.Column(db.String(100), unique=True, nullable=False)
+    phone = db.Column(db.String(50), nullable=True)
+    amount = db.Column(db.Float, nullable=False)
+    product_id = db.Column(db.Integer, nullable=False)
+    payment_method = db.Column(db.String(20), default='M-Pesa')
+    status = db.Column(db.String(50), default='Pending')
+    download_token = db.Column(db.String(100), default=lambda: str(uuid.uuid4()), unique=True)
+    ip_address = db.Column(db.String(50), nullable=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+class SiteConfig(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(50), unique=True, nullable=False)
+    value = db.Column(db.Text, nullable=False)
+
 class Opportunity(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String(20)) # 'Hiring' or 'Tasker'
-    platform = db.Column(db.String(50)) # 'Outlier' or 'Handshake'
+    type = db.Column(db.String(20)) # Hiring / Tasker
+    platform = db.Column(db.String(50)) # Outlier / Handshake
     rate = db.Column(db.String(100))
     whatsapp = db.Column(db.String(50))
     description = db.Column(db.Text)
@@ -32,19 +62,4 @@ class ChatTicket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     whatsapp = db.Column(db.String(50))
     error_desc = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
-class AdminUser(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True)
-    password = db.Column(db.String(255))
-    role = db.Column(db.String(20))
-
-class Transaction(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    checkout_request_id = db.Column(db.String(100), unique=True)
-    amount = db.Column(db.Float)
-    payment_method = db.Column(db.String(20))
-    status = db.Column(db.String(50), default='Pending')
-    download_token = db.Column(db.String(100), default=lambda: str(uuid.uuid4()))
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
