@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Terminal Access</title>
-    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Space Mono', monospace;
-            background: #050505;
-            color: #00ff00;
+            font-family: 'Roboto', sans-serif;
+            background: #e0e0e0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -18,46 +18,51 @@
         }
 
         .box {
-            border: 2px solid #00ff00;
+            background: white;
+            border-top: 5px solid #002b5e;
             padding: 40px;
             text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
         }
 
         input {
             display: block;
             width: 100%;
-            margin: 10px 0;
-            padding: 10px;
-            background: black;
-            border: 1px solid #00ff00;
-            color: #00ff00;
+            margin: 15px 0;
+            padding: 12px;
+            border: 1px solid #ccc;
             box-sizing: border-box;
-            font-family: 'Space Mono', monospace;
+            font-family: 'Roboto', sans-serif;
         }
 
         button {
             width: 100%;
-            padding: 10px;
-            background: #00ff00;
-            color: black;
+            padding: 12px;
+            background: #002b5e;
+            color: white;
             font-weight: bold;
             border: none;
             cursor: pointer;
-            font-family: 'Space Mono', monospace;
-            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            color: #002b5e;
+            margin-top: 0;
         }
     </style>
 </head>
 
 <body>
     <div class="box">
-        <h2>FESWIDE SOCIETY</h2>
-        <p>SECURE TERMINAL LOGIN</p>
-        {% if error %}<p style="color:red; font-weight:bold;">{{ error }}</p>{% endif %}
+        <h2>FESWIDE TERMINAL</h2>
+        <p style="color: #666;">AUTHORIZED ACCESS ONLY</p>
+        {% if error %}<p style="color:#8b0000; font-weight:bold;">{{ error }}</p>{% endif %}
         <form method="POST">
             <input type="text" name="username" placeholder="Operator ID" required>
             <input type="password" name="password" placeholder="Passkey" required>
-            <button type="submit">INITIALIZE SESSION</button>
+            <button type="submit">LOGIN</button>
         </form>
     </div>
 </body>

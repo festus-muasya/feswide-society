@@ -27,21 +27,32 @@ def log_action(operator, action):
         db.session.add(ActivityLog(operator=operator, action=action))
         db.session.commit()
     except Exception as e:
-        print(f"Log Error: {e}")
+        pass
 
-# ANTI-CRASH BOOT SEQUENCE
+# ANTI-CRASH BOOT SEQUENCE & INVENTORY SEEDING
 with app.app_context():
     try:
         db.create_all()
         if not AdminUser.query.first():
             db.session.add(AdminUser(username='superadmin', password='FeswideMaster2026!', role='superadmin'))
         if not SiteConfig.query.filter_by(key='hero_text').first():
-            db.session.add(SiteConfig(key='hero_text', value="Feswide Society Index. Secure OPSEC Modules."))
+            db.session.add(SiteConfig(key='hero_text', value="Welcome to the Feswide Society Index. All available AI training modules are rigorously verified by our Quality Assurance team."))
+            db.session.add(SiteConfig(key='upload_notice', value="Requirement: Submit your completed PDF for review."))
+        
+        # RESTORING YOUR DEFAULT INVENTORY SO IT IS NEVER EMPTY
+        if not Product.query.first():
+            desc = "Verified Feswide Golden Trajectory answers. Secure download restricted to buyer."
+            db.session.add_all([
+                Product(name="AETHER MULTILINGUAL QUALITY CHECK", price=999.0, filename="aether.pdf", description=desc),
+                Product(name="AETHER CODER SCREENING", price=999.0, filename="coder.pdf", description=desc),
+                Product(name="KOBRA CLIPS", price=999.0, filename="kobra.pdf", description=desc),
+                Product(name="GRAND PRIX", price=999.0, filename="gp.pdf", description=desc)
+            ])
         db.session.commit()
     except Exception as e:
         print(f"CRITICAL DATABASE ERROR ON BOOT: {e}")
 
-# --- LIVE M-PESA DARAJA INTEGRATION ---
+# --- LIVE M-PESA DARAJA INTEGRATION (PRODUCTION ONLY) ---
 def get_daraja_token():
     key = os.environ.get('DARAJA_CONSUMER_KEY', '').strip()
     secret = os.environ.get('DARAJA_CONSUMER_SECRET', '').strip()
@@ -62,13 +73,13 @@ def stk_push():
         
         token, err = get_daraja_token()
         if not token: 
-            return jsonify({"error": f"Safaricom Gateway Rejected Auth: Ensure live keys are in Vercel."}), 500
+            return jsonify({"error": f"Gateway Auth Rejected. Check live keys in Vercel."}), 500
 
         shortcode = os.environ.get('DARAJA_BUSINESS_SHORTCODE', '').strip()
         passkey = os.environ.get('DARAJA_PASSKEY', '').strip()
         
         if not shortcode or not passkey:
-            return jsonify({"error": "Missing Paybill/Till Shortcode in Vercel."}), 500
+            return jsonify({"error": "Missing Paybill/Till Shortcode or Passkey in Vercel env."}), 500
 
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         password = base64.b64encode((shortcode + passkey + timestamp).encode()).decode('utf-8')
@@ -83,7 +94,7 @@ def stk_push():
             "Password": password, 
             "Timestamp": timestamp,
             "TransactionType": "CustomerPayBillOnline", 
-            "Amount": int(product.price), # REAL PRICE IN PRODUCTION
+            "Amount": int(product.price), 
             "PartyA": phone, 
             "PartyB": shortcode, 
             "PhoneNumber": phone,
@@ -108,7 +119,8 @@ def stk_push():
 def verify_manual():
     try:
         data = request.json
-        db.session.add(Transaction(checkout_request_id=data.get('txn_id'), phone="AIRTEL", amount=999, product_id=data.get('product_id'), status='Pending Manual', ip_address=request.remote_addr))
+        product = Product.query.get(data.get('product_id'))
+        db.session.add(Transaction(checkout_request_id=data.get('txn_id'), phone="AIRTEL", amount=product.price, product_id=product.id, status='Pending Manual', ip_address=request.remote_addr))
         db.session.commit()
         return jsonify({"status": "success"})
     except Exception as e:
@@ -164,7 +176,6 @@ def index():
         config = {c.key: c.value for c in SiteConfig.query.all()}
         products = Product.query.all()
     except Exception as e:
-        print(f"DB READ ERROR ON HOMEPAGE: {e}")
         config = {'hero_text': 'DATABASE OFFLINE. CHECK LOGS.', 'upload_notice': ''}
         products = []
     return render_template('index.html', products=products, config=config)
@@ -184,6 +195,10 @@ def upload_answer():
             return jsonify({"status": "success", "message": "Uploaded securely to Feswide Supabase."})
         return jsonify({"status": "error", "message": "Supabase File Storage not configured."}), 500
     return jsonify({"status": "error", "message": "Invalid file. PDFs only."}), 400
+
+@app.route('/api/chat', methods=['POST'])
+def faith_chat():
+    return jsonify({"reply": "I am Agent Faith. Contact support@feswide.com for secure handling."})
 
 # --- ADMIN ROUTES ---
 @app.route('/login', methods=['GET', 'POST'])
@@ -226,6 +241,21 @@ def approve_manual(id):
         log_action(session['username'], f"Manually approved Airtel TXN: {txn.checkout_request_id}")
     except Exception: pass
     return jsonify({"success": True})
+
+@app.route('/admin/add-product', methods=['POST'])
+def add_product():
+    if session.get('role') != 'superadmin': abort(403)
+    try:
+        file = request.files.get('file')
+        if file and file.filename.endswith('.pdf'):
+            fname = secure_filename(file.filename)
+            if supabase:
+                supabase.storage.from_("feswide-pdfs").upload(fname, file.read())
+            db.session.add(Product(name=request.form.get('name'), price=float(request.form.get('price')), description=request.form.get('description'), filename=fname))
+            db.session.commit()
+            log_action(session['username'], f"Added product: {request.form.get('name')}")
+    except Exception as e: print(f"Product Add Error: {e}")
+    return redirect(url_for('admin'))
 
 @app.route('/admin/update-config', methods=['POST'])
 def update_config():

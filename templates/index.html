@@ -4,70 +4,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feswide Society | Secure Index</title>
-    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
+    <title>FESWIDE SOCIETY</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --navy: #0a192f;
-            --maroon: #800000;
-            --white: #f1f1f1;
-            --black: #050505;
+            --navy: #002b5e;
+            --maroon: #8b0000;
+            --light-grey: #e0e0e0;
+            --black: #000000;
+            --white: #ffffff;
         }
 
         body {
-            font-family: 'Space Mono', monospace;
-            background-color: var(--white);
-            color: var(--black);
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--light-grey);
             margin: 0;
-            padding: 20px;
+            padding: 0;
         }
 
+        /* HEADER */
+        .header {
+            background-color: var(--navy);
+            color: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            border-bottom: 5px solid var(--maroon);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: 2px;
+        }
+
+        /* NAVIGATION */
         .nav {
             display: flex;
             gap: 15px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--black);
-            padding-bottom: 10px;
         }
 
         .nav button {
-            background: none;
-            border: 2px solid var(--black);
+            background: var(--light-grey);
+            color: var(--navy);
+            border: 1px solid var(--black);
             padding: 10px 20px;
             font-weight: bold;
             cursor: pointer;
+            text-transform: uppercase;
         }
 
         .nav button.active {
-            background: var(--navy);
+            background: var(--maroon);
             color: var(--white);
+            border: 1px solid var(--white);
         }
 
+        /* MAIN CONTENT */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .hero-banner {
+            background: var(--white);
+            border: 2px solid var(--black);
+            border-left: 10px solid var(--navy);
+            padding: 20px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--black);
+            margin-bottom: 20px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        /* PRODUCT GRID */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 20px;
         }
 
         .card {
+            background: var(--white);
             border: 2px solid var(--black);
             padding: 20px;
-            background: white;
-            box-shadow: 4px 4px 0 var(--black);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        .btn {
+        .card-title {
+            color: var(--navy);
+            font-size: 18px;
+            text-transform: uppercase;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .price {
+            font-size: 24px;
+            color: var(--maroon);
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .btn-purchase {
+            background: var(--navy);
+            color: var(--white);
+            border: none;
+            padding: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            width: 100%;
+        }
+
+        /* UPLOAD SECTION */
+        .upload-section {
+            background: var(--white);
+            border: 2px solid var(--black);
+            padding: 30px;
+            max-width: 600px;
+        }
+
+        .upload-section input,
+        .upload-section select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        /* CHATBOT BUTTON */
+        .support-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
             background: var(--maroon);
             color: var(--white);
-            border: 2px solid var(--black);
-            padding: 10px;
-            cursor: pointer;
-            width: 100%;
+            padding: 15px 25px;
             font-weight: bold;
-            margin-top: 10px;
-            text-transform: uppercase;
+            border: 2px solid var(--black);
+            cursor: pointer;
+            z-index: 1000;
         }
 
+        /* CHAT WINDOW */
+        .chat-window {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 300px;
+            background: var(--white);
+            border: 2px solid var(--black);
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .chat-header {
+            background: var(--navy);
+            color: var(--white);
+            padding: 10px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chat-body {
+            height: 250px;
+            padding: 10px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+
+        .chat-input {
+            display: flex;
+            border-top: 1px solid #ccc;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+        }
+
+        .chat-input button {
+            background: var(--maroon);
+            color: white;
+            border: none;
+            padding: 0 15px;
+            cursor: pointer;
+        }
+
+        /* MODAL */
         #global-modal {
             display: none;
             position: fixed;
@@ -78,25 +225,23 @@
             background: rgba(0, 0, 0, 0.8);
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 1001;
         }
 
         .modal-content {
             background: var(--white);
             padding: 30px;
-            border: 4px solid var(--black);
+            border: 4px solid var(--navy);
             width: 400px;
-            box-shadow: 8px 8px 0 var(--maroon);
         }
 
-        input,
-        select {
-            box-sizing: border-box;
+        .modal-content select,
+        .modal-content input {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 2px solid var(--black);
-            font-family: 'Space Mono', monospace;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
         }
 
         .hidden {
@@ -106,68 +251,86 @@
 </head>
 
 <body>
-    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
-        <img src="{{ url_for('static', filename='logo.png') }}" style="height: 40px;" alt="Logo"
-            onerror="this.style.display='none'">
-        <h1 style="margin: 0;">FESWIDE SOCIETY</h1>
-    </div>
-
-    <div class="nav">
-        <button id="b-store" class="active" onclick="switchTab('store')">MODULE STORE</button>
-        <button id="b-dash" onclick="switchTab('dash')">CONTRIBUTOR HUB</button>
-    </div>
-
-    <div id="store">
-        <h3 style="border-left: 4px solid var(--navy); padding-left: 10px;">{{ config.get('hero_text') }}</h3>
-
-        <div class="grid">
-            {% if products %}
-            {% for p in products %}
-            <div class="card">
-                <h3 style="margin-top:0; border-bottom: 1px dashed var(--black); padding-bottom: 10px;">{{ p.name }}
-                </h3>
-                <p>{{ p.description }}</p>
-                <p style="font-weight:bold; color:var(--maroon); font-size: 1.2rem;">KES {{ p.price }}</p>
-                <button class="btn" onclick="showPaymentModal({{ p.id }}, '{{ p.name }}')">PURCHASE SECURE
-                    DOWNLOAD</button>
-            </div>
-            {% endfor %}
-            {% else %}
-            <div class="card" style="grid-column: 1 / -1; text-align: center;">
-                <h3>INVENTORY EMPTY</h3>
-                <p>Modules will appear here once added via the Superadmin Terminal.</p>
-            </div>
-            {% endif %}
+    <div class="header">
+        <h1>FESWIDE SOCIETY</h1>
+        <div class="nav">
+            <button id="b-store" class="active" onclick="switchTab('store')">KNOWLEDGE REPOSITORY</button>
+            <button id="b-dash" onclick="switchTab('dash')">CONTRIBUTOR HUB</button>
         </div>
     </div>
 
-    <div id="dash" class="hidden">
-        <h2 style="border-left: 4px solid var(--navy); padding-left: 10px;">Upload Completed Rubric</h2>
-        <p>{{ config.get('upload_notice') }}</p>
+    <div class="container">
+        <div id="store">
+            <div class="hero-banner">{{ config.get('hero_text') }}</div>
 
-        <div class="card" style="max-width: 500px;">
-            <select id="pform">
-                <option value="Outlier">Outlier</option>
-                <option value="Handshake">Handshake</option>
-            </select>
-            <input type="text" id="pname" placeholder="Target Project Name">
-            <input type="text" id="pmpesa" placeholder="Receiving M-Pesa Number (e.g., 07XXXXXXXX)">
-            <input type="file" id="pfile" accept=".pdf">
-            <button class="btn" style="background:var(--navy);" onclick="submitUpload()">SUBMIT FOR REVIEW</button>
+            <input type="text" class="search-bar" id="sInput" placeholder="Search for verified modules..."
+                onkeyup="searchModules()">
+
+            <div class="grid" id="productGrid">
+                {% if products %}
+                {% for p in products %}
+                <div class="card">
+                    <div>
+                        <h3 class="card-title">{{ p.name }}</h3>
+                        <p>{{ p.description }}</p>
+                    </div>
+                    <div>
+                        <div class="price">KES {{ p.price }}</div>
+                        <button class="btn-purchase" onclick="showPaymentModal({{ p.id }}, '{{ p.name }}')">PURCHASE
+                            DOWNLOAD</button>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p style="text-align:center; grid-column: 1 / -1; font-weight:bold;">Loading Database...</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="dash" class="hidden">
+            <div class="upload-section">
+                <h2 style="color: var(--navy); margin-top:0;">Upload Completed Rubric</h2>
+                <p style="margin-bottom: 20px;">{{ config.get('upload_notice') }}</p>
+                <select id="pform">
+                    <option value="Outlier">Outlier AI</option>
+                    <option value="Handshake">Handshake AI</option>
+                </select>
+                <input type="text" id="pname" placeholder="Target Project Name">
+                <input type="text" id="pmpesa" placeholder="M-Pesa Number for Payout">
+                <input type="file" id="pfile" accept=".pdf">
+                <button class="btn-purchase" onclick="submitUpload()">SUBMIT FOR REVIEW</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="support-btn" onclick="toggleChat()">SUPPORT ASSISTANT</button>
+
+    <div class="chat-window" id="chatbot">
+        <div class="chat-header">
+            <span>Agent Faith</span>
+            <span style="cursor:pointer;" onclick="toggleChat()">✖</span>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <p style="color:var(--navy); font-weight:bold;">Agent Faith: How can I assist you with your purchase today?
+            </p>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="cIn" placeholder="Type here..." onkeypress="if(event.key === 'Enter') sendChatMsg()">
+            <button onclick="sendChatMsg()">Send</button>
         </div>
     </div>
 
     <div id="global-modal">
         <div class="modal-content">
-            <h2 id="mTitle" style="margin-top:0; border-bottom: 2px solid var(--black); padding-bottom: 10px;"></h2>
+            <h2 id="mTitle" style="color:var(--navy); margin-top:0;"></h2>
             <div id="mBody" style="margin: 20px 0;"></div>
-            <button id="mConfirm" class="btn" style="background:var(--navy);"></button>
-            <button class="btn" onclick="closeModal()"
-                style="background:transparent; color:var(--black); margin-top:10px;">CANCEL</button>
+            <button id="mConfirm" class="btn-purchase"></button>
+            <button onclick="closeModal()"
+                style="width:100%; background:transparent; border:none; margin-top:15px; cursor:pointer; font-weight:bold;">CANCEL</button>
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 
 </html>

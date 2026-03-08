@@ -1,13 +1,64 @@
 let pollInterval;
 let currentProductId = null;
-let currentProductName = null;
 
+// --- SEARCH FUNCTIONALITY ---
+function searchModules() {
+    let input = document.getElementById('sInput').value.toLowerCase();
+    let cards = document.getElementsByClassName('card');
+
+    for (let i = 0; i < cards.length; i++) {
+        let title = cards[i].querySelector('.card-title').innerText.toLowerCase();
+        if (title.includes(input)) {
+            cards[i].style.display = "flex";
+        } else {
+            cards[i].style.display = "none";
+        }
+    }
+}
+
+// --- TAB SWITCHING ---
+function switchTab(view) {
+    document.getElementById('store').style.display = view === 'store' ? 'block' : 'none';
+    document.getElementById('dash').style.display = view === 'dash' ? 'block' : 'none';
+    document.getElementById('b-store').className = view === 'store' ? 'active' : '';
+    document.getElementById('b-dash').className = view === 'dash' ? 'active' : '';
+}
+
+// --- CHATBOT FUNCTIONALITY ---
+function toggleChat() {
+    let c = document.getElementById('chatbot');
+    c.style.display = (c.style.display === 'block') ? 'none' : 'block';
+}
+
+async function sendChatMsg() {
+    let input = document.getElementById('cIn');
+    let body = document.getElementById('chatBody');
+    if (!input.value) return;
+
+    let text = input.value;
+    body.innerHTML += `<p style="text-align:right; background:#e0e0e0; padding:8px; border-radius:5px;">${text}</p>`;
+    input.value = '';
+    body.scrollTop = body.scrollHeight;
+
+    try {
+        let res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: text }) });
+        let data = await res.json();
+        setTimeout(() => {
+            body.innerHTML += `<p style="color:#002b5e; font-weight:bold;">Agent Faith: ${data.reply}</p>`;
+            body.scrollTop = body.scrollHeight;
+        }, 800);
+    } catch (e) {
+        body.innerHTML += `<p style="color:red;">Network Error.</p>`;
+    }
+}
+
+// --- PAYMENT MODAL LOGIC ---
 function showPaymentModal(productId, productName) {
     currentProductId = productId;
-    currentProductName = productName;
 
-    document.getElementById('mTitle').innerText = `PURCHASE: ${productName}`;
+    document.getElementById('mTitle').innerText = productName;
     document.getElementById('mBody').innerHTML = `
+        <label style="font-weight:bold; font-size:14px;">Select Network Provider:</label>
         <select id="networkSelect" onchange="handleNetworkChange()">
             <option value="safaricom">Safaricom (M-Pesa)</option>
             <option value="airtel">Airtel Money</option>
@@ -18,10 +69,10 @@ function showPaymentModal(productId, productName) {
         </div>
         
         <div id="airtel-flow" style="display: none; background: #f8f9fa; padding: 15px; border: 1px solid #ccc; font-size: 13px;">
-            <p style="color: darkred; font-weight: bold;">STK Push unsupported for Airtel.</p>
+            <p style="color: #8b0000; font-weight: bold; margin-top:0;">STK Push is unsupported for Airtel.</p>
             <p>1. Go to Airtel Money -> Send Money -> To M-Pesa.</p>
-            <p>2. Till: <b>Enter your Till here</b> | Amount: <b>Listed Price</b></p>
-            <input type="text" id="aInput" placeholder="Airtel Transaction ID" style="margin-top:10px;">
+            <p>2. Till: <b>Enter Feswide Till</b></p>
+            <input type="text" id="aInput" placeholder="Enter Airtel Transaction ID" style="margin-top:10px;">
         </div>
     `;
 
@@ -59,7 +110,7 @@ function processPaymentRoute() {
 
 async function triggerSTKPush(phone) {
     document.getElementById('mConfirm').style.display = 'none';
-    document.getElementById('mBody').innerHTML = `<p style="font-weight:bold; color: #0a192f;">TRIGGERING SECURE STK PUSH...</p>`;
+    document.getElementById('mBody').innerHTML = `<p style="font-weight:bold; color: #002b5e;">TRIGGERING SECURE STK PUSH...</p>`;
 
     try {
         let res = await fetch('/stk-push', {
@@ -73,10 +124,10 @@ async function triggerSTKPush(phone) {
             document.getElementById('mBody').innerHTML += '<p>Awaiting PIN confirmation on your device...</p>';
             pollPayment(data.checkout_id);
         } else {
-            document.getElementById('mBody').innerHTML = `<p style="color: darkred; font-weight: bold;">ERROR: ${data.error}</p>`;
+            document.getElementById('mBody').innerHTML = `<p style="color: #8b0000; font-weight: bold;">ERROR: ${data.error}</p>`;
         }
     } catch (e) {
-        document.getElementById('mBody').innerHTML = `<p style="color: darkred;">Network Error resolving gateway.</p>`;
+        document.getElementById('mBody').innerHTML = `<p style="color: #8b0000;">Network Error connecting to Safaricom.</p>`;
     }
 }
 
@@ -90,9 +141,9 @@ async function verifyManualPayment(txnId) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ txn_id: txnId, product_id: currentProductId })
         });
-        document.getElementById('mBody').innerHTML = `<p style="font-weight:bold; color: #0a192f;">VERIFICATION LOGGED.</p><p>A Feswide sub-admin will review and approve your transaction shortly.</p>`;
+        document.getElementById('mBody').innerHTML = `<p style="font-weight:bold; color: #002b5e;">VERIFICATION LOGGED.</p><p>A Feswide sub-admin will review and approve your transaction shortly.</p>`;
     } catch (e) {
-        document.getElementById('mBody').innerHTML = `<p style="color: darkred;">Failed to send verification.</p>`;
+        document.getElementById('mBody').innerHTML = `<p style="color: #8b0000;">Failed to send verification.</p>`;
     }
 }
 
@@ -105,23 +156,17 @@ function pollPayment(checkoutId) {
             clearInterval(pollInterval);
             document.getElementById('mTitle').innerText = 'PAYMENT SUCCESSFUL';
             document.getElementById('mBody').innerHTML = `
-                <a href="/secure-download/${data.download_token}" target="_blank" style="background: #155724; color: white; padding: 12px; text-decoration: none; border: 2px solid black; display: block; font-weight: bold; text-align: center;">DOWNLOAD SECURE PDF</a>
-                <p style="font-size: 11px; margin-top: 15px; color: darkred; font-weight: bold; text-align: center;">OPSEC WARNING: This link is mathematically bound to your current IP address.</p>
+                <a href="/secure-download/${data.download_token}" target="_blank" style="background: #155724; color: white; padding: 15px; text-decoration: none; display: block; font-weight: bold; text-align: center; font-size: 16px;">DOWNLOAD SECURE PDF</a>
+                <p style="font-size: 12px; margin-top: 15px; color: #8b0000; font-weight: bold; text-align: center;">SECURITY NOTICE: This link is mathematically bound to your current IP address.</p>
             `;
         } else if (data.status === 'Failed') {
             clearInterval(pollInterval);
-            document.getElementById('mBody').innerHTML = `<p style="color: darkred; font-weight: bold;">Transaction Failed or Cancelled.</p>`;
+            document.getElementById('mBody').innerHTML = `<p style="color: #8b0000; font-weight: bold;">Transaction Failed or Cancelled.</p>`;
         }
     }, 4000);
 }
 
-function switchTab(view) {
-    document.getElementById('store').style.display = view === 'store' ? 'block' : 'none';
-    document.getElementById('dash').style.display = view === 'dash' ? 'block' : 'none';
-    document.getElementById('b-store').className = view === 'store' ? 'active' : '';
-    document.getElementById('b-dash').className = view === 'dash' ? 'active' : '';
-}
-
+// --- UPLOAD LOGIC ---
 async function submitUpload() {
     let fileInput = document.getElementById('pfile');
     if (!fileInput.files[0]) return alert("Please select a PDF file.");
@@ -132,7 +177,9 @@ async function submitUpload() {
     fd.append('project_name', document.getElementById('pname').value);
     fd.append('mpesa_number', document.getElementById('pmpesa').value);
 
-    document.querySelector('#dash .btn').innerText = "UPLOADING...";
+    let btn = document.querySelector('.upload-section button');
+    let originalText = btn.innerText;
+    btn.innerText = "UPLOADING...";
 
     try {
         let res = await fetch('/upload-answer', { method: 'POST', body: fd });
@@ -141,14 +188,16 @@ async function submitUpload() {
     } catch (e) {
         alert("Upload failed. Check your network.");
     } finally {
-        document.querySelector('#dash .btn').innerText = "SUBMIT FOR REVIEW";
+        btn.innerText = originalText;
     }
 }
 
-// Anti-inspection
+// --- ANTI-INSPECTION OPSEC ---
 document.addEventListener('contextmenu', event => event.preventDefault());
 document.addEventListener('keydown', function (e) {
     if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && (e.keyCode == 85 || e.keyCode == 83))) {
-        e.preventDefault(); alert("Feswide OPSEC: Inspection Disabled."); return false;
+        e.preventDefault();
+        alert("Feswide Society: Inspection Disabled.");
+        return false;
     }
 });
