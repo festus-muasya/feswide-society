@@ -5,21 +5,345 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Feswide Society: The ultimate repository for Outlier answers and Handshake AI answers.">
-    <title>FESWIDE SOCIETY // Official Repository</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        content="Feswide Society: The premium repository for Outlier and Handshake AI verified answers.">
+    <title>FESWIDE SOCIETY | Official Repository</title>
+    <style>
+        :root {
+            --navy: #0A2540;
+            --maroon: #8A1538;
+            --brown: #7A5C4A;
+            --grey: #F6F9FC;
+            --white: #FFFFFF;
+            --text: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: var(--grey);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        header {
+            background: var(--navy);
+            padding: 25px 20px;
+            text-align: center;
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .nav-btns {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btns button {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 2px solid transparent;
+            padding: 12px 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .nav-btns button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-btns button.active {
+            background: var(--maroon);
+            border-color: var(--maroon);
+        }
+
+        /* ADVANCED MODAL */
+        #global-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 5000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-card {
+            background: var(--white);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 20px;
+            background: var(--navy);
+            color: var(--white);
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .modal-body {
+            padding: 30px 20px;
+            font-size: 15px;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .info-panel {
+            background: var(--white);
+            border-left: 6px solid var(--navy);
+            padding: 25px;
+            margin-bottom: 30px;
+            font-size: 15px;
+            line-height: 1.6;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-top: 6px solid var(--navy);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            color: var(--navy);
+            font-size: 20px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+            min-height: 45px;
+            line-height: 1.5;
+        }
+
+        .price {
+            font-size: 28px;
+            color: var(--maroon);
+            font-weight: bold;
+            margin: 20px 0;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .btn-action {
+            background: var(--navy);
+            color: var(--white);
+            padding: 15px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn-action:hover {
+            background: var(--maroon);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fdfdfd;
+            font-size: 15px;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--navy);
+        }
+
+        .notice {
+            background: #F0F7FF;
+            border: 1px solid #CCE3FD;
+            color: #0056B3;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        /* CHATBOT */
+        #chatbot {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 340px;
+            max-width: 90vw;
+            background: var(--white);
+            border-radius: 12px;
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .chat-head {
+            background: var(--navy);
+            color: var(--white);
+            padding: 18px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-body {
+            height: 280px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-bubble {
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 85%;
+            line-height: 1.5;
+        }
+
+        .chat-bot {
+            background: var(--white);
+            color: var(--text);
+            border: 1px solid #eee;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-user {
+            background: var(--navy);
+            color: var(--white);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            border-top: 1px solid #eee;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            outline: none;
+        }
+
+        .chat-input-area button {
+            background: var(--navy);
+            color: var(--white);
+            border: none;
+            padding: 0 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #chat-trigger {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--maroon);
+            color: var(--white);
+            padding: 16px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            z-index: 1001;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(138, 21, 56, 0.4);
+            border: none;
+        }
+
+        footer {
+            background: var(--navy);
+            color: var(--white);
+            padding: 50px 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .footer-links a {
+            color: #a8c7fa;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+    </style>
 </head>
 
 <body oncontextmenu="return false;">
 
-    <div id="global-modal" class="modal-overlay">
+    <div id="global-modal">
         <div class="modal-card">
-            <div class="modal-header" id="modal-header">
-                <span id="modal-title">SYSTEM NOTICE</span>
-            </div>
-            <div class="modal-body" id="modal-message">
-                Processing request...
-            </div>
+            <div class="modal-header" id="mTitle">SYSTEM NOTIFICATION</div>
+            <div class="modal-body" id="mBody"></div>
             <div class="modal-footer">
                 <button class="btn-action" style="width: auto; padding: 10px 30px;"
                     onclick="closeModal()">ACKNOWLEDGE</button>
@@ -39,12 +363,13 @@
 
     <div class="container" id="store">
         <div class="info-panel">
-            <strong>SYSTEM STATUS: ONLINE // SECURE CONNECTION ESTABLISHED</strong><br><br>
-            Welcome to the Feswide Society index. All available AI training modules (Handshake AI & Outlier AI) are
-            rigorously verified by our Quality Assurance team.
+            <strong>Welcome to the Feswide Society Index</strong><br><br>
+            All available AI training modules for Handshake AI and Outlier AI are rigorously verified by our Quality
+            Assurance team. Purchasing a module grants immediate access to the accurate trajectory documents required
+            for task passing.
         </div>
 
-        <input type="text" class="form-control" id="sInput" placeholder="SEARCH DATABASE FOR SPECIFIC MODULES..."
+        <input type="text" class="form-control" id="sInput" placeholder="Search database for specific modules..."
             onkeyup="searchModules()">
 
         <div class="grid">
@@ -56,8 +381,8 @@
                 </div>
                 <div>
                     <p class="price">KES {{ p.price }}</p>
-                    <button class="btn-action"
-                        onclick="showModal('info', 'SECURE REDIRECT INITIATED', 'YOU ARE BEING ROUTED TO THE SECURE M-PESA PAYMENT GATEWAY. DO NOT CLOSE THIS WINDOW.')">PURCHASE
+                    <button type="button" class="btn-action"
+                        onclick="showModal('SECURE REDIRECT INITIATED', 'You are being routed to the secure M-Pesa payment gateway. Please follow the prompt on your device.')">PURCHASE
                         ACCESS</button>
                 </div>
             </div>
@@ -68,63 +393,151 @@
     <div class="container" id="dash" style="display:none;">
         <div class="grid">
             <div class="card" style="border-top-color: var(--navy);">
-                <h2
-                    style="color: var(--navy); border-bottom: 4px solid var(--maroon); padding-bottom: 10px; margin-bottom: 20px;">
-                    UPLOAD PORTAL</h2>
-                <div class="notice">REQUIREMENT: Submit your completed Outlier or Handshake PDF for review. Approved
-                    submissions generate a KES 500/= payout to the provided M-Pesa number.</div>
+                <h2 style="color: var(--navy); margin-bottom: 20px;">UPLOAD PORTAL</h2>
+                <div class="notice">Requirement: Submit your completed Outlier or Handshake PDF for review. Approved
+                    submissions generate a KES 500 payout to the provided M-Pesa number.</div>
 
                 <select id="pform" class="form-control">
-                    <option value="Handshake AI">HANDSHAKE AI</option>
-                    <option value="Outlier AI">OUTLIER AI</option>
+                    <option value="Handshake AI">Handshake AI</option>
+                    <option value="Outlier AI">Outlier AI</option>
                 </select>
-                <input type="text" id="pname" class="form-control" placeholder="EXACT PROJECT NAME">
-                <input type="text" id="pmpesa" class="form-control" placeholder="M-PESA PAYOUT NUMBER (e.g. 2547...)">
-                <input type="file" id="pfile" accept=".pdf" class="form-control">
+                <input type="text" id="pname" class="form-control" placeholder="Exact Project Name">
+                <input type="text" id="pmpesa" class="form-control" placeholder="M-Pesa Payout Number">
+                <input type="file" id="pfile" accept=".pdf" class="form-control"
+                    style="background: white; padding: 12px;">
 
-                <button class="btn-action" onclick="submitUpload()">SUBMIT PDF FOR REVIEW</button>
+                <button type="button" class="btn-action" onclick="submitUpload()">SUBMIT DOCUMENT</button>
             </div>
 
             <div class="card" style="border-top-color: var(--brown);">
-                <h2
-                    style="color: var(--brown); border-bottom: 4px solid var(--navy); padding-bottom: 10px; margin-bottom: 20px;">
-                    VOTE BOX // CRACK REQUEST</h2>
-                <p style="font-size: 13px; color: #444; margin-bottom: 20px; line-height: 1.5;">Cannot locate your
-                    assigned project? Submit a crack request. Our operations team prioritizes high-demand projects.</p>
+                <h2 style="color: var(--brown); margin-bottom: 20px;">REQUEST BOX</h2>
+                <p style="font-size: 14px; color: #555; margin-bottom: 25px; line-height: 1.6;">Cannot locate your
+                    assigned project? Submit a request here. Our engineering team prioritizes high-demand projects,
+                    typically releasing solutions within 48 hours.</p>
 
-                <input type="text" id="vname" class="form-control" placeholder="TARGET PROJECT NAME">
-                <button class="btn-action" style="background: var(--brown);" onclick="submitVote()">LOG REQUEST</button>
+                <input type="text" id="vname" class="form-control" placeholder="Target Project Name">
+                <button type="button" class="btn-action" style="background: var(--brown);" onclick="submitVote()">SUBMIT
+                    REQUEST</button>
             </div>
         </div>
     </div>
 
-    <div id="chat-trigger" onclick="toggleChat()">AGENT FAITH</div>
+    <button id="chat-trigger" onclick="toggleChat()">SUPPORT ASSISTANT</button>
     <div id="chatbot">
         <div class="chat-head">
-            <span>SUPPORT TERMINAL</span>
-            <span onclick="toggleChat()" style="cursor:pointer;">[CLOSE]</span>
+            <span>AGENT FAITH</span>
+            <span onclick="toggleChat()" style="cursor:pointer; font-size: 18px;">&times;</span>
         </div>
         <div class="chat-body" id="chatBody">
-            <div
-                style="background: var(--navy); color: var(--white); padding: 10px; border: 1px solid var(--border); width: 85%;">
-                <b>FAITH:</b> Welcome. I am Agent Faith. How may I assist you today?
+            <div class="chat-bubble chat-bot">Welcome. I am Agent Faith. How may I assist you with the database today?
             </div>
         </div>
         <div class="chat-input-area">
-            <input type="text" id="cIn" placeholder="Enter query...">
+            <input type="text" id="cIn" placeholder="Type your message...">
             <button onclick="sendChatMsg()">SEND</button>
         </div>
     </div>
 
     <footer>
         <div class="footer-links">
-            <a href="mailto:support@feswide.com">SUPPORT EMAIL</a> | <a href="#">TELEGRAM SECURE CHANNEL</a>
+            <a href="mailto:support@feswide.com">SUPPORT EMAIL</a>
+            <a href="#">TWITTER</a>
+            <a href="#">SECURE TELEGRAM</a>
         </div>
-        <p style="font-size: 11px; margin-top: 25px;">&copy; 2026 FESWIDE SOCIETY // UNAUTHORIZED DUPLICATION PROHIBITED
-        </p>
+        <p style="font-size: 12px; margin-top: 30px; color: #888;">&copy; 2026 FESWIDE SOCIETY | UNAUTHORIZED
+            DUPLICATION PROHIBITED</p>
     </footer>
 
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        function showModal(title, body) {
+            document.getElementById('mTitle').innerText = title;
+            document.getElementById('mBody').innerText = body;
+            document.getElementById('global-modal').style.display = 'flex';
+        }
+        function closeModal() { document.getElementById('global-modal').style.display = 'none'; }
+
+        function switchTab(view) {
+            document.getElementById('store').style.display = view === 'store' ? 'block' : 'none';
+            document.getElementById('dash').style.display = view === 'dash' ? 'block' : 'none';
+            document.getElementById('b-store').className = view === 'store' ? 'active' : '';
+            document.getElementById('b-dash').className = view === 'dash' ? 'active' : '';
+        }
+
+        function searchModules() {
+            let q = document.getElementById('sInput').value.toLowerCase();
+            let cards = document.querySelectorAll('#store .card');
+            cards.forEach(c => {
+                let t = c.querySelector('.card-title').innerText.toLowerCase();
+                c.style.display = t.includes(q) ? 'flex' : 'none';
+            });
+        }
+
+        async function submitUpload() {
+            let file = document.getElementById('pfile').files[0];
+            let pname = document.getElementById('pname').value;
+            let pmpesa = document.getElementById('pmpesa').value;
+
+            if (!file || !pname || !pmpesa) { showModal('VALIDATION ERROR', 'All fields and a PDF document are required.'); return; }
+
+            let fd = new FormData();
+            fd.append('file', file);
+            fd.append('platform', document.getElementById('pform').value);
+            fd.append('project_name', pname);
+            fd.append('mpesa_number', pmpesa);
+
+            try {
+                let res = await fetch('/upload-answer', { method: 'POST', body: fd });
+                let d = await res.json();
+                showModal(d.status === 'success' ? 'SUCCESS' : 'ERROR', d.message);
+                if (d.status === 'success') {
+                    document.getElementById('pname').value = '';
+                    document.getElementById('pfile').value = '';
+                }
+            } catch (e) { showModal('SYSTEM ERROR', 'Connection failed. Please try again.'); }
+        }
+
+        async function submitVote() {
+            let n = document.getElementById('vname').value;
+            if (!n) { showModal('VALIDATION ERROR', 'Please enter a target project name.'); return; }
+            await fetch('/request-project', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ project_name: n, platform: 'REQUEST' }) });
+            showModal('REQUEST LOGGED', 'Feswide Society engineers will process this module in less than 48 hours.');
+            document.getElementById('vname').value = '';
+        }
+
+        function toggleChat() {
+            let c = document.getElementById('chatbot');
+            c.style.display = c.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        async function sendChatMsg() {
+            let i = document.getElementById('cIn');
+            let b = document.getElementById('chatBody');
+            if (!i.value) return;
+
+            let query = i.value;
+            b.innerHTML += `<div class="chat-bubble chat-user">${query}</div>`;
+            i.value = '';
+            b.scrollTop = b.scrollHeight;
+
+            try {
+                let res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: query }) });
+                let d = await res.json();
+                setTimeout(() => {
+                    b.innerHTML += `<div class="chat-bubble chat-bot">${d.reply}</div>`;
+                    b.scrollTop = b.scrollHeight;
+                }, 600);
+            } catch (e) {
+                setTimeout(() => {
+                    b.innerHTML += `<div class="chat-bubble chat-bot" style="color:red;">Connection Error.</div>`;
+                    b.scrollTop = b.scrollHeight;
+                }, 600);
+            }
+        }
+
+        document.onkeydown = function (e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) return false;
+        };
+    </script>
 </body>
 
 </html>

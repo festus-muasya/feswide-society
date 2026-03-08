@@ -3,41 +3,93 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>FESWIDE SOCIETY // LOGIN</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOGIN | FESWIDE SOCIETY</title>
     <style>
         body {
+            background: #F6F9FC;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
         }
 
-        .login-card {
-            background: var(--white);
-            border: 4px solid var(--navy);
+        .login-box {
+            background: #FFFFFF;
+            border-radius: 12px;
             padding: 40px;
-            box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 400px;
-            text-align: center;
+        }
+
+        h2 {
+            color: #0A2540;
+            margin-bottom: 25px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        .form-control:focus {
+            border-color: #0A2540;
+        }
+
+        .btn {
+            background: #0A2540;
+            color: #FFFFFF;
+            padding: 16px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            letter-spacing: 1px;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            background: #8A1538;
+        }
+
+        .error {
+            background: #FDE8E8;
+            color: #C81E1E;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 600;
         }
     </style>
 </head>
 
 <body oncontextmenu="return false;">
-    <div class="login-card">
-        <h2 style="color: var(--maroon); margin-bottom: 20px; text-decoration: underline;">SECURE TERMINAL</h2>
+    <div class="login-box">
+        <h2>SECURE TERMINAL</h2>
         {% if error %}
-        <div class="notice" style="background: var(--maroon); color: white; border-color: black;">{{ error }}</div>
+        <div class="error">{{ error }}</div>
         {% endif %}
         <form method="POST" action="/login">
-            <input type="text" name="username" class="form-control" placeholder="OPERATOR ID" required>
-            <input type="password" name="password" class="form-control" placeholder="PASSKEY" required>
-            <button type="submit" class="btn-action">AUTHENTICATE</button>
+            <input type="text" name="username" class="form-control" placeholder="Operator ID" required>
+            <input type="password" name="password" class="form-control" placeholder="Passkey" required>
+            <button type="submit" class="btn">AUTHENTICATE</button>
         </form>
     </div>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 
 </html>
