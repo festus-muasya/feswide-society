@@ -3,67 +3,75 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Admin // Feswide Society</title>
+    <title>ADMIN CONSOLE // FESWIDE</title>
     <style>
         body {
-            font-family: Arial;
             background: #eee;
+            font-family: Courier, monospace;
             padding: 20px;
         }
 
-        .box {
-            background: white;
+        .panel {
+            background: #fff;
+            border: 2px solid #000;
             padding: 20px;
-            border: 1px solid #ccc;
-            border-top: 5px solid #003366;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            border-bottom: 4px solid #6b0000;
+            padding-bottom: 10px;
             margin-bottom: 20px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 10px;
         }
 
         th,
         td {
+            border: 1px solid #000;
             padding: 10px;
-            border: 1px solid #ddd;
             text-align: left;
         }
 
         th {
-            background: #003366;
-            color: white;
+            background: #002b5c;
+            color: #fff;
         }
     </style>
 </head>
 
 <body>
-    <div class="box">
-        <h2>PENDING UPLOADS</h2>
+    <div class="panel">
+        <h2>PENDING CONTRIBUTOR UPLOADS</h2>
         <table>
             <tr>
-                <th>Platform</th>
-                <th>Project</th>
-                <th>Mpesa</th>
-                <th>Action</th>
+                <th>PLATFORM</th>
+                <th>PROJECT</th>
+                <th>MPESA NO.</th>
+                <th>STATUS</th>
+                <th>ACTION</th>
             </tr>
             {% for u in uploads %}
             <tr>
                 <td>{{u.platform}}</td>
                 <td>{{u.project_name}}</td>
                 <td>{{u.mpesa_number}}</td>
-                <td><button>Approve</button></td>
+                <td>{{u.status}}</td>
+                <td><button>APPROVE & PAY</button></td>
             </tr>
             {% endfor %}
         </table>
     </div>
-    <div class="box">
-        <h2>REQUESTED CRACKS (VOTE BOX)</h2>
+    <div class="panel">
+        <h2>USER PROJECT REQUESTS (VOTE BOX)</h2>
         <table>
             <tr>
-                <th>Project</th>
-                <th>Date</th>
+                <th>TARGET PROJECT</th>
+                <th>DATE</th>
             </tr>
             {% for r in requests %}
             <tr>
@@ -73,38 +81,6 @@
             {% endfor %}
         </table>
     </div>
-    <div class="box">
-        <h2>STORE INVENTORY</h2>
-        {% if role == 'superadmin' %}
-        <div style="margin-bottom: 10px;">
-            <input type="text" id="n" placeholder="Name"> <input type="number" id="p" placeholder="Price"> <input
-                type="file" id="f">
-            <button onclick="add()">Add Product</button>
-        </div>
-        {% endif %}
-        <table>
-            <tr>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Action</th>
-            </tr>
-            {% for p in products %}
-            <tr>
-                <td>{{p.name}}</td>
-                <td>{{p.price}}</td>
-                <td>{% if role == 'superadmin' %}<button onclick="del({{p.id}})">Delete</button>{% endif %}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-    <script>
-        async function add() {
-            let fd = new FormData(); fd.append('name', document.getElementById('n').value);
-            fd.append('price', document.getElementById('p').value); fd.append('file', document.getElementById('f').files[0]);
-            await fetch('/admin/add-product', { method: 'POST', body: fd }); location.reload();
-        }
-        async function del(id) { await fetch('/admin/delete-product/' + id, { method: 'POST' }); location.reload(); }
-    </script>
 </body>
 
 </html>

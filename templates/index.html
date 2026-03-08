@@ -3,225 +3,286 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Feswide Society: The ultimate repository for Outlier and Handshake AI answers.">
+    <meta name="keywords" content="Outlier answers, Handshake answers, Feswide society, Feswide, feswide.com">
     <title>FESWIDE SOCIETY // Official Repository</title>
     <style>
         :root {
-            --navy: #003366;
-            --maroon: #800000;
-            --brown: #8B4513;
-            --grey: #e0e0e0;
+            --navy: #002b5c;
+            --maroon: #6b0000;
+            --brown: #5c3d2e;
+            --grey: #d1d1d1;
             --white: #ffffff;
+            --border: #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Courier New", Courier, monospace;
+            font-weight: bold;
         }
 
         body {
             background: var(--grey);
-            font-family: Arial, sans-serif;
-            margin: 0;
+            color: #000;
+            overflow-x: hidden;
         }
 
         header {
             background: var(--navy);
             padding: 20px;
-            color: white;
             border-bottom: 5px solid var(--maroon);
+            text-align: center;
+        }
+
+        .logo h1 {
+            color: var(--white);
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .nav-btns {
+            margin-top: 15px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .nav-btns button {
-            background: var(--grey);
-            border: 1px solid var(--navy);
-            padding: 10px;
+            background: var(--white);
+            border: 2px solid var(--border);
+            padding: 10px 20px;
             cursor: pointer;
-            font-weight: bold;
+            font-size: 14px;
         }
 
         .nav-btns button.active {
             background: var(--maroon);
-            color: white;
+            color: var(--white);
+            border-color: var(--white);
         }
 
         .container {
-            max-width: 1000px;
-            margin: 20px auto;
-            padding: 20px;
-        }
-
-        .search-box {
-            background: white;
-            padding: 20px;
-            border: 1px solid #ccc;
-            position: relative;
-            margin-bottom: 30px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #999;
-        }
-
-        .suggestions {
-            display: none;
-            position: absolute;
-            background: white;
             width: 95%;
-            border: 1px solid var(--navy);
-            z-index: 10;
-        }
-
-        .s-item {
-            padding: 10px;
-            cursor: pointer;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .s-item:hover {
-            background: var(--navy);
-            color: white;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            background: white;
-            border: 1px solid #ccc;
-            border-top: 5px solid var(--navy);
-            padding: 20px;
-            text-align: center;
-        }
-
-        .btn-buy {
-            background: var(--navy);
-            color: white;
-            width: 100%;
-            padding: 10px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
+            max-width: 1100px;
+            margin: 20px auto;
         }
 
         .panel {
-            background: white;
-            border: 1px solid #ccc;
+            background: var(--white);
+            border: 3px solid var(--navy);
             padding: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            box-shadow: 6px 6px 0px var(--border);
         }
 
         .notice {
             background: #fff3cd;
+            border: 2px solid #856404;
             padding: 15px;
-            border: 1px solid #ffeeba;
-            color: #856404;
-            font-weight: bold;
             margin-bottom: 20px;
+            color: #856404;
+            font-size: 13px;
         }
 
-        .form-group {
-            margin-bottom: 15px;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
         }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+        .card {
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-top: 6px solid var(--navy);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .price {
+            font-size: 24px;
+            color: var(--maroon);
+            margin: 15px 0;
+        }
+
+        .btn-action {
+            background: var(--navy);
+            color: var(--white);
+            padding: 12px;
+            width: 100%;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .btn-action:hover {
+            background: var(--maroon);
         }
 
         .form-control {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #999;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid var(--border);
+            background: #f9f9f9;
+            outline: none;
         }
 
         #chatbot {
             position: fixed;
-            bottom: 0;
+            bottom: 85px;
             right: 20px;
-            width: 280px;
-            border: 2px solid var(--navy);
-            background: white;
+            width: 300px;
+            max-width: 85vw;
+            background: var(--white);
+            border: 3px solid var(--navy);
             display: none;
             flex-direction: column;
+            z-index: 1000;
         }
 
-        .chat-btn {
-            position: fixed;
-            bottom: 10px;
-            right: 20px;
-            background: var(--maroon);
-            color: white;
+        .chat-header {
+            background: var(--navy);
+            color: var(--white);
+            padding: 10px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chat-body {
+            height: 220px;
+            padding: 10px;
+            overflow-y: auto;
+            background: #eee;
+            font-size: 12px;
+        }
+
+        .chat-input {
+            display: flex;
+            border-top: 2px solid var(--navy);
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+        }
+
+        .chat-input button {
+            background: var(--navy);
+            color: var(--white);
+            border: none;
             padding: 10px;
             cursor: pointer;
+        }
+
+        #chat-trigger {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--maroon);
+            color: var(--white);
+            padding: 15px;
+            border: 3px solid var(--white);
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        footer {
+            background: var(--navy);
+            color: var(--white);
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 6px solid var(--maroon);
+            margin-top: 40px;
+        }
+
+        .footer-links a {
+            color: #add8e6;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 14px;
         }
     </style>
 </head>
 
-<body>
+<body oncontextmenu="return false;">
+
     <header>
-        <h1>FESWIDE SOCIETY</h1>
+        <div class="logo">
+            <h1>FESWIDE SOCIETY</h1>
+        </div>
         <div class="nav-btns">
-            <button onclick="show('store')" id="b-store" class="active">REPOSITORY</button>
-            <button onclick="show('dash')" id="b-dash">CONTRIBUTOR PORTAL</button>
+            <button onclick="show('store')" id="b-store" class="active">KNOWLEDGE REPOSITORY</button>
+            <button onclick="show('dash')" id="b-dash">CONTRIBUTOR HUB</button>
         </div>
     </header>
-    <div class="container">
-        <div id="store">
-            <div class="search-box">
-                <input type="text" id="sInput" class="search-input" placeholder="Search Database..."
-                    onkeyup="doSearch()">
-                <div id="sBox" class="suggestions"></div>
+
+    <div class="container" id="store">
+        <div class="panel"><input type="text" class="form-control" id="sInput"
+                placeholder="SEARCH PROJECTS (e.g. Kobra Clips, Grand Prix)..." onkeyup="search()"></div>
+        <div class="grid">
+            {% for p in products %}
+            <div class="card">
+                <h3>{{ p.name }}</h3>
+                <p class="price">KES {{ p.price }}</p>
+                <button class="btn-action" onclick="alert('REDIRECTING TO M-PESA GATEWAY...')">PURCHASE ACCESS</button>
             </div>
-            <div class="grid">
-                {% for p in products %}
-                <div class="card">
-                    <h3>{{ p.name }}</h3>
-                    <p style="font-size: 20px; font-weight: bold; color: var(--maroon);">KES {{ p.price }}</p>
-                    <button class="btn-buy" onclick="alert('Checkout for {{p.name}}')">PURCHASE</button>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        <div id="dash" style="display:none;">
-            <div class="panel">
-                <h2 style="color: var(--navy); border-bottom: 2px solid var(--maroon);">CONTRIBUTOR UPLOAD</h2>
-                <div class="notice">KES 500/= payout after manual review (approx. 48hrs).</div>
-                <div class="form-group">
-                    <label>Platform:</label>
-                    <select id="pform" class="form-control">
-                        <option>Handshake AI</option>
-                        <option>Outlier AI</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Project Name:</label>
-                    <input type="text" id="pname" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>M-Pesa Number:</label>
-                    <input type="text" id="pmpesa" class="form-control" placeholder="2547...">
-                </div>
-                <input type="file" id="pfile" accept=".pdf" style="margin-top: 10px;">
-                <button class="btn-buy" onclick="up()" style="margin-top: 15px;">SUBMIT PDF</button>
-            </div>
-            <div class="panel" style="border-top: 5px solid var(--brown);">
-                <h2 style="color: var(--brown);">VOTE BOX (REQUEST CRACK)</h2>
-                <input type="text" id="vname" class="form-control" placeholder="Project Name">
-                <button class="btn-buy" style="background: var(--brown); margin-top: 10px;" onclick="vote()">SUBMIT
-                    REQUEST</button>
-            </div>
+            {% endfor %}
         </div>
     </div>
-    <div class="chat-btn" onclick="tChat()">SUPPORT</div>
+
+    <div class="container" id="dash" style="display:none;">
+        <div class="panel">
+            <h2
+                style="color: var(--navy); border-bottom: 3px solid var(--maroon); margin-bottom: 20px; padding-bottom: 5px;">
+                CONTRIBUTOR PORTAL</h2>
+            <div class="notice">NOTICE: Payment of KES 500/= is processed after manual verification. Payouts take up to
+                48 hours.</div>
+            <select id="pform" class="form-control">
+                <option>HANDSHAKE AI</option>
+                <option>OUTLIER AI</option>
+            </select>
+            <input type="text" id="pname" class="form-control" placeholder="EXACT PROJECT NAME">
+            <input type="text" id="pmpesa" class="form-control" placeholder="M-PESA NUMBER (254...)">
+            <input type="file" id="pfile" accept=".pdf" class="form-control">
+            <button class="btn-action" onclick="up()">SUBMIT FOR REVIEW</button>
+        </div>
+        <div class="panel" style="border-color: var(--brown);">
+            <h2 style="color: var(--brown);">VOTE BOX // CRACK REQUEST</h2>
+            <p style="font-size: 13px; margin-bottom: 15px;">Can't find a project? Request it here.</p>
+            <input type="text" id="vname" class="form-control" placeholder="PROJECT NAME TO CRACK">
+            <button class="btn-action" style="background: var(--brown);" onclick="vote()">LOG REQUEST</button>
+        </div>
+    </div>
+
+    <div id="chat-trigger" onclick="tChat()">💬</div>
     <div id="chatbot">
-        <div style="background: var(--navy); color: white; padding: 10px;">Agent Faith</div>
-        <div style="height: 150px; padding: 10px; background: #eee; font-size: 12px;">Welcome to Feswide Society.</div>
+        <div class="chat-header">AGENT FAITH <span onclick="tChat()" style="cursor:pointer">[X]</span></div>
+        <div class="chat-body" id="chat-body">
+            <div><b>Faith:</b> Welcome. How can I assist you with the Feswide database today?</div>
+        </div>
+        <div class="chat-input"><input type="text" id="cIn" placeholder="Type query..."><button
+                onclick="sendMsg()">SEND</button></div>
     </div>
+
+    <footer>
+        <div class="footer-links">
+            <a href="mailto:support@feswide.com">EMAIL SUPPORT</a> |
+            <a href="#">X (TWITTER)</a> |
+            <a href="#">TELEGRAM</a>
+        </div>
+        <p style="font-size: 11px; margin-top: 20px;">&copy; 2026 FESWIDE SOCIETY. ALL RIGHTS RESERVED.</p>
+    </footer>
+
     <script>
         function show(v) {
             document.getElementById('store').style.display = v == 'store' ? 'block' : 'none';
@@ -229,20 +290,12 @@
             document.getElementById('b-store').className = v == 'store' ? 'active' : '';
             document.getElementById('b-dash').className = v == 'dash' ? 'active' : '';
         }
-        async function doSearch() {
-            let q = document.getElementById('sInput').value;
-            let b = document.getElementById('sBox');
-            if (q.length < 2) { b.style.display = 'none'; return; }
-            let res = await fetch('/api/search?q=' + q);
-            let data = await res.json();
-            b.innerHTML = '';
-            if (data.length) {
-                data.forEach(i => {
-                    let d = document.createElement('div'); d.className = 's-item';
-                    d.innerHTML = `<span>${i.name}</span> <span>${i.price ? 'KES ' + i.price : ''}</span>`;
-                    b.appendChild(d);
-                });
-                b.style.display = 'block';
+        function search() {
+            let q = document.getElementById('sInput').value.toLowerCase();
+            let cards = document.getElementsByClassName('card');
+            for (let c of cards) {
+                let t = c.getElementsByTagName('h3')[0].innerText.toLowerCase();
+                c.style.display = t.includes(q) ? 'block' : 'none';
             }
         }
         async function up() {
@@ -256,10 +309,25 @@
         }
         async function vote() {
             let n = document.getElementById('vname').value;
-            await fetch('/request-project', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ project_name: n, platform: 'Requested' }) });
-            alert("Feswide society will crack them in less than 48hrs. Check back soon.");
+            if (!n) { alert("PLEASE ENTER A PROJECT NAME."); return; }
+            await fetch('/request-project', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ project_name: n, platform: 'VOTE' }) });
+            alert("Feswide society will crack them in less than 48hrs check back on our website.");
         }
         function tChat() { let c = document.getElementById('chatbot'); c.style.display = c.style.display == 'flex' ? 'none' : 'flex'; }
+        async function sendMsg() {
+            let i = document.getElementById('cIn');
+            let b = document.getElementById('chat-body');
+            if (!i.value) return;
+            b.innerHTML += `<div><b>You:</b> ${i.value}</div>`;
+            let res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: i.value }) });
+            let d = await res.json();
+            b.innerHTML += `<div><b>Faith:</b> ${d.reply}</div>`;
+            i.value = ''; b.scrollTop = b.scrollHeight;
+        }
+        // SECURITY: DISABLE DEVELOPER KEYS
+        document.onkeydown = function (e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) return false;
+        };
     </script>
 </body>
 
