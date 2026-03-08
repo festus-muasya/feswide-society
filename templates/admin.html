@@ -3,58 +3,83 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>COMMAND CENTER | Feswide Society</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMMAND CENTER | FESWIDE SOCIETY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --navy: #0a192f;
             --maroon: #800000;
+            --orange: #ff9800;
             --white: #ffffff;
             --bg: #f4f7f9;
+            --green: #2e7d32;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg);
+            background-color: var(--bg);
             margin: 0;
             color: #333;
+            user-select: none;
         }
 
+        /* 1. HEADER & TERMINAL IDENTITY */
         .header {
             background: var(--navy);
-            color: white;
+            color: var(--white);
             padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 4px solid var(--maroon);
-            sticky;
+            border-bottom: 5px solid var(--maroon);
+            position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
         }
 
-        .container {
-            padding: 30px;
+        .header h2 {
+            margin: 0;
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+
+        .logout-link {
+            color: #ff9b9b;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .main-content {
+            padding: 30px 5%;
             max-width: 1400px;
             margin: auto;
         }
 
+        /* 2. PANEL ARCHITECTURE */
         .panel {
-            background: white;
+            background: var(--white);
             border: 1px solid #ddd;
             padding: 25px;
             margin-bottom: 25px;
             border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
         .panel h3 {
             margin-top: 0;
             color: var(--navy);
             border-bottom: 2px solid var(--bg);
-            padding-bottom: 10px;
+            padding-bottom: 12px;
             margin-bottom: 20px;
             font-size: 14px;
             text-transform: uppercase;
+        }
+
+        /* 3. TABLE STYLES */
+        .table-container {
+            overflow-x: auto;
         }
 
         table {
@@ -65,8 +90,9 @@
 
         th {
             background: #f8f9fa;
-            padding: 12px;
+            color: #666;
             text-align: left;
+            padding: 12px;
             border-bottom: 2px solid #eee;
         }
 
@@ -78,8 +104,8 @@
         .badge {
             padding: 4px 8px;
             border-radius: 4px;
-            font-weight: bold;
             font-size: 10px;
+            font-weight: bold;
             text-transform: uppercase;
         }
 
@@ -88,36 +114,54 @@
             color: #234e52;
         }
 
+        .pending {
+            background: #fffaf0;
+            color: #7b341e;
+        }
+
+        /* 4. SUPERADMIN SPECIFIC */
         .super-only {
             border-left: 8px solid var(--maroon);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
         }
 
         input,
         select,
         textarea {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ccc;
             border-radius: 4px;
             margin-top: 5px;
             box-sizing: border-box;
+            font-size: 14px;
         }
 
-        .btn {
+        .action-btn {
+            padding: 12px 20px;
             background: var(--navy);
-            color: white;
+            color: var(--white);
             border: none;
-            padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            margin-top: 10px;
+            font-size: 12px;
+            text-transform: uppercase;
         }
 
-        .btn-del {
+        .delete-btn {
             background: #e53e3e;
-            font-size: 11px;
-            padding: 5px 10px;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
         }
     </style>
 </head>
@@ -125,92 +169,111 @@
 <body oncontextmenu="return false;">
 
     <div class="header">
-        <h2>FESWIDE TERMINAL [{{ role|upper }}]</h2>
+        <h2>FESWIDE SECURE TERMINAL [{{ role|upper }}]</h2>
         <div>
-            <span style="font-size: 13px; margin-right: 15px;">Operator: <b>{{ username }}</b></span>
-            <a href="/logout" style="color:white; font-weight:bold; text-decoration:none; font-size:12px;">[LOGOUT]</a>
+            <span style="font-size: 12px; margin-right: 20px;">Operator: <b>{{ username }}</b></span>
+            <a href="/logout" class="logout-link">[ TERMINATE SESSION ]</a>
         </div>
     </div>
 
-    <div class="container">
+    <div class="main-content">
+
         {% if role == 'superadmin' %}
         <div class="panel super-only">
-            <h3 style="color: var(--maroon);">Broadcast Maintenance Message</h3>
-            <form action="/admin/update-config" method="POST" style="display:flex; gap:10px;">
-                <input name="hero_text" value="{{ config_text }}" placeholder="Enter site-wide alert message...">
-                <button type="submit" class="btn" style="background: var(--maroon); margin-top:5px;">UPDATE
-                    SITE</button>
+            <h3 style="color: var(--maroon);">Broadcast Global Maintenance Alert</h3>
+            <form action="/admin/update-config" method="POST" style="display:flex; gap:15px; align-items: flex-end;">
+                <div style="flex:1;">
+                    <label style="font-size: 11px; font-weight: bold;">Storefront Message (Entire Page Hero
+                        Text)</label>
+                    <input name="hero_text" value="{{ config_text }}"
+                        placeholder="Enter alert e.g. 'API under maintenance for 2 hours'..." required>
+                </div>
+                <button type="submit" class="action-btn" style="background: var(--maroon); height: 43px;">Broadcast
+                    Update</button>
             </form>
         </div>
         {% endif %}
 
         <div class="panel">
-            <h3>Live Payment Logs (M-Pesa & Binance)</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Request ID</th>
-                        <th>Method</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Time</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for t in txns %}
-                    <tr>
-                        <td><code>{{ t.checkout_request_id }}</code></td>
-                        <td>{{ t.payment_method }}</td>
-                        <td>KES {{ t.amount }}</td>
-                        <td><span class="badge {% if t.status == 'Paid' %}paid{% endif %}">{{ t.status }}</span></td>
-                        <td>{{ t.timestamp.strftime('%H:%M | %d %b') }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <h3>Payment Logs (M-Pesa / Binance USDT)</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>TXN ID</th>
+                            <th>Network</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in txns %}
+                        <tr>
+                            <td><code>{{ t.checkout_request_id }}</code></td>
+                            <td>{{ t.payment_method }}</td>
+                            <td>KES {{ t.amount }}</td>
+                            <td><span class="badge {% if t.status == 'Paid' %}paid{% else %}pending{% endif %}">{{
+                                    t.status }}</span></td>
+                            <td>{{ t.timestamp.strftime('%H:%M | %d %b') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="panel">
-            <h3 style="color: #d69e2e;">Support Tickets (Agent John)</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>WhatsApp Contact</th>
-                        <th>Error Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for ticket in tickets %}
-                    <tr>
-                        <td>{{ ticket.timestamp.strftime('%H:%M') }}</td>
-                        <td><a href="https://wa.me/{{ ticket.whatsapp }}" target="_blank"
-                                style="color:green; font-weight:bold;">{{ ticket.whatsapp }}</a></td>
-                        <td>{{ ticket.error_desc }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <h3 style="color: #d69e2e;">Agent John: Technical Support Tickets</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Report Time</th>
+                            <th>WhatsApp Link</th>
+                            <th>Error Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr>
+                            <td>{{ ticket.timestamp.strftime('%H:%M') }}</td>
+                            <td>
+                                <a href="https://wa.me/{{ ticket.whatsapp }}" target="_blank"
+                                    style="color:var(--green); font-weight:bold; text-decoration:none;">
+                                    {{ ticket.whatsapp }} →
+                                </a>
+                            </td>
+                            <td>{{ ticket.error_desc }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         {% if role == 'superadmin' %}
         <div class="panel super-only">
-            <h3 style="color: var(--maroon);">Module Management</h3>
+            <h3 style="color: var(--maroon);">Module Repository & Price Management</h3>
             <form action="/admin/add-product" method="POST" enctype="multipart/form-data">
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:15px;">
-                    <input name="name" placeholder="Title" required>
-                    <input name="price" placeholder="Price (KES)" required>
-                    <input type="file" name="file" accept=".pdf" required>
+                <div class="form-grid">
+                    <div><label>Module Title</label><input name="name" required></div>
+                    <div><label>Price (KES)</label><input name="price" required></div>
+                    <div><label>Verified PDF File</label><input type="file" name="file" accept=".pdf" required></div>
                 </div>
-                <textarea name="description" placeholder="Description (e.g. Tested and 100% accurate)"></textarea>
-                <button type="submit" class="btn">PUBLISH MODULE</button>
+                <textarea name="description" placeholder="Description (e.g. Tested and they are 100% accurate)"
+                    style="margin-top: 15px; height: 60px;"></textarea>
+                <button type="submit" class="action-btn" style="width: 100%; margin-top: 20px;">Publish to Live
+                    Repository</button>
             </form>
-            <hr style="margin:20px 0;">
+
+            <h4 style="margin-top: 40px; font-size: 13px; color: #888;">Active Inventory List</h4>
             <table>
                 <thead>
                     <tr>
-                        <th>Module</th>
+                        <th>Module Name</th>
                         <th>Price</th>
+                        <th>Filesystem ID</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -218,10 +281,12 @@
                     {% for p in products %}
                     <tr>
                         <td>{{ p.name }}</td>
-                        <td>KES {{ p.price }}</td>
+                        <td style="color:var(--green); font-weight:bold;">KES {{ p.price }}</td>
+                        <td><code>{{ p.filename }}</code></td>
                         <td>
-                            <form action="/admin/delete-product/{{ p.id }}" method="POST">
-                                <button type="submit" class="btn-del">REMOVE</button>
+                            <form action="/admin/delete-product/{{ p.id }}" method="POST"
+                                onsubmit="return confirm('Permanent Removal?')">
+                                <button type="submit" class="delete-btn">Remove</button>
                             </form>
                         </td>
                     </tr>
@@ -231,20 +296,30 @@
         </div>
 
         <div class="panel super-only">
-            <h3 style="color: var(--maroon);">Staff Access Control</h3>
-            <form action="/admin/create-subadmin" method="POST" style="display:flex; gap:10px;">
-                <input name="username" placeholder="Staff Username" required>
-                <input name="password" type="password" placeholder="Passkey" required>
-                <button type="submit" class="btn">CREATE LOGIN</button>
+            <h3 style="color: var(--maroon);">Staff & Sub-Admin Generation</h3>
+            <form action="/admin/create-subadmin" method="POST">
+                <div class="form-grid">
+                    <div><label>Assigned ID</label><input name="username" required></div>
+                    <div><label>Secure Passkey</label><input name="password" type="password" required></div>
+                    <div style="display: flex; align-items: flex-end;"><button type="submit" class="action-btn">Generate
+                            Login</button></div>
+                </div>
             </form>
         </div>
         {% endif %}
+
     </div>
 
     <script>
-        // OPSEC: Hardened Source Protection
+        /**
+         * OPSEC: HARDENED SOURCE PROTECTION
+         * Disables DevTools (F12), Inspect, and View Source
+         */
         document.onkeydown = function (e) {
-            if (event.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73) || (e.ctrlKey && e.keyCode == 85)) return false;
+            if (event.keyCode == 123) return false;
+            if (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) return false;
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false;
         };
     </script>
 </body>

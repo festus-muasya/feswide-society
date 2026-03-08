@@ -24,7 +24,6 @@ class AdminUser(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(20), default='subadmin')
-    is_active = db.Column(db.Boolean, default=True)
 
 class ActivityLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -51,8 +50,8 @@ class SiteConfig(db.Model):
 
 class Opportunity(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String(20)) # Hiring / Tasker
-    platform = db.Column(db.String(50)) # Outlier / Handshake
+    type = db.Column(db.String(20))
+    platform = db.Column(db.String(50))
     rate = db.Column(db.String(100))
     whatsapp = db.Column(db.String(50))
     description = db.Column(db.Text)
