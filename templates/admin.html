@@ -4,178 +4,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FESWIDE SOCIETY // Admin Portal</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Admin // Feswide Society</title>
+    <style>
+        :root {
+            --primary-blue: #0A2540;
+            --accent-red: #d93025;
+            --success-green: #00D924;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #F6F9FC;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .role-badge {
+            background: var(--primary-blue);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 3rem;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fc;
+            color: var(--primary-blue);
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn-green {
+            background: var(--success-green);
+        }
+
+        .btn-red {
+            background: var(--accent-red);
+        }
+
+        .btn-blue {
+            background: var(--primary-blue);
+        }
+
+        .add-product-box {
+            background: #f8f9fc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid #eee;
+        }
+
+        .add-product-box input {
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 
 <body>
 
-    <header>
-        <div class="header-titles">
-            <h1>Feswide Admin Portal</h1>
-            <p>Superadmin & Subadmin Dashboard</p>
+    <div class="dashboard">
+        <div class="header">
+            <h2>Feswide Admin Control</h2>
+            <div>
+                <span class="role-badge">Logged in as: {{ role }}</span>
+                <button class="btn btn-blue" onclick="window.location.href='/'" style="margin-left: 10px;">Exit to
+                    Store</button>
+            </div>
         </div>
-        <div class="header-nav">
-            <button onclick="window.location.href='/'">Back to Store</button>
-            <button style="background: var(--accent-red); border-color: var(--accent-red);">Logout</button>
+
+        <h3 style="color: var(--primary-blue); margin-bottom: 15px;">Live Store Inventory</h3>
+
+        {% if role == 'superadmin' %}
+        <div class="add-product-box">
+            <h4>Upload New Product to Store</h4>
+            <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="prodName" placeholder="Product Name (e.g., Flamingo Answers)">
+                <input type="number" id="prodPrice" placeholder="Price (KES)">
+                <input type="file" id="prodFile" accept=".pdf">
+                <button class="btn btn-blue" onclick="addNewProduct()">Add to Store</button>
+            </div>
         </div>
-    </header>
+        {% endif %}
 
-    <div class="container">
-
-        <div class="intro-section" style="text-align: left;">
-            <h2>Pending Answer Uploads</h2>
-            <p style="margin-bottom: 15px; color: var(--text-muted);">Review PDFs uploaded by users. Approve to trigger
-                payout.</p>
-
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Upload ID</th>
-                        <th>User Phone</th>
-                        <th>Document Name</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for upload in uploads %}
-                    <tr id="upload-row-{{ upload.id }}">
-                        <td>{{ upload.id }}</td>
-                        <td>{{ upload.uploader_phone }}</td>
-                        <td>{{ upload.filename }}</td>
-                        <td>
-                            {% if upload.status == 'Reviewing' %}
-                            <span style="color: #ff9900; font-weight: bold;">Reviewing</span>
-                            {% elif upload.status == 'Approved' %}
-                            <span style="color: var(--success-green); font-weight: bold;">Approved</span>
-                            {% else %}
-                            <span style="color: var(--accent-red); font-weight: bold;">{{ upload.status }}</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <button class="btn-small btn-view" onclick="alert('View PDF feature coming soon!')">View
-                                PDF</button>
-                            {% if upload.status == 'Reviewing' %}
-                            <button class="btn-small btn-approve"
-                                onclick="manageUpload({{ upload.id }}, 'approve')">Approve & Pay</button>
-                            <button class="btn-small btn-reject"
-                                onclick="manageUpload({{ upload.id }}, 'reject')">Reject</button>
-                            {% endif %}
-                        </td>
-                    </tr>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.id }}</td>
+                <td>{{ product.name }}</td>
+                <td>KES {{ product.price }}</td>
+                <td>
+                    {% if role == 'superadmin' %}
+                    <button class="btn btn-red" onclick="deleteProduct({{ product.id }})">Delete</button>
                     {% else %}
-                    <tr>
-                        <td colspan="5" style="text-align: center;">No uploads found.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    <span style="color: #888; font-size: 0.85rem;">Restricted</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
 
-        <div class="intro-section" style="text-align: left;">
-            <h2>User Management</h2>
-            <p style="margin-bottom: 15px; color: var(--text-muted);">Control user access and assign Subadmin roles.</p>
-
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>User ID</th>
-                        <th>Phone Number</th>
-                        <th>Role</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in users %}
-                    <tr>
-                        <td>{{ user.id }}</td>
-                        <td>{{ user.phone }}</td>
-                        <td>
-                            {% if user.role == 'superadmin' %}
-                            <strong style="color: var(--accent-red);">Superadmin</strong>
-                            {% elif user.role == 'subadmin' %}
-                            <strong style="color: var(--primary-blue);">Subadmin</strong>
-                            {% elif user.role == 'suspended' %}
-                            <strong style="color: var(--text-muted);">Suspended</strong>
-                            {% else %}
-                            <strong>User</strong>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if user.role != 'superadmin' %}
-                            {% if user.role != 'subadmin' %}
-                            <button class="btn-small btn-view" onclick="manageUser({{ user.id }}, 'subadmin')">Make
-                                Subadmin</button>
-                            {% else %}
-                            <button class="btn-small btn-reject" onclick="manageUser({{ user.id }}, 'user')">Revoke
-                                Admin</button>
-                            {% endif %}
-
-                            {% if user.role != 'suspended' %}
-                            <button class="btn-small btn-reject"
-                                onclick="manageUser({{ user.id }}, 'suspended')">Suspend</button>
-                            {% else %}
-                            <button class="btn-small btn-approve"
-                                onclick="manageUser({{ user.id }}, 'user')">Restore</button>
-                            {% endif %}
-                            {% endif %}
-                        </td>
-                    </tr>
+        <h3 style="color: var(--primary-blue); margin-bottom: 15px;">Contributor Uploads (Handshake & Outlier)</h3>
+        <table>
+            <tr>
+                <th>Phone</th>
+                <th>Platform</th>
+                <th>Project Name</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            {% for upload in uploads %}
+            <tr>
+                <td>{{ upload.uploader_phone }}</td>
+                <td><strong>{{ upload.platform }}</strong></td>
+                <td>{{ upload.project_name }}</td>
+                <td>{{ upload.status }}</td>
+                <td>
+                    {% if upload.status == 'Reviewing' %}
+                    <button class="btn btn-green" onclick="alert('Approving triggers payout!')">Approve & Pay</button>
                     {% else %}
-                    <tr>
-                        <td colspan="4" style="text-align: center;">No users found.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
+                    Completed
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
 
     <script>
-        // Function to handle approving/rejecting documents
-        async function manageUpload(uploadId, action) {
-            if (!confirm(`Are you sure you want to ${action} this upload?`)) return;
+        async function addNewProduct() {
+            const name = document.getElementById('prodName').value;
+            const price = document.getElementById('prodPrice').value;
+            const file = document.getElementById('prodFile').files[0];
 
-            try {
-                const response = await fetch(`/admin/upload/${uploadId}/${action}`, {
-                    method: 'POST'
-                });
-                const data = await response.json();
+            if (!name || !price || !file) { alert("Fill all fields!"); return; }
 
-                if (data.success) {
-                    alert(data.message);
-                    location.reload(); // Reload the page to show updated status
-                } else {
-                    alert("Error: " + data.message);
-                }
-            } catch (error) {
-                alert("Server connection failed.");
-            }
+            const fd = new FormData();
+            fd.append('name', name); fd.append('price', price); fd.append('file', file);
+
+            const res = await fetch('/admin/add-product', { method: 'POST', body: fd });
+            if (res.ok) location.reload();
         }
 
-        // Function to handle changing user roles
-        async function manageUser(userId, newRole) {
-            if (!confirm(`Are you sure you want to change this user's role to ${newRole}?`)) return;
-
-            try {
-                const response = await fetch(`/admin/user/${userId}/${newRole}`, {
-                    method: 'POST'
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    alert(data.message);
-                    location.reload(); // Reload the page to show updated roles
-                } else {
-                    alert("Error: " + data.message);
-                }
-            } catch (error) {
-                alert("Server connection failed.");
-            }
+        async function deleteProduct(id) {
+            if (!confirm("Are you sure you want to permanently delete this from the store?")) return;
+            const res = await fetch(`/admin/delete-product/${id}`, { method: 'POST' });
+            if (res.ok) location.reload();
         }
     </script>
+
 </body>
 
 </html>

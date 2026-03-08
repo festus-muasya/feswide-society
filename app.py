@@ -1,187 +1,129 @@
 import os
 from flask import Flask, render_template, request, jsonify, send_from_directory, abort
-from models import db, Transaction, UserUpload, User
+from models import db, Transaction, UserUpload, User, Product, SearchQuery
+from werkzeug.utils import secure_filename
 
-# ==========================================
-# 1. FLASK APP INITIALIZATION (VERCEL READ-ONLY FIX)
-# ==========================================
-# Force Flask to use the writable /tmp folder for its instance path
 app = Flask(__name__, instance_path='/tmp/instance')
 
-# ==========================================
-# 2. DATABASE CONFIGURATION 
-# ==========================================
-# Pulls your Supabase string from Vercel. 
-# Falls back to a temporary SQLite database in /tmp if the variable is missing.
 database_url = os.environ.get('DATABASE_URL', 'sqlite:////tmp/feswide.db')
-
-# SQLAlchemy requires 'postgresql://' instead of 'postgres://'
 if database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback_secret_key_123')
 
-# ==========================================
-# 3. SECURITY & API CREDENTIALS
-# ==========================================
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback_secret_key_for_local_testing')
-
-# Daraja Credentials (Ready for when you set them in Vercel)
-DARAJA_CONSUMER_KEY = os.environ.get('DARAJA_CONSUMER_KEY', '')
-DARAJA_CONSUMER_SECRET = os.environ.get('DARAJA_CONSUMER_SECRET', '')
-DARAJA_PASSKEY = os.environ.get('DARAJA_PASSKEY', '')
-DARAJA_BUSINESS_SHORTCODE = os.environ.get('DARAJA_BUSINESS_SHORTCODE', '')
-
-# ==========================================
-# 4. FILE STORAGE (VERCEL READ-ONLY FIX)
-# ==========================================
-# Secure answers are part of your GitHub repo, so they live in the main folder
-SECURE_ANSWERS_DIR = os.path.join(os.path.dirname(__file__), 'secure_answers')
-
-# User uploads MUST go to the temporary /tmp folder when running on Vercel
+# File Storage for Vercel
 if os.environ.get('VERCEL_ENV') or os.environ.get('VERCEL_URL'):
-    USER_UPLOADS_DIR = '/tmp/user_uploads'
+    UPLOAD_DIR = '/tmp/uploads'
 else:
-    USER_UPLOADS_DIR = os.path.join(os.path.dirname(__file__), 'user_uploads')
+    UPLOAD_DIR = os.path.join(os.path.dirname(__file__), 'uploads')
 
-# Create the upload directory if it doesn't exist
-os.makedirs(USER_UPLOADS_DIR, exist_ok=True)
-
-
-# ==========================================
-# 5. INITIALIZE DATABASE
-# ==========================================
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 db.init_app(app)
 
 with app.app_context():
     try:
-        # Creates tables in Supabase if they don't exist yet
         db.create_all()
-        print("Successfully connected to the database and ensured tables exist.")
+        # Seed some default products if the store is empty
+        if not Product.query.first():
+            p1 = Product(name="Aether Multilingual Quality Check", price=999.00, filename="aether_module.pdf")
+            p2 = Product(name="Aether Coder Screening Module", price=999.00, filename="coder_module.pdf")
+            db.session.add_all([p1, p2])
+            db.session.commit()
     except Exception as e:
-        print(f"FATAL DATABASE ERROR: {e}")
+        print(f"DATABASE ERROR: {e}")
 
-
-# ==========================================
-# 6. PUBLIC & STOREFRONT ROUTES
-# ==========================================
-
+# --- PUBLIC ROUTES ---
 @app.route('/')
 def index():
-    return render_template('index.html')
+    products = Product.query.all()
+    return render_template('index.html', products=products)
+
+@app.route('/api/search')
+def api_search():
+    query = request.args.get('q', '').lower()
+    if not query:
+        return jsonify([])
+    
+    # Save the search query for future users
+    existing_search = SearchQuery.query.filter_by(query=query).first()
+    if existing_search:
+        existing_search.search_count += 1
+    else:
+        new_search = SearchQuery(query=query)
+        db.session.add(new_search)
+    db.session.commit()
+
+    # Find matching products
+    matches = Product.query.filter(Product.name.ilike(f'%{query}%')).limit(5).all()
+    results = [{"name": p.name, "price": p.price} for p in matches]
+    
+    # Add popular user searches to suggestions
+    popular = SearchQuery.query.filter(SearchQuery.query.ilike(f'%{query}%')).order_by(SearchQuery.search_count.desc()).limit(3).all()
+    for pop in popular:
+        if not any(r['name'].lower() == pop.query for r in results):
+            results.append({"name": f"Other users searched: {pop.query}", "price": None})
+
+    return jsonify(results)
 
 @app.route('/pay-stk', methods=['POST'])
 def pay_stk():
     data = request.json
-    phone = data.get('phone')
-    item = data.get('item')
-    amount = data.get('amount')
-    
-    # Placeholder for actual Daraja STK Push logic
     mock_checkout_id = "ws_CO_1234567890" 
-    
-    # Save pending transaction to the database
-    new_txn = Transaction(
-        checkout_request_id=mock_checkout_id, 
-        phone=phone, 
-        amount=amount, 
-        document_name=item
-    )
+    new_txn = Transaction(checkout_request_id=mock_checkout_id, phone=data.get('phone'), amount=data.get('amount'), document_name=data.get('item'))
     db.session.add(new_txn)
     db.session.commit()
-    
     return jsonify({"status": "PROMPTED", "checkoutId": mock_checkout_id})
-
-@app.route('/daraja-callback', methods=['POST'])
-def daraja_callback():
-    # Daraja API hits this route automatically after the user enters their PIN
-    callback_data = request.json
-    
-    # Placeholder for checking if payment was successful and updating the DB
-    return jsonify({"ResultCode": 0, "ResultDesc": "Accepted"})
-
-@app.route('/download/<checkout_id>')
-def download_document(checkout_id):
-    # Only allow download if the database says this checkout_id is 'Paid'
-    txn = Transaction.query.filter_by(checkout_request_id=checkout_id).first()
-    
-    if txn and txn.status == 'Paid':
-        # Map item name to actual filename
-        filename_map = {
-            "Aether Multilingual Quality Check": "aether_module.pdf",
-            "Aether Coder Screening Module": "coder_module.pdf",
-            "Pre-Test Quality Screening": "pretest_module.pdf"
-        }
-        actual_file = filename_map.get(txn.document_name)
-        
-        # Serve the file securely
-        if actual_file:
-            return send_from_directory(SECURE_ANSWERS_DIR, actual_file, as_attachment=True)
-        else:
-            abort(404, description="File not found in system.")
-    else:
-        abort(403, description="Payment not completed or unauthorized.")
 
 @app.route('/upload-answer', methods=['POST'])
 def upload_answer():
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
-        
     file = request.files['file']
-    if file.filename != '':
-        filepath = os.path.join(USER_UPLOADS_DIR, file.filename)
-        file.save(filepath)
-        
-        # Save upload record to DB
-        new_upload = UserUpload(uploader_phone="Current User", filename=file.filename)
+    platform = request.form.get('platform')
+    project_name = request.form.get('project_name')
+    
+    if file and file.filename.endswith('.pdf'):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(UPLOAD_DIR, filename))
+        new_upload = UserUpload(uploader_phone="Guest User", platform=platform, project_name=project_name, filename=filename)
         db.session.add(new_upload)
         db.session.commit()
-        
-        return jsonify({"message": "File securely sent to Superadmin."})
+        return jsonify({"message": f"{project_name} successfully sent to Admin Dashboard!"})
+    return jsonify({"error": "Invalid file type. Must be PDF."}), 400
 
-
-# ==========================================
-# 7. ADMIN DASHBOARD ROUTES
-# ==========================================
-
+# --- ADMIN ROUTES ---
 @app.route('/admin')
 def admin_dashboard():
-    # Fetch all records from the database to display in the HTML tables
-    all_uploads = UserUpload.query.order_by(UserUpload.id.desc()).all()
-    all_users = User.query.all()
-    
-    return render_template('admin.html', uploads=all_uploads, users=all_users)
+    # Simulating a logged-in user role for demonstration (Change to 'subadmin' to test restrictions)
+    current_role = 'superadmin' 
+    uploads = UserUpload.query.order_by(UserUpload.id.desc()).all()
+    users = User.query.all()
+    products = Product.query.all()
+    return render_template('admin.html', uploads=uploads, users=users, products=products, role=current_role)
 
-@app.route('/admin/upload/<int:upload_id>/<action>', methods=['POST'])
-def manage_upload(upload_id, action):
-    # Fetch the specific upload by ID
-    upload = UserUpload.query.get_or_404(upload_id)
+@app.route('/admin/add-product', methods=['POST'])
+def add_product():
+    name = request.form.get('name')
+    price = request.form.get('price')
+    file = request.files['file']
     
-    if action == 'approve':
-        upload.status = 'Approved'
-        # Placeholder for triggering M-Pesa B2C payout
-    elif action == 'reject':
-        upload.status = 'Rejected'
-    else:
-        return jsonify({"success": False, "message": "Invalid action."}), 400
-        
-    db.session.commit()
-    return jsonify({"success": True, "message": f"Document {action}d successfully."})
-
-@app.route('/admin/user/<int:user_id>/<role>', methods=['POST'])
-def manage_user(user_id, role):
-    # Fetch the specific user by ID
-    user = User.query.get_or_404(user_id)
-    
-    valid_roles = ['user', 'subadmin', 'superadmin', 'suspended']
-    if role in valid_roles:
-        user.role = role
+    if file:
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(UPLOAD_DIR, filename))
+        new_prod = Product(name=name, price=float(price), filename=filename)
+        db.session.add(new_prod)
         db.session.commit()
-        return jsonify({"success": True, "message": f"User role updated to {role}."})
-        
-    return jsonify({"success": False, "message": "Invalid role."}), 400
+        return jsonify({"success": True})
+    return jsonify({"success": False}), 400
 
+@app.route('/admin/delete-product/<int:prod_id>', methods=['POST'])
+def delete_product(prod_id):
+    prod = Product.query.get_or_404(prod_id)
+    db.session.delete(prod)
+    db.session.commit()
+    return jsonify({"success": True})
 
 if __name__ == '__main__':
     app.run(debug=True)
