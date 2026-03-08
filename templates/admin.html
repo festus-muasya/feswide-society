@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FESWIDE SOCIETY // Admin Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <header>
+        <div class="header-titles">
+            <h1>Feswide Admin Portal</h1>
+            <p>Superadmin & Subadmin Dashboard</p>
+        </div>
+        <div class="header-nav">
+            <button onclick="window.location.href='/'">Back to Store</button>
+            <button style="background: var(--accent-red); border-color: var(--accent-red);">Logout</button>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <div class="intro-section" style="text-align: left;">
+            <h2>Pending Answer Uploads</h2>
+            <p style="margin-bottom: 15px; color: var(--text-muted);">Review PDFs uploaded by users. Approve to trigger
+                payout.</p>
+
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Upload ID</th>
+                        <th>User Phone</th>
+                        <th>Document Name</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for upload in uploads %}
+                    <tr id="upload-row-{{ upload.id }}">
+                        <td>{{ upload.id }}</td>
+                        <td>{{ upload.uploader_phone }}</td>
+                        <td>{{ upload.filename }}</td>
+                        <td>
+                            {% if upload.status == 'Reviewing' %}
+                            <span style="color: #ff9900; font-weight: bold;">Reviewing</span>
+                            {% elif upload.status == 'Approved' %}
+                            <span style="color: var(--success-green); font-weight: bold;">Approved</span>
+                            {% else %}
+                            <span style="color: var(--accent-red); font-weight: bold;">{{ upload.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn-small btn-view" onclick="alert('View PDF feature coming soon!')">View
+                                PDF</button>
+                            {% if upload.status == 'Reviewing' %}
+                            <button class="btn-small btn-approve"
+                                onclick="manageUpload({{ upload.id }}, 'approve')">Approve & Pay</button>
+                            <button class="btn-small btn-reject"
+                                onclick="manageUpload({{ upload.id }}, 'reject')">Reject</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center;">No uploads found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="intro-section" style="text-align: left;">
+            <h2>User Management</h2>
+            <p style="margin-bottom: 15px; color: var(--text-muted);">Control user access and assign Subadmin roles.</p>
+
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Phone Number</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.phone }}</td>
+                        <td>
+                            {% if user.role == 'superadmin' %}
+                            <strong style="color: var(--accent-red);">Superadmin</strong>
+                            {% elif user.role == 'subadmin' %}
+                            <strong style="color: var(--primary-blue);">Subadmin</strong>
+                            {% elif user.role == 'suspended' %}
+                            <strong style="color: var(--text-muted);">Suspended</strong>
+                            {% else %}
+                            <strong>User</strong>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.role != 'superadmin' %}
+                            {% if user.role != 'subadmin' %}
+                            <button class="btn-small btn-view" onclick="manageUser({{ user.id }}, 'subadmin')">Make
+                                Subadmin</button>
+                            {% else %}
+                            <button class="btn-small btn-reject" onclick="manageUser({{ user.id }}, 'user')">Revoke
+                                Admin</button>
+                            {% endif %}
+
+                            {% if user.role != 'suspended' %}
+                            <button class="btn-small btn-reject"
+                                onclick="manageUser({{ user.id }}, 'suspended')">Suspend</button>
+                            {% else %}
+                            <button class="btn-small btn-approve"
+                                onclick="manageUser({{ user.id }}, 'user')">Restore</button>
+                            {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center;">No users found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        // Function to handle approving/rejecting documents
+        async function manageUpload(uploadId, action) {
+            if (!confirm(`Are you sure you want to ${action} this upload?`)) return;
+
+            try {
+                const response = await fetch(`/admin/upload/${uploadId}/${action}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message);
+                    location.reload(); // Reload the page to show updated status
+                } else {
+                    alert("Error: " + data.message);
+                }
+            } catch (error) {
+                alert("Server connection failed.");
+            }
+        }
+
+        // Function to handle changing user roles
+        async function manageUser(userId, newRole) {
+            if (!confirm(`Are you sure you want to change this user's role to ${newRole}?`)) return;
+
+            try {
+                const response = await fetch(`/admin/user/${userId}/${newRole}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message);
+                    location.reload(); // Reload the page to show updated roles
+                } else {
+                    alert("Error: " + data.message);
+                }
+            } catch (error) {
+                alert("Server connection failed.");
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,400 @@
+/* MODERN RESPONSIVE CSS */
+:root {
+    --primary-blue: #003366;
+    --accent-red: #cc0000;
+    --light-bg: #f4f7f6;
+    --text-dark: #333333;
+    --text-muted: #666666;
+    --success-green: #28a745;
+    --mpesa-green: #49b24b;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--light-bg);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+/* HEADER & NAVIGATION */
+header {
+    background-color: var(--primary-blue);
+    color: white;
+    padding: 1.5rem 1rem;
+    border-bottom: 5px solid var(--accent-red);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header-titles h1 {
+    font-size: 1.8rem;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+    font-style: italic;
+}
+
+.header-titles p {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #ffcccc;
+    margin-top: 5px;
+}
+
+.header-nav button {
+    background: transparent;
+    color: white;
+    border: 1px solid white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: 0.3s;
+}
+
+.header-nav button:hover {
+    background: white;
+    color: var(--primary-blue);
+}
+
+/* MAIN CONTAINER */
+.container {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* SEARCH ENGINE */
+.search-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.search-section input {
+    width: 70%;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px 0 0 8px;
+    font-size: 1rem;
+    outline: none;
+}
+
+.search-section button {
+    padding: 15px 30px;
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.intro-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.intro-section h2 {
+    color: var(--primary-blue);
+    margin-bottom: 10px;
+}
+
+/* GRID SYSTEM */
+.module-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+    .module-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .module-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* CARD STYLING */
+.module-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.module-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-blue);
+}
+
+.card-header {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}
+
+.card-header h3 {
+    font-size: 1.1rem;
+    color: var(--primary-blue);
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.price-tag {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.btn-buy {
+    display: block;
+    width: 100%;
+    background-color: var(--success-green);
+    color: white;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-buy:hover {
+    background-color: #218838;
+}
+
+/* UPLOAD DASHBOARD SECTION */
+#userDashboard {
+    display: none;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin-bottom: 2rem;
+}
+
+.upload-area {
+    border: 2px dashed var(--primary-blue);
+    padding: 2rem;
+    text-align: center;
+    border-radius: 8px;
+    background: #f8f9fa;
+    margin-top: 1rem;
+}
+
+/* CHATBOT FAITH */
+#chatbot-faith {
+    position: fixed;
+    bottom: -320px;
+    /* Hidden state */
+    left: 20px;
+    width: 300px;
+    background: white;
+    border-radius: 10px 10px 0 0;
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    transition: bottom 0.3s ease-in-out;
+}
+
+.chat-header {
+    background: var(--primary-blue);
+    color: white;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+
+.chat-body {
+    height: 250px;
+    padding: 15px;
+    overflow-y: auto;
+    background: #f9f9f9;
+    font-size: 0.9rem;
+}
+
+.bot-msg {
+    background: #e0f0ff;
+    padding: 8px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+.chat-input-area {
+    display: flex;
+    border-top: 1px solid #ddd;
+}
+
+.chat-input-area input {
+    flex-grow: 1;
+    padding: 10px;
+    border: none;
+    outline: none;
+}
+
+.chat-input-area button {
+    background: var(--success-green);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+/* ADMIN DASHBOARD SPECIFIC STYLES */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background: white;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.admin-table th {
+    background-color: #f8f9fa;
+    color: var(--primary-blue);
+}
+
+.btn-small {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: white;
+}
+
+.btn-approve {
+    background-color: var(--success-green);
+}
+
+.btn-reject {
+    background-color: var(--accent-red);
+}
+
+.btn-view {
+    background-color: var(--primary-blue);
+}
+
+/* M-PESA STK PUSH OVERLAY */
+#paymentOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 1001;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    backdrop-filter: blur(5px);
+}
+
+.mpesa-card {
+    background: white;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.mpesa-header {
+    background: var(--mpesa-green);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.mpesa-logo-sim {
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.4rem;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.mpesa-body {
+    padding: 25px;
+    text-align: center;
+}
+
+.btn-cancel {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+/* FOOTER */
+footer {
+    margin-top: 4rem;
+    padding: 2rem;
+    background: #eee;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    border-top: 1px solid #ddd;
+}
+
+.support-email {
+    font-size: 1.1rem;
+    color: var(--primary-blue);
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}

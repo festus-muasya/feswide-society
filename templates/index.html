@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FESWIDE SOCIETY // Official Repository</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <header>
+        <div class="header-titles">
+            <h1>Feswide Society</h1>
+            <p>Premium Answer Repository // 2026 Edition</p>
+        </div>
+        <div class="header-nav">
+            <button onclick="toggleView('store')">Store</button>
+            <button onclick="toggleView('dashboard')">User Dashboard</button>
+        </div>
+    </header>
+
+    <div class="container" id="mainStore">
+        <div class="search-section">
+            <input type="text" id="searchInput" placeholder="Search for Outlier or Handshake project answers...">
+            <button onclick="searchProjects()">Search</button>
+        </div>
+
+        <div class="intro-section">
+            <h2>Verified Knowledge Bases</h2>
+            <p>Access high-quality answers and screening modules securely. Instant delivery via M-Pesa STK Push.</p>
+        </div>
+
+        <div class="module-grid">
+            <div class="module-card">
+                <div class="card-header">
+                    <h3>Aether Multilingual Quality Check</h3>
+                </div>
+                <div class="card-body">
+                    <span class="price-tag">KES 999.00</span>
+                    <button class="btn-buy"
+                        onclick="initiateSTK('Aether Multilingual Quality Check', '999.00')">Purchase Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="userDashboard" style="display: none;">
+        <h2>My Dashboard</h2>
+        <p>Upload your Handshake AI or Outlier AI answers here.</p>
+        <div class="upload-area">
+            <h3>&#8681; Upload PDF Answers</h3>
+            <input type="file" accept=".pdf" id="answerUpload">
+            <button class="btn-buy" style="width: auto; padding: 10px 20px; margin-top: 10px;"
+                onclick="uploadFile()">Submit for Review</button>
+        </div>
+    </div>
+
+    <div id="chatbot-faith">
+        <div class="chat-header">
+            <span>Agent Faith</span>
+            <button onclick="toggleChat()">&#10006;</button>
+        </div>
+        <div class="chat-body" id="chat-body">
+            <div class="bot-msg">Hi there! I'm Faith. Are you looking to buy answers or upload your own to get paid?
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" placeholder="Type a message...">
+            <button>Send</button>
+        </div>
+    </div>
+
+    <div id="paymentOverlay">
+        <div class="mpesa-card">
+            <div class="mpesa-header">
+                <span class="mpesa-logo-sim">M-PESA</span>
+                <h4>Secure Checkout</h4>
+            </div>
+            <div class="mpesa-body">
+                <h3 id="displayItemName">Item Name</h3>
+                <h2 id="displayAmount">KES 0.00</h2>
+                <p id="stkMessage">Requesting...</p>
+                <button onclick="closeOverlay()" class="btn-cancel">Cancel Transaction</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="support-email"><span>&#9993;</span> support@feswide.com</div>
+        <p>&copy; 2026 FESWIDE SOCIETY.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>
