@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__, instance_path='/tmp/instance')
 
+# --- CONFIGURATION & DATABASE ---
 database_url = os.environ.get('DATABASE_URL', 'sqlite:////tmp/feswide.db')
 if database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
@@ -14,6 +15,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'feswide_global_secure_2026')
 
+# Vercel Read-Only File System Fix
 UPLOAD_DIR = '/tmp/uploads' if os.environ.get('VERCEL_ENV') else os.path.join(os.path.dirname(__file__), 'uploads')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
@@ -40,14 +42,23 @@ with app.app_context():
         db.session.add(SiteConfig(key='upload_notice', value="Requirement: Submit your completed PDF for review. Approved submissions generate a KES 500 payout to the provided M-Pesa number."))
     db.session.commit()
 
+# --- M-PESA DARAJA INTEGRATION ---
 def get_daraja_token():
-    key = os.environ.get('DARAJA_CONSUMER_KEY', '')
-    secret = os.environ.get('DARAJA_CONSUMER_SECRET', '')
+    # .strip() prevents hidden space errors from Vercel env variables
+    key = os.environ.get('DARAJA_CONSUMER_KEY', '').strip()
+    secret = os.environ.get('DARAJA_CONSUMER_SECRET', '').strip()
     url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials" 
+    
     try:
-        r = requests.get(url, auth=(key, secret), timeout=5)
-        return r.json().get('access_token')
-    except: return None
+        r = requests.get(url, auth=(key, secret), timeout=10)
+        if r.status_code == 200:
+            return r.json().get('access_token')
+        else:
+            print(f"DARAJA AUTH REJECTED: Status {r.status_code} - {r.text}")
+            return None
+    except Exception as e: 
+        print(f"DARAJA NETWORK ERROR: {e}")
+        return None
 
 @app.route('/stk-push', methods=['POST'])
 def stk_push():
@@ -59,17 +70,25 @@ def stk_push():
     if not product or not phone: return jsonify({"error": "Invalid request"}), 400
 
     token = get_daraja_token()
-    if not token: return jsonify({"error": "Payment Gateway Error. Try again later."}), 500
+    if not token: 
+        return jsonify({"error": "Payment Gateway Error. Check Vercel logs."}), 500
 
-    shortcode = os.environ.get('DARAJA_BUSINESS_SHORTCODE', '174379')
-    passkey = os.environ.get('DARAJA_PASSKEY', 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919')
+    shortcode = os.environ.get('DARAJA_BUSINESS_SHORTCODE', '174379').strip()
+    passkey = os.environ.get('DARAJA_PASSKEY', 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919').strip()
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     password = base64.b64encode((shortcode + passkey + timestamp).encode()).decode('utf-8')
 
+    # Format phone to 254...
     if phone.startswith('0'): phone = '254' + phone[1:]
     elif phone.startswith('+'): phone = phone[1:]
 
     headers = {"Authorization": f"Bearer {token}"}
+    
+    # Ensure Callback URL is an absolute HTTPS link
+    callback_url = request.host_url.rstrip('/') + "/daraja-callback"
+    if callback_url.startswith("http://") and "localhost" not in callback_url:
+        callback_url = callback_url.replace("http://", "https://")
+
     payload = {
         "BusinessShortCode": shortcode,
         "Password": password,
@@ -79,21 +98,27 @@ def stk_push():
         "PartyA": phone,
         "PartyB": shortcode,
         "PhoneNumber": phone,
-        "CallBackURL": f"https://{request.host}/daraja-callback",
+        "CallBackURL": callback_url,
         "AccountReference": f"Feswide_{product.id}",
         "TransactionDesc": f"Payment for {product.name}"
     }
 
     url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest" 
-    r = requests.post(url, json=payload, headers=headers)
-    response_data = r.json()
+    try:
+        r = requests.post(url, json=payload, headers=headers, timeout=15)
+        response_data = r.json()
 
-    if response_data.get('ResponseCode') == '0':
-        checkout_id = response_data.get('CheckoutRequestID')
-        db.session.add(Transaction(checkout_request_id=checkout_id, phone=phone, amount=product.price, product_id=product.id))
-        db.session.commit()
-        return jsonify({"status": "success", "checkout_id": checkout_id})
-    return jsonify({"error": "Failed to trigger M-Pesa. Check number format."}), 400
+        if response_data.get('ResponseCode') == '0':
+            checkout_id = response_data.get('CheckoutRequestID')
+            db.session.add(Transaction(checkout_request_id=checkout_id, phone=phone, amount=product.price, product_id=product.id))
+            db.session.commit()
+            return jsonify({"status": "success", "checkout_id": checkout_id})
+        else:
+            print(f"STK PUSH FAILED: {response_data}")
+            return jsonify({"error": "Failed to trigger M-Pesa. Check number format or Daraja balance."}), 400
+    except Exception as e:
+        print(f"STK PUSH EXCEPTION: {e}")
+        return jsonify({"error": "M-Pesa API connection failed."}), 500
 
 @app.route('/daraja-callback', methods=['POST'])
 def daraja_callback():
@@ -107,7 +132,8 @@ def daraja_callback():
         if txn:
             txn.status = 'Paid' if result_code == 0 else 'Failed'
             db.session.commit()
-    except Exception as e: print("Callback Error:", e)
+    except Exception as e: 
+        print(f"CALLBACK ERROR: {e}")
     return jsonify({"ResultCode": 0, "ResultDesc": "Accepted"})
 
 @app.route('/check-payment/<checkout_id>')
@@ -128,6 +154,7 @@ def secure_download(token):
     db.session.commit()
     return send_from_directory(UPLOAD_DIR, product.filename, as_attachment=True)
 
+# --- USER ROUTES ---
 @app.route('/')
 def index():
     config = {c.key: c.value for c in SiteConfig.query.all()}
@@ -160,6 +187,7 @@ def faith_chat():
     else: reply = "Processing request. Contact support@feswide.com for human assistance."
     return jsonify({"reply": reply})
 
+# --- ADMIN ROUTES ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if not AdminUser.query.first():
@@ -209,6 +237,49 @@ def edit_product(id):
     db.session.commit()
     log_action(session['username'], f"Edited product: {p.name}")
     return redirect(url_for('admin'))
+
+@app.route('/admin/add-product', methods=['POST'])
+def add_product():
+    if session.get('role') != 'superadmin': abort(403)
+    file = request.files.get('file')
+    if file and file.filename.endswith('.pdf'):
+        fname = secure_filename(file.filename)
+        file.save(os.path.join(UPLOAD_DIR, fname))
+        prod_name = request.form.get('name')
+        db.session.add(Product(name=prod_name, price=float(request.form.get('price')), description=request.form.get('description'), filename=fname))
+        db.session.commit()
+        log_action(session['username'], f"Published module: {prod_name}")
+    return redirect(url_for('admin'))
+
+@app.route('/admin/delete-product/<int:id>', methods=['POST'])
+def delete_product(id):
+    if session.get('role') != 'superadmin': abort(403)
+    p = Product.query.get_or_404(id)
+    log_action(session['username'], f"Deleted module: {p.name}")
+    db.session.delete(p)
+    db.session.commit()
+    return jsonify({"success": True})
+
+@app.route('/admin/create-subadmin', methods=['POST'])
+def create_subadmin():
+    if session.get('role') != 'superadmin': abort(403)
+    u = request.form.get('username')
+    p = request.form.get('password')
+    if not AdminUser.query.filter_by(username=u).first():
+        db.session.add(AdminUser(username=u, password=p, role='subadmin'))
+        db.session.commit()
+        log_action(session['username'], f"Created subadmin: {u}")
+    return redirect(url_for('admin'))
+
+@app.route('/admin/toggle-admin/<int:id>', methods=['POST'])
+def toggle_admin(id):
+    if session.get('role') != 'superadmin': abort(403)
+    admin_account = AdminUser.query.get_or_404(id)
+    if admin_account.username != 'superadmin':
+        admin_account.is_active = not admin_account.is_active
+        db.session.commit()
+        log_action(session['username'], f"Toggled access for: {admin_account.username}")
+    return jsonify({"success": True})
 
 @app.route('/admin/download/<filename>')
 def download_file(filename):
