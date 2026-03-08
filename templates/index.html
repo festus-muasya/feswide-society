@@ -3,7 +3,6 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FESWIDE SOCIETY</title>
     <style>
         :root {
@@ -55,28 +54,6 @@
             font-weight: bold;
         }
 
-        /* Chat agent styles */
-        .chat-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--maroon);
-            color: white;
-            padding: 15px 25px;
-            border: 2px solid #000;
-            cursor: pointer;
-        }
-
-        .chat-window {
-            display: none;
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            width: 300px;
-            background: white;
-            border: 2px solid #000;
-        }
-
         #global-modal {
             display: none;
             position: fixed;
@@ -116,13 +93,6 @@
         </div>
     </div>
 
-    <button class="chat-btn" onclick="toggleChat()">SUPPORT ASSISTANT</button>
-    <div class="chat-window" id="chatWin">
-        <div style="background:var(--navy); color:white; padding:10px;">Agent Faith</div>
-        <div id="chatBody" style="height:200px; overflow-y:auto; padding:10px;"></div>
-        <input type="text" id="cIn" style="width:100%; padding:10px; box-sizing:border-box;" placeholder="Type here...">
-    </div>
-
     <div id="global-modal">
         <div class="modal-content">
             <h3 id="mTitle"></h3>
@@ -143,20 +113,16 @@
         document.onkeydown = function (e) {
             if (event.keyCode == 123) return false;
             if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
-            if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
-            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
             if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
         };
 
         let curId = null;
         function openPayment(id, name) { curId = id; document.getElementById('mTitle').innerText = name; document.getElementById('global-modal').style.display = 'flex'; }
         function toggleInputs() { document.getElementById('phone').style.display = document.getElementById('method').value === 'mpesa' ? 'block' : 'none'; }
-        function toggleChat() { let w = document.getElementById('chatWin'); w.style.display = w.style.display === 'block' ? 'none' : 'block'; }
 
         async function pay() {
             let m = document.getElementById('method').value;
-            let route = m === 'mpesa' ? '/stk-push' : '/binance-pay';
-            let res = await fetch(route, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: curId, phone: document.getElementById('phone').value }) });
+            let res = await fetch(m === 'mpesa' ? '/stk-push' : '/binance-pay', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: curId, phone: document.getElementById('phone').value }) });
             let data = await res.json();
             if (data.checkout_url) window.location.href = data.checkout_url;
             else if (data.status === 'success') alert("Check phone for STK Prompt!");
