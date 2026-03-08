@@ -7,8 +7,8 @@
     <title>LOGIN | FESWIDE SOCIETY</title>
     <style>
         body {
-            background: #F3F4F6;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #e0e0e0;
+            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -18,64 +18,68 @@
 
         .login-box {
             background: #FFFFFF;
-            border-radius: 12px;
+            border: 4px solid #003366;
             padding: 40px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            box-shadow: 10px 10px 0px #000000;
             width: 100%;
             max-width: 400px;
         }
 
         h2 {
-            color: #0A2540;
+            color: #800000;
             margin-bottom: 25px;
-            font-weight: 800;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
         }
 
         .form-control {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            border: 2px solid #000;
             outline: none;
-            font-size: 15px;
+            font-size: 14px;
             box-sizing: border-box;
+            font-weight: bold;
         }
 
         .form-control:focus {
-            border-color: #0A2540;
+            border-color: #003366;
         }
 
         .btn {
-            background: #0A2540;
+            background: #003366;
             color: #FFFFFF;
-            padding: 16px;
+            padding: 15px;
             width: 100%;
-            border: none;
-            border-radius: 8px;
+            border: 2px solid #000;
             cursor: pointer;
             font-weight: bold;
             font-size: 15px;
+            text-transform: uppercase;
         }
 
         .btn:hover {
-            background: #1A56DB;
+            background: #800000;
         }
 
         .error {
-            background: #FDE8E8;
-            color: #C81E1E;
+            background: #fff3cd;
+            color: #856404;
             padding: 15px;
-            border-radius: 8px;
+            border: 2px solid #856404;
             margin-bottom: 20px;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
         }
     </style>
 </head>
 
-<body oncontextmenu="return false;">
+<body oncontextmenu="preventInspect(event)">
     <div class="login-box">
         <h2>SECURE TERMINAL</h2>
         {% if error %}<div class="error">{{ error }}</div>{% endif %}
@@ -85,6 +89,14 @@
             <button type="submit" class="btn">AUTHENTICATE</button>
         </form>
     </div>
+    <script>
+        function preventInspect(e) { e.preventDefault(); alert("Access Denied"); return false; }
+        document.addEventListener('keydown', function (e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
+                e.preventDefault(); alert("Access Denied"); return false;
+            }
+        });
+    </script>
 </body>
 
 </html>

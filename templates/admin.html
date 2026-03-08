@@ -7,18 +7,19 @@
     <title>ADMIN TERMINAL | FESWIDE SOCIETY</title>
     <style>
         :root {
-            --navy: #0A2540;
-            --blue: #1A56DB;
+            --navy: #003366;
+            --maroon: #800000;
             --white: #FFFFFF;
-            --bg: #F3F4F6;
+            --bg: #e0e0e0;
+            --black: #000000;
         }
 
         body {
             background: var(--bg);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: Arial, sans-serif;
             padding: 20px;
             margin: 0;
-            color: #333;
+            color: var(--black);
         }
 
         .header {
@@ -28,85 +29,92 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-radius: 8px;
+            border: 4px solid var(--black);
             margin-bottom: 30px;
         }
 
         .header h1 {
             margin: 0;
             font-size: 20px;
+            text-transform: uppercase;
         }
 
         .btn {
             padding: 10px 18px;
-            border: none;
-            border-radius: 6px;
+            border: 2px solid var(--black);
             cursor: pointer;
-            font-weight: 600;
+            font-weight: bold;
             font-size: 13px;
             text-decoration: none;
             display: inline-block;
             color: white;
+            text-transform: uppercase;
         }
 
         .btn-logout {
-            background: #DC2626;
+            background: var(--maroon);
         }
 
         .btn-blue {
-            background: var(--blue);
+            background: var(--navy);
         }
 
         .btn-red {
-            background: #DC2626;
+            background: var(--maroon);
         }
 
         .btn-green {
-            background: #059669;
+            background: #155724;
         }
 
         .panel {
             background: var(--white);
             padding: 30px;
-            border-radius: 12px;
+            border: 4px solid var(--black);
             margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 8px 8px 0px var(--black);
         }
 
         .panel h2 {
             color: var(--navy);
-            border-bottom: 2px solid #eee;
+            border-bottom: 3px solid var(--maroon);
             padding-bottom: 15px;
             margin-bottom: 20px;
             font-size: 18px;
+            text-transform: uppercase;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         th,
         td {
-            border-bottom: 1px solid #eee;
-            padding: 15px;
+            border: 2px solid var(--black);
+            padding: 12px;
             text-align: left;
         }
 
         th {
-            background: #f8f9fa;
-            color: var(--navy);
+            background: var(--navy);
+            color: var(--white);
+        }
+
+        tr:nth-child(even) {
+            background: #f0f0f0;
         }
 
         .form-control {
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            padding: 10px;
+            border: 2px solid var(--black);
             margin-bottom: 10px;
             width: 100%;
             font-family: inherit;
+            font-size: 13px;
+            outline: none;
         }
     </style>
 </head>
@@ -127,10 +135,10 @@
         <div class="panel">
             <h2>EDIT SITE MESSAGES</h2>
             <form action="/admin/update-config" method="POST">
-                <label style="font-size:12px; font-weight:bold; color:#666;">Homepage Hero Text:</label>
+                <label style="font-size:12px; font-weight:bold;">Homepage Hero Text:</label>
                 <textarea name="hero_text" class="form-control" rows="3">{{ config.hero_text }}</textarea>
 
-                <label style="font-size:12px; font-weight:bold; color:#666;">Upload Notice Text:</label>
+                <label style="font-size:12px; font-weight:bold;">Upload Notice Text:</label>
                 <textarea name="upload_notice" class="form-control" rows="2">{{ config.upload_notice }}</textarea>
 
                 <button type="submit" class="btn btn-blue">SAVE CHANGES</button>
@@ -138,23 +146,23 @@
         </div>
 
         <div class="panel">
-            <h2>LIVE M-PESA TRANSACTIONS</h2>
+            <h2>SECURE DOWNLOAD TRACKING</h2>
+            <p style="font-size: 12px; font-weight: bold; margin-bottom: 10px;">Unique ID maps authorized buyers to
+                limit file sharing.</p>
             <div style="max-height: 250px; overflow-y: auto;">
                 <table>
                     <tr>
-                        <th>Phone</th>
-                        <th>Amount</th>
+                        <th>Buyer Phone</th>
+                        <th>Unique Request ID</th>
                         <th>Status</th>
-                        <th>Time</th>
                     </tr>
                     {% for t in txns %}
                     <tr>
-                        <td>{{ t.phone }}</td>
-                        <td>KES {{ t.amount }}</td>
+                        <td><strong>{{ t.phone }}</strong></td>
+                        <td style="font-size: 11px;">{{ t.checkout_request_id }}</td>
                         <td
-                            style="color: {% if t.status == 'Paid' %}#059669{% else %}#DC2626{% endif %}; font-weight:bold;">
+                            style="color: {% if t.status == 'Paid' %}#155724{% else %}var(--maroon){% endif %}; font-weight:bold;">
                             {{ t.status }}</td>
-                        <td style="font-size: 12px;">{{ t.timestamp.strftime('%H:%M:%S') }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -166,7 +174,7 @@
     <div class="panel">
         <h2>STORE INVENTORY CONTROL</h2>
         {% if role == 'superadmin' %}
-        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+        <div style="background: #e0e0e0; padding: 20px; border: 2px solid var(--black); margin-bottom: 25px;">
             <form action="/admin/add-product" method="POST" enctype="multipart/form-data"
                 style="display: flex; gap: 10px; align-items: center;">
                 <input type="text" name="name" class="form-control" placeholder="Module Title" required
@@ -221,6 +229,11 @@
             const res = await fetch('/admin/delete-product/' + id, { method: 'POST' });
             if (res.ok) location.reload();
         }
+        document.addEventListener('keydown', function (e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
+                e.preventDefault(); alert("Access Denied"); return false;
+            }
+        });
     </script>
 </body>
 

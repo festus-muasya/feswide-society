@@ -7,26 +7,27 @@
     <meta name="description"
         content="Feswide Society: The premium repository for Outlier and Handshake AI verified answers.">
     <link rel="icon" href="/static/logo.png" type="image/png">
-    <title>FESWIDE SOCIETY | Official Repository</title>
+    <title>FESWIDE SOCIETY | OFFICIAL REPOSITORY</title>
     <style>
         :root {
-            --navy: #0A2540;
-            --blue: #1A56DB;
-            --grey: #F3F4F6;
-            --white: #FFFFFF;
-            --text: #1F2937;
+            --navy: #003366;
+            --maroon: #800000;
+            --brown: #8B4513;
+            --grey: #e0e0e0;
+            --white: #ffffff;
+            --black: #000000;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         body {
             background: var(--grey);
-            color: var(--text);
+            color: var(--black);
             overflow-x: hidden;
         }
 
@@ -35,12 +36,12 @@
             padding: 25px 20px;
             text-align: center;
             color: var(--white);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-bottom: 6px solid var(--maroon);
         }
 
         .logo h1 {
-            font-size: 28px;
-            font-weight: 800;
+            font-size: 26px;
+            text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 20px;
         }
@@ -48,28 +49,28 @@
         .nav-btns {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 10px;
             flex-wrap: wrap;
         }
 
         .nav-btns button {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--white);
-            border: 2px solid transparent;
+            background: var(--grey);
+            color: var(--navy);
+            border: 2px solid var(--black);
             padding: 12px 25px;
             cursor: pointer;
             font-size: 14px;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: 0.3s;
+            font-weight: bold;
+            text-transform: uppercase;
         }
 
         .nav-btns button.active {
-            background: var(--blue);
-            border-color: var(--blue);
+            background: var(--maroon);
+            color: var(--white);
+            border-color: var(--white);
         }
 
-        /* ADVANCED MODAL (NO BROWSER ALERTS) */
+        /* CUSTOM MODAL */
         #global-modal {
             display: none;
             position: fixed;
@@ -77,8 +78,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.8);
             z-index: 5000;
             align-items: center;
             justify-content: center;
@@ -86,47 +86,33 @@
 
         .modal-card {
             background: var(--white);
-            border-radius: 12px;
+            border: 4px solid var(--navy);
             width: 90%;
             max-width: 450px;
             text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            box-shadow: 10px 10px 0px var(--black);
         }
 
         .modal-header {
-            padding: 20px;
+            padding: 15px;
             background: var(--navy);
             color: var(--white);
             font-weight: bold;
             font-size: 18px;
+            text-transform: uppercase;
         }
 
         .modal-body {
             padding: 30px 20px;
             font-size: 15px;
-            color: #444;
-            line-height: 1.6;
+            line-height: 1.5;
+            font-weight: bold;
         }
 
         .modal-input {
             width: 100%;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            padding: 12px;
+            border: 2px solid var(--black);
             margin-top: 15px;
             font-size: 16px;
             outline: none;
@@ -134,8 +120,9 @@
         }
 
         .modal-footer {
-            padding: 20px;
-            background: #f8f9fa;
+            padding: 15px;
+            background: #eee;
+            border-top: 2px solid var(--black);
             display: flex;
             gap: 10px;
             justify-content: center;
@@ -144,188 +131,182 @@
         .container {
             width: 95%;
             max-width: 1200px;
-            margin: 40px auto;
+            margin: 30px auto;
         }
 
         .info-panel {
             background: var(--white);
-            border-left: 6px solid var(--blue);
-            padding: 25px;
+            border: 2px solid var(--black);
+            border-left: 8px solid var(--navy);
+            padding: 20px;
             margin-bottom: 30px;
             font-size: 15px;
             line-height: 1.6;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            font-weight: bold;
         }
 
+        /* RESPONSIVE GRID */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
         }
 
         .card {
             background: var(--white);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 2px solid var(--black);
+            border-top: 6px solid var(--navy);
+            padding: 25px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border-top: 6px solid var(--navy);
-            transition: transform 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
         }
 
         .card-title {
             color: var(--navy);
-            font-size: 20px;
-            margin-bottom: 12px;
-            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
         }
 
         .card-desc {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 20px;
-            min-height: 45px;
-            line-height: 1.5;
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 15px;
+            min-height: 40px;
         }
 
         .price {
-            font-size: 28px;
-            color: var(--navy);
+            font-size: 26px;
+            color: var(--maroon);
             font-weight: bold;
-            margin: 20px 0;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
+            margin: 15px 0;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ccc;
         }
 
         .btn-action {
-            background: var(--blue);
+            background: var(--navy);
             color: var(--white);
-            padding: 15px;
+            padding: 12px;
             width: 100%;
-            border: none;
-            border-radius: 8px;
+            border: 2px solid var(--black);
             cursor: pointer;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: bold;
-            transition: background 0.2s;
+            text-transform: uppercase;
         }
 
         .btn-action:hover {
-            background: #1449B8;
+            background: var(--maroon);
         }
 
-        .btn-secondary {
-            background: #E5E7EB;
-            color: #374151;
-        }
-
-        .btn-secondary:hover {
-            background: #D1D5DB;
+        .pending-notice {
+            background: var(--white);
+            border: 2px solid var(--black);
+            padding: 20px;
+            text-align: center;
+            color: var(--navy);
+            font-weight: bold;
+            margin-top: 30px;
+            font-size: 16px;
         }
 
         .form-control {
             width: 100%;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background: #fdfdfd;
-            font-size: 15px;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid var(--black);
+            background: #f9f9f9;
+            font-size: 14px;
             outline: none;
         }
 
         .notice {
-            background: #F0F7FF;
-            border: 1px solid #CCE3FD;
-            color: #0056B3;
+            background: #fff3cd;
+            border: 2px solid #856404;
+            color: #856404;
             padding: 15px;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 25px;
-            line-height: 1.5;
+            font-size: 13px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
         }
 
         /* CHATBOT */
         #chatbot {
             position: fixed;
-            bottom: 90px;
+            bottom: 80px;
             right: 20px;
-            width: 340px;
+            width: 320px;
+            max-width: 90vw;
             background: var(--white);
-            border-radius: 12px;
+            border: 4px solid var(--navy);
             display: none;
             flex-direction: column;
             z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.5);
         }
 
         .chat-head {
             background: var(--navy);
             color: var(--white);
-            padding: 18px;
+            padding: 15px;
             font-weight: bold;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            text-transform: uppercase;
         }
 
         .chat-body {
-            height: 280px;
+            height: 250px;
             overflow-y: auto;
-            padding: 20px;
-            background: #f8f9fa;
-            font-size: 14px;
+            padding: 15px;
+            background: #eee;
+            font-size: 13px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
+            border-bottom: 2px solid var(--black);
         }
 
         .chat-bubble {
-            padding: 12px 16px;
-            border-radius: 12px;
+            padding: 10px;
+            border: 1px solid var(--black);
             max-width: 85%;
-            line-height: 1.5;
+            font-weight: bold;
         }
 
         .chat-bot {
             background: var(--white);
-            border: 1px solid #eee;
             align-self: flex-start;
-            border-bottom-left-radius: 4px;
         }
 
         .chat-user {
-            background: var(--blue);
+            background: var(--navy);
             color: var(--white);
             align-self: flex-end;
-            border-bottom-right-radius: 4px;
         }
 
         .chat-input-area {
             display: flex;
-            border-top: 1px solid #eee;
         }
 
         .chat-input-area input {
             flex: 1;
-            padding: 15px;
+            padding: 12px;
             border: none;
             outline: none;
+            font-weight: bold;
         }
 
         .chat-input-area button {
             background: var(--navy);
             color: var(--white);
             border: none;
-            padding: 0 20px;
+            border-left: 2px solid var(--black);
+            padding: 0 15px;
             cursor: pointer;
             font-weight: bold;
         }
@@ -334,28 +315,29 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: var(--navy);
+            background: var(--maroon);
             color: var(--white);
-            padding: 16px 24px;
-            border-radius: 30px;
+            padding: 15px 20px;
+            border: 2px solid var(--black);
             cursor: pointer;
             z-index: 1001;
             font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            border: none;
+            text-transform: uppercase;
+            box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5);
         }
 
         footer {
             background: var(--navy);
             color: var(--white);
-            padding: 50px 20px;
+            padding: 40px 20px;
             text-align: center;
-            margin-top: 60px;
+            margin-top: 50px;
+            border-top: 6px solid var(--maroon);
         }
     </style>
 </head>
 
-<body oncontextmenu="return false;">
+<body oncontextmenu="preventInspect(event)">
 
     <div id="global-modal">
         <div class="modal-card">
@@ -365,7 +347,7 @@
                 <input type="text" id="mInput" class="modal-input" placeholder="e.g. 2547XXXXXXXX">
             </div>
             <div class="modal-footer" id="mFooter">
-                <button class="btn-action btn-secondary" style="width: auto; padding: 10px 20px;"
+                <button class="btn-action" style="background: #666; width: auto; padding: 10px 20px;"
                     onclick="closeModal()">CLOSE</button>
                 <button class="btn-action" id="mConfirm"
                     style="width: auto; padding: 10px 20px; display: none;">CONFIRM</button>
@@ -398,16 +380,21 @@
                 <div>
                     <p class="price">KES {{ p.price }}</p>
                     <button type="button" class="btn-action"
-                        onclick="initiatePayment({{ p.id }}, '{{ p.name }}')">Purchase Download</button>
+                        onclick="initiatePayment({{ p.id }}, '{{ p.name }}')">PURCHASE DOWNLOAD</button>
                 </div>
             </div>
             {% endfor %}
+        </div>
+
+        <div class="pending-notice">
+            All unavailable answers will be automatically posted, we are working on that. To start earning, navigate to
+            our contributor dashboard.
         </div>
     </div>
 
     <div class="container" id="dash" style="display:none;">
         <div class="grid">
-            <div class="card">
+            <div class="card" style="border-top-color: var(--navy);">
                 <h2 style="color: var(--navy); margin-bottom: 20px;">UPLOAD PORTAL</h2>
                 <div class="notice">{{ config.upload_notice }}</div>
                 <select id="pform" class="form-control">
@@ -417,16 +404,17 @@
                 <input type="text" id="pname" class="form-control" placeholder="Exact Project Name">
                 <input type="text" id="pmpesa" class="form-control" placeholder="M-Pesa Payout Number (254...)">
                 <input type="file" id="pfile" accept=".pdf" class="form-control"
-                    style="background: white; padding: 12px;">
+                    style="background: white; padding: 10px;">
                 <button type="button" class="btn-action" onclick="submitUpload()">SUBMIT DOCUMENT</button>
             </div>
 
-            <div class="card">
-                <h2 style="color: var(--navy); margin-bottom: 20px;">REQUEST BOX</h2>
-                <p style="font-size: 14px; color: #555; margin-bottom: 25px; line-height: 1.6;">Cannot locate your
-                    assigned project? Submit a request here. High-demand projects are prioritized.</p>
+            <div class="card" style="border-top-color: var(--brown);">
+                <h2 style="color: var(--brown); margin-bottom: 20px;">REQUEST BOX</h2>
+                <p style="font-size: 13px; color: #333; margin-bottom: 25px; line-height: 1.5; font-weight: bold;">
+                    Cannot locate your assigned project? Submit a request here. High-demand projects are prioritized.
+                </p>
                 <input type="text" id="vname" class="form-control" placeholder="Target Project Name">
-                <button type="button" class="btn-action" style="background: #374151;" onclick="submitVote()">SUBMIT
+                <button type="button" class="btn-action" style="background: var(--brown);" onclick="submitVote()">SUBMIT
                     REQUEST</button>
             </div>
         </div>
@@ -435,7 +423,7 @@
     <button id="chat-trigger" onclick="toggleChat()">SUPPORT ASSISTANT</button>
     <div id="chatbot">
         <div class="chat-head"><span>AGENT FAITH</span><span onclick="toggleChat()"
-                style="cursor:pointer; font-size: 18px;">&times;</span></div>
+                style="cursor:pointer; font-size: 18px;">X</span></div>
         <div class="chat-body" id="chatBody">
             <div class="chat-bubble chat-bot">Welcome. I am Agent Faith. How may I assist you?</div>
         </div>
@@ -446,7 +434,7 @@
     </div>
 
     <footer>
-        <p style="font-size: 12px; color: #a8c7fa;">&copy; 2026 FESWIDE SOCIETY | UNAUTHORIZED DUPLICATION PROHIBITED
+        <p style="font-size: 12px; font-weight: bold;">&copy; 2026 FESWIDE SOCIETY | UNAUTHORIZED DUPLICATION PROHIBITED
         </p>
     </footer>
 
@@ -456,43 +444,18 @@
         function showModal(title, body, showInput = false, confirmCallback = null) {
             document.getElementById('mTitle').innerText = title;
             document.getElementById('mBody').innerText = body;
-
             const input = document.getElementById('mInput');
             const confirmBtn = document.getElementById('mConfirm');
 
-            if (showInput) { input.style.display = 'block'; input.value = ''; }
-            else { input.style.display = 'none'; }
-
-            if (confirmCallback) {
-                confirmBtn.style.display = 'block';
-                confirmBtn.onclick = confirmCallback;
-            } else { confirmBtn.style.display = 'none'; }
-
+            if (showInput) { input.style.display = 'block'; input.value = ''; } else { input.style.display = 'none'; }
+            if (confirmCallback) { confirmBtn.style.display = 'block'; confirmBtn.onclick = confirmCallback; } else { confirmBtn.style.display = 'none'; }
             document.getElementById('global-modal').style.display = 'flex';
         }
 
-        function closeModal() {
-            document.getElementById('global-modal').style.display = 'none';
-            if (pollInterval) clearInterval(pollInterval);
-        }
+        function closeModal() { document.getElementById('global-modal').style.display = 'none'; if (pollInterval) clearInterval(pollInterval); }
+        function switchTab(view) { document.getElementById('store').style.display = view === 'store' ? 'block' : 'none'; document.getElementById('dash').style.display = view === 'dash' ? 'block' : 'none'; document.getElementById('b-store').className = view === 'store' ? 'active' : ''; document.getElementById('b-dash').className = view === 'dash' ? 'active' : ''; }
+        function searchModules() { let q = document.getElementById('sInput').value.toLowerCase(); document.querySelectorAll('#store .card').forEach(c => { let t = c.querySelector('.card-title').innerText.toLowerCase(); c.style.display = t.includes(q) ? 'flex' : 'none'; }); }
 
-        function switchTab(view) {
-            document.getElementById('store').style.display = view === 'store' ? 'block' : 'none';
-            document.getElementById('dash').style.display = view === 'dash' ? 'block' : 'none';
-            document.getElementById('b-store').className = view === 'store' ? 'active' : '';
-            document.getElementById('b-dash').className = view === 'dash' ? 'active' : '';
-        }
-
-        function searchModules() {
-            let q = document.getElementById('sInput').value.toLowerCase();
-            let cards = document.querySelectorAll('#store .card');
-            cards.forEach(c => {
-                let t = c.querySelector('.card-title').innerText.toLowerCase();
-                c.style.display = t.includes(q) ? 'flex' : 'none';
-            });
-        }
-
-        // --- M-PESA PAYMENT LOGIC ---
         function initiatePayment(productId, productName) {
             showModal('M-PESA CHECKOUT', `Enter your M-Pesa phone number to purchase ${productName}.`, true, async () => {
                 let phone = document.getElementById('mInput').value;
@@ -504,21 +467,13 @@
                 document.getElementById('mBody').innerText = 'Triggering STK Push. Check your phone for the PIN prompt...';
 
                 try {
-                    let res = await fetch('/stk-push', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ phone: phone, product_id: productId })
-                    });
+                    let res = await fetch('/stk-push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: phone, product_id: productId }) });
                     let data = await res.json();
-
                     if (data.status === 'success') {
                         document.getElementById('mBody').innerText = 'Awaiting payment confirmation. Please do not close this window...';
                         pollPayment(data.checkout_id);
-                    } else {
-                        document.getElementById('mTitle').innerText = 'ERROR';
-                        document.getElementById('mBody').innerText = data.error;
-                    }
-                } catch (e) { document.getElementById('mBody').innerText = 'Connection Error.'; }
+                    } else { showModal('ERROR', data.error); }
+                } catch (e) { showModal('ERROR', 'Connection Error.'); }
             });
         }
 
@@ -529,63 +484,41 @@
                 if (data.status === 'Paid') {
                     clearInterval(pollInterval);
                     document.getElementById('mTitle').innerText = 'PAYMENT SUCCESSFUL';
-                    document.getElementById('mBody').innerHTML = `<p style="margin-bottom:15px; color:green; font-weight:bold;">Transaction Verified!</p> <a href="/secure-download/${data.download_token}" target="_blank" style="background:#1A56DB; color:white; padding:12px 20px; text-decoration:none; border-radius:6px; display:inline-block;">DOWNLOAD SECURE PDF</a> <p style="font-size:11px; margin-top:10px; color:red;">This link will expire after 3 uses.</p>`;
+                    document.getElementById('mBody').innerHTML = `<p style="margin-bottom:15px; color:green;">Transaction Verified!</p> <a href="/secure-download/${data.download_token}" target="_blank" style="background:var(--navy); color:white; padding:12px 20px; text-decoration:none; border: 2px solid var(--black); display:inline-block; font-weight:bold;">DOWNLOAD SECURE PDF</a> <p style="font-size:11px; margin-top:10px; color:red;">This secure link expires after 3 uses to prevent sharing.</p>`;
                 } else if (data.status === 'Failed') {
                     clearInterval(pollInterval);
-                    document.getElementById('mTitle').innerText = 'PAYMENT FAILED';
-                    document.getElementById('mBody').innerText = 'Transaction cancelled or failed.';
+                    showModal('PAYMENT FAILED', 'Transaction cancelled or failed.');
                 }
             }, 3000);
         }
 
-        // --- UPLOAD & VOTE LOGIC ---
         async function submitUpload() {
-            let file = document.getElementById('pfile').files[0];
-            let pname = document.getElementById('pname').value;
-            let pmpesa = document.getElementById('pmpesa').value;
+            let file = document.getElementById('pfile').files[0]; let pname = document.getElementById('pname').value; let pmpesa = document.getElementById('pmpesa').value;
             if (!file || !pname || !pmpesa) { showModal('ERROR', 'All fields and a PDF document are required.'); return; }
-
-            let fd = new FormData();
-            fd.append('file', file);
-            fd.append('platform', document.getElementById('pform').value);
-            fd.append('project_name', pname);
-            fd.append('mpesa_number', pmpesa);
-
-            try {
-                let res = await fetch('/upload-answer', { method: 'POST', body: fd });
-                let d = await res.json();
-                showModal(d.status === 'success' ? 'SUCCESS' : 'ERROR', d.message);
-                if (d.status === 'success') { document.getElementById('pname').value = ''; document.getElementById('pfile').value = ''; }
-            } catch (e) { showModal('ERROR', 'Connection failed. Please try again.'); }
+            let fd = new FormData(); fd.append('file', file); fd.append('platform', document.getElementById('pform').value); fd.append('project_name', pname); fd.append('mpesa_number', pmpesa);
+            try { let res = await fetch('/upload-answer', { method: 'POST', body: fd }); let d = await res.json(); showModal(d.status === 'success' ? 'SUCCESS' : 'ERROR', d.message); if (d.status === 'success') { document.getElementById('pname').value = ''; document.getElementById('pfile').value = ''; } } catch (e) { showModal('ERROR', 'Connection failed.'); }
         }
 
         async function submitVote() {
-            let n = document.getElementById('vname').value;
-            if (!n) { showModal('ERROR', 'Please enter a target project name.'); return; }
+            let n = document.getElementById('vname').value; if (!n) { showModal('ERROR', 'Please enter a target project name.'); return; }
             await fetch('/request-project', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ project_name: n, platform: 'REQUEST' }) });
-            showModal('SUCCESS', 'Request logged. Engineers will process this module in less than 48 hours.');
-            document.getElementById('vname').value = '';
+            showModal('SUCCESS', 'Request logged. Engineers will process this module in less than 48 hours.'); document.getElementById('vname').value = '';
         }
 
-        // --- CHATBOT ---
         function toggleChat() { let c = document.getElementById('chatbot'); c.style.display = c.style.display === 'flex' ? 'none' : 'flex'; }
-
         async function sendChatMsg() {
-            let i = document.getElementById('cIn');
-            let b = document.getElementById('chatBody');
-            if (!i.value) return;
-            let q = i.value;
-            b.innerHTML += `<div class="chat-bubble chat-user">${q}</div>`;
-            i.value = ''; b.scrollTop = b.scrollHeight;
-            try {
-                let res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: q }) });
-                let d = await res.json();
-                setTimeout(() => { b.innerHTML += `<div class="chat-bubble chat-bot">${d.reply}</div>`; b.scrollTop = b.scrollHeight; }, 500);
-            } catch (e) { setTimeout(() => { b.innerHTML += `<div class="chat-bubble chat-bot" style="color:red;">Network Error.</div>`; b.scrollTop = b.scrollHeight; }, 500); }
+            let i = document.getElementById('cIn'); let b = document.getElementById('chatBody'); if (!i.value) return;
+            let q = i.value; b.innerHTML += `<div class="chat-bubble chat-user">${q}</div>`; i.value = ''; b.scrollTop = b.scrollHeight;
+            try { let res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: q }) }); let d = await res.json(); setTimeout(() => { b.innerHTML += `<div class="chat-bubble chat-bot">${d.reply}</div>`; b.scrollTop = b.scrollHeight; }, 500); } catch (e) { setTimeout(() => { b.innerHTML += `<div class="chat-bubble chat-bot" style="color:red;">Network Error.</div>`; b.scrollTop = b.scrollHeight; }, 500); }
         }
 
-        // SECURITY 
-        document.onkeydown = function (e) { if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) return false; };
+        // --- EXTREME SECURITY: PREVENT INSPECT & RIGHT CLICK ---
+        function preventInspect(e) { e.preventDefault(); alert("Access Denied"); return false; }
+        document.addEventListener('keydown', function (e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
+                e.preventDefault(); alert("Access Denied"); return false;
+            }
+        });
     </script>
 </body>
 

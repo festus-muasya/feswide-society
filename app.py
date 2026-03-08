@@ -25,12 +25,14 @@ def log_action(operator, action):
 
 with app.app_context():
     db.create_all()
-    # Seed default products and editable text
+    # Seed default products with IDENTICAL descriptions and 999 pricing
+    standard_desc = "Verified Feswide Golden Trajectory answers. Secure download restricted to buyer."
     if not Product.query.first():
         db.session.add_all([
-            Product(name="Aether Coder Screening", price=1.0, filename="coder.pdf", description="Verified coding trajectories and detailed rubrics."),
-            Product(name="Grand Prix English Evaluation", price=1.0, filename="gp.pdf", description="Comprehensive assessment guidelines and certified answers."),
-            Product(name="Kobra Clips Multimodal", price=1.0, filename="kobra.pdf", description="Video and image labeling operational protocols.")
+            Product(name="Aether Multilingual Quality Check", price=999.0, filename="aether.pdf", description=standard_desc),
+            Product(name="Aether Coder Screening", price=999.0, filename="coder.pdf", description=standard_desc),
+            Product(name="Kobra Clips", price=999.0, filename="kobra.pdf", description=standard_desc),
+            Product(name="Grand Prix", price=999.0, filename="gp.pdf", description=standard_desc)
         ])
     if not SiteConfig.query.filter_by(key='hero_text').first():
         db.session.add(SiteConfig(key='hero_text', value="Welcome to the Feswide Society Index. All available AI training modules are rigorously verified by our Quality Assurance team."))
@@ -38,11 +40,10 @@ with app.app_context():
         db.session.add(SiteConfig(key='upload_notice', value="Requirement: Submit your completed PDF for review. Approved submissions generate a KES 500 payout to the provided M-Pesa number."))
     db.session.commit()
 
-# --- M-PESA DARAJA INTEGRATION ---
 def get_daraja_token():
     key = os.environ.get('DARAJA_CONSUMER_KEY', '')
     secret = os.environ.get('DARAJA_CONSUMER_SECRET', '')
-    url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials" # Change to api.safaricom for prod
+    url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials" 
     try:
         r = requests.get(url, auth=(key, secret), timeout=5)
         return r.json().get('access_token')
@@ -65,7 +66,6 @@ def stk_push():
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     password = base64.b64encode((shortcode + passkey + timestamp).encode()).decode('utf-8')
 
-    # Formatting phone to 254...
     if phone.startswith('0'): phone = '254' + phone[1:]
     elif phone.startswith('+'): phone = phone[1:]
 
@@ -84,7 +84,7 @@ def stk_push():
         "TransactionDesc": f"Payment for {product.name}"
     }
 
-    url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest" # Change to api.safaricom for prod
+    url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest" 
     r = requests.post(url, json=payload, headers=headers)
     response_data = r.json()
 
@@ -121,14 +121,13 @@ def check_payment(checkout_id):
 def secure_download(token):
     txn = Transaction.query.filter_by(download_token=token).first()
     if not txn or txn.status != 'Paid': abort(403)
-    if txn.download_count >= 3: return "Download link expired for security.", 403
+    if txn.download_count >= 3: return "ACCESS DENIED: This secure download link has expired.", 403
     
     product = Product.query.get(txn.product_id)
     txn.download_count += 1
     db.session.commit()
     return send_from_directory(UPLOAD_DIR, product.filename, as_attachment=True)
 
-# --- USER ROUTES ---
 @app.route('/')
 def index():
     config = {c.key: c.value for c in SiteConfig.query.all()}
@@ -155,13 +154,12 @@ def request_project():
 @app.route('/api/chat', methods=['POST'])
 def faith_chat():
     msg = request.json.get('message', '').lower()
-    if any(w in msg for w in ["hi", "hello"]): reply = "Hello! I am Agent Faith. How can I assist you today?"
+    if any(w in msg for w in ["hi", "hello"]): reply = "Hello. I am Agent Faith. How can I assist you today?"
     elif "price" in msg: reply = "Premium modules are KES 999. Contributors earn KES 500 per approved PDF."
-    elif "upload" in msg: reply = "Securely upload Handshake/Outlier PDFs via the Contributor Hub."
-    else: reply = "Processing request... Contact support@feswide.com for human assistance."
+    elif "upload" in msg: reply = "Securely upload Handshake or Outlier PDFs via the Contributor Hub."
+    else: reply = "Processing request. Contact support@feswide.com for human assistance."
     return jsonify({"reply": reply})
 
-# --- ADMIN ROUTES ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if not AdminUser.query.first():
