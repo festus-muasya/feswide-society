@@ -5,229 +5,127 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADMIN TERMINAL // FESWIDE SOCIETY</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        body {
-            background: #c0c0c0;
-            font-family: "Courier New", Courier, monospace;
-            padding: 20px;
-            margin: 0;
-        }
-
-        .header {
-            background: #002b5c;
-            color: white;
-            padding: 20px;
+        .admin-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 4px solid #000;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
 
-        .header h1 {
-            margin: 0;
-            font-size: 20px;
-            text-transform: uppercase;
-        }
-
-        .btn-logout {
-            background: #6b0000;
-            color: white;
-            border: 2px solid #000;
-            padding: 10px 15px;
-            cursor: pointer;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .panel {
-            background: white;
-            border: 4px solid #000;
+        .admin-panel {
+            background: var(--white);
+            border: 4px solid var(--border);
             padding: 30px;
             margin-bottom: 30px;
-            box-shadow: 10px 10px 0px #000;
-            overflow-x: auto;
-        }
-
-        .panel-title {
-            color: #002b5c;
-            border-bottom: 3px solid #6b0000;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-
-        th,
-        td {
-            border: 2px solid #000;
-            padding: 12px;
-            text-align: left;
-        }
-
-        th {
-            background: #002b5c;
-            color: white;
-            text-transform: uppercase;
-        }
-
-        tr:nth-child(even) {
-            background: #f0f0f0;
-        }
-
-        .btn {
-            padding: 8px 12px;
-            border: 2px solid #000;
-            cursor: pointer;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 12px;
-        }
-
-        .btn-blue {
-            background: #002b5c;
-            color: white;
-        }
-
-        .btn-red {
-            background: #6b0000;
-            color: white;
-        }
-
-        .form-control {
-            padding: 10px;
-            border: 2px solid #000;
-            margin-right: 10px;
-            margin-bottom: 10px;
-            font-family: inherit;
+            box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.8);
         }
     </style>
 </head>
 
-<body>
+<body oncontextmenu="return false;">
 
-    <div class="header">
-        <h1>FESWIDE ADMINISTRATIVE TERMINAL</h1>
-        <div>
-            <span style="margin-right: 20px; font-weight: bold;">ACCESS LEVEL: [{{ role | upper }}]</span>
-            <a href="/logout" class="btn-logout">TERMINATE SESSION</a>
+    <div id="global-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header" id="modal-header"><span id="modal-title"></span></div>
+            <div class="modal-body" id="modal-message"></div>
+            <div class="modal-footer"><button class="btn-action" style="width: auto; padding: 10px 30px;"
+                    onclick="closeModal()">ACKNOWLEDGE</button></div>
         </div>
     </div>
 
-    <div class="panel">
-        <h2 class="panel-title">CONTRIBUTOR UPLOADS (DATA ACCESS)</h2>
-        <table>
-            <tr>
-                <th>Date</th>
-                <th>Platform</th>
-                <th>Project Name</th>
-                <th>M-Pesa Payout Number</th>
-                <th>PDF File</th>
-                <th>Action</th>
-            </tr>
-            {% for u in uploads %}
-            <tr>
-                <td>{{ u.upload_date.strftime('%Y-%m-%d') }}</td>
-                <td><strong>{{ u.platform }}</strong></td>
-                <td>{{ u.project_name }}</td>
-                <td style="color: #6b0000; font-weight: bold;">{{ u.mpesa_number }}</td>
-                <td><a href="/admin/download/{{ u.filename }}" target="_blank" class="btn btn-blue">VIEW DOCUMENT</a>
-                </td>
-                <td><button class="btn" onclick="alert('M-PESA PAYOUT LOGGED FOR {{ u.mpesa_number }}')">MARK
-                        PAID</button></td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="6" style="text-align: center; padding: 20px;">NO PENDING UPLOADS.</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-
-    <div class="panel" style="border-color: #5c3d2e;">
-        <h2 class="panel-title" style="color: #5c3d2e; border-bottom-color: #002b5c;">USER PROJECT REQUESTS (VOTE BOX)
-        </h2>
-        <table>
-            <tr>
-                <th>Date Requested</th>
-                <th>Target Platform</th>
-                <th>Target Project Name</th>
-            </tr>
-            {% for r in requests %}
-            <tr>
-                <td>{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td>{{ r.platform }}</td>
-                <td><strong>{{ r.project_name }}</strong></td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="3" style="text-align: center; padding: 20px;">NO CRACK REQUESTS LOGGED.</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-
-    <div class="panel">
-        <h2 class="panel-title">STORE INVENTORY CONTROL</h2>
-
-        {% if role == 'superadmin' %}
-        <div style="background: #e8e8e8; padding: 20px; border: 2px solid #000; margin-bottom: 20px;">
-            <h3 style="margin-top: 0; color: #002b5c;">ADD NEW PDF ANSWER MODULE</h3>
-            <form action="/admin/add-product" method="POST" enctype="multipart/form-data"
-                style="display: flex; flex-wrap: wrap; align-items: center;">
-                <input type="text" name="name" class="form-control" placeholder="Module Title" required>
-                <input type="text" name="description" class="form-control" placeholder="Short Description"
-                    style="width: 300px;" required>
-                <input type="number" name="price" class="form-control" placeholder="Price (KES)" value="999" required
-                    style="width: 120px;">
-                <input type="file" name="file" class="form-control" accept=".pdf" required>
-                <button type="submit" class="btn btn-blue">PUBLISH MODULE</button>
-            </form>
+    <div class="container">
+        <div class="admin-header">
+            <h1 style="color: var(--navy);">FESWIDE ADMIN TERMINAL</h1>
+            <div>
+                <span style="font-weight: bold; margin-right: 20px;">ACCESS: [{{ role | upper }}]</span>
+                <a href="/logout" class="btn-action"
+                    style="text-decoration: none; padding: 10px 20px; background: var(--maroon);">LOGOUT</a>
+            </div>
         </div>
-        {% else %}
-        <div
-            style="background: #fff3cd; padding: 15px; border: 2px solid #856404; color: #856404; margin-bottom: 20px; font-weight: bold;">
-            NOTICE: AS A SUB-ADMIN, YOU DO NOT HAVE CLEARANCE TO MODIFY STORE INVENTORY.
-        </div>
-        {% endif %}
 
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Module Name</th>
-                <th>Description</th>
-                <th>Price</th>
-                <th>Action</th>
-            </tr>
-            {% for p in products %}
-            <tr>
-                <td>{{ p.id }}</td>
-                <td><strong>{{ p.name }}</strong></td>
-                <td>{{ p.description }}</td>
-                <td>KES {{ p.price }}</td>
-                <td>
-                    {% if role == 'superadmin' %}
-                    <button class="btn btn-red" onclick="deleteProd({{ p.id }})">DELETE FOREVER</button>
+        <div class="admin-panel">
+            <h2
+                style="color: var(--navy); border-bottom: 3px solid var(--maroon); padding-bottom: 10px; margin-bottom: 20px;">
+                USER UPLOADS</h2>
+            <div class="table-responsive">
+                <table>
+                    <tr>
+                        <th>Date</th>
+                        <th>Platform</th>
+                        <th>Project Name</th>
+                        <th>M-Pesa Number</th>
+                        <th>PDF File</th>
+                        <th>Action</th>
+                    </tr>
+                    {% for u in uploads %}
+                    <tr>
+                        <td>{{ u.upload_date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ u.platform }}</td>
+                        <td>{{ u.project_name }}</td>
+                        <td style="color: var(--maroon); font-weight: bold;">{{ u.mpesa_number }}</td>
+                        <td><a href="/admin/download/{{ u.filename }}" target="_blank" class="btn-action"
+                                style="padding: 5px 10px; text-decoration: none;">VIEW PDF</a></td>
+                        <td><button class="btn-action" style="padding: 5px 10px; background: #155724;"
+                                onclick="showModal('success', 'PAYMENT LOGGED', 'PAYOUT TO {{ u.mpesa_number }} APPROVED.')">MARK
+                                PAID</button></td>
+                    </tr>
                     {% else %}
-                    [ RESTRICTED ]
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
+                    <tr>
+                        <td colspan="6" style="text-align: center;">NO PENDING UPLOADS.</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
 
+        <div class="admin-panel">
+            <h2
+                style="color: var(--navy); border-bottom: 3px solid var(--maroon); padding-bottom: 10px; margin-bottom: 20px;">
+                STORE INVENTORY</h2>
+            {% if role == 'superadmin' %}
+            <form action="/admin/add-product" method="POST" enctype="multipart/form-data"
+                style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="text" name="name" class="form-control" placeholder="Module Title" required style="flex:1;">
+                <input type="text" name="description" class="form-control" placeholder="Description" required
+                    style="flex:2;">
+                <input type="number" name="price" class="form-control" value="999" required style="width:100px;">
+                <input type="file" name="file" class="form-control" accept=".pdf" required style="flex:1;">
+                <button type="submit" class="btn-action" style="width: auto;">ADD</button>
+            </form>
+            {% else %}
+            <div class="notice">SUB-ADMINS CANNOT MODIFY INVENTORY.</div>
+            {% endif %}
+
+            <div class="table-responsive">
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </tr>
+                    {% for p in products %}
+                    <tr>
+                        <td>{{ p.name }}</td>
+                        <td>{{ p.description }}</td>
+                        <td>KES {{ p.price }}</td>
+                        <td>
+                            {% if role == 'superadmin' %}
+                            <button class="btn-action" style="padding: 5px 10px; background: var(--maroon);"
+                                onclick="deleteProduct({{ p.id }})">DELETE</button>
+                            {% else %} RESTRICTED {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
-        async function deleteProd(id) {
-            if (!confirm("WARNING: ARE YOU SURE YOU WANT TO PERMANENTLY DELETE THIS MODULE?")) return;
+        async function deleteProduct(id) {
             const res = await fetch('/admin/delete-product/' + id, { method: 'POST' });
             if (res.ok) location.reload();
         }

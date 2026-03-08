@@ -3,74 +3,41 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FESWIDE SOCIETY // ADMIN TERMINAL</title>
+    <title>FESWIDE SOCIETY // LOGIN</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         body {
-            background: #c0c0c0;
-            font-family: "Courier New", Courier, monospace;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
         }
 
-        .login-box {
-            background: #ffffff;
-            border: 4px solid #002b5c;
+        .login-card {
+            background: var(--white);
+            border: 4px solid var(--navy);
             padding: 40px;
-            text-align: center;
-            box-shadow: 10px 10px 0px #000000;
+            box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.8);
             width: 100%;
             max-width: 400px;
-        }
-
-        h2 {
-            color: #6b0000;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            border-bottom: 2px solid #002b5c;
-            padding-bottom: 10px;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 2px solid #000000;
-            outline: none;
-            font-family: inherit;
-            font-weight: bold;
-        }
-
-        button {
-            background: #002b5c;
-            color: #ffffff;
-            padding: 15px;
-            width: 100%;
-            border: 2px solid #000000;
-            cursor: pointer;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        button:hover {
-            background: #6b0000;
+            text-align: center;
         }
     </style>
 </head>
 
 <body oncontextmenu="return false;">
-    <div class="login-box">
-        <h2>SECURE TERMINAL ACCESS</h2>
+    <div class="login-card">
+        <h2 style="color: var(--maroon); margin-bottom: 20px; text-decoration: underline;">SECURE TERMINAL</h2>
+        {% if error %}
+        <div class="notice" style="background: var(--maroon); color: white; border-color: black;">{{ error }}</div>
+        {% endif %}
         <form method="POST" action="/login">
-            <input type="text" name="username" placeholder="OPERATOR ID" required>
-            <input type="password" name="password" placeholder="PASSKEY" required>
-            <button type="submit">AUTHENTICATE</button>
+            <input type="text" name="username" class="form-control" placeholder="OPERATOR ID" required>
+            <input type="password" name="password" class="form-control" placeholder="PASSKEY" required>
+            <button type="submit" class="btn-action">AUTHENTICATE</button>
         </form>
-        <p style="font-size: 11px; margin-top: 20px; font-weight: bold;">UNAUTHORIZED ACCESS IS STRICTLY PROHIBITED.</p>
     </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 
 </html>

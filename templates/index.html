@@ -6,318 +6,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
         content="Feswide Society: The ultimate repository for Outlier answers and Handshake AI answers.">
-    <meta name="keywords" content="Outlier answers, Handshake answers, Feswide society, Feswide, feswide.com">
     <title>FESWIDE SOCIETY // Official Repository</title>
-    <style>
-        :root {
-            --navy: #002b5c;
-            --maroon: #6b0000;
-            --brown: #5c3d2e;
-            --grey: #c0c0c0;
-            --white: #ffffff;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Courier New", Courier, monospace;
-            font-weight: bold;
-        }
-
-        body {
-            background: var(--grey);
-            overflow-x: hidden;
-        }
-
-        header {
-            background: var(--navy);
-            padding: 30px 15px;
-            border-bottom: 6px solid var(--maroon);
-            text-align: center;
-            color: var(--white);
-        }
-
-        .logo h1 {
-            font-size: 26px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-        }
-
-        .nav-btns {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .nav-btns button {
-            background: var(--white);
-            color: var(--navy);
-            border: 2px solid #000;
-            padding: 12px 25px;
-            cursor: pointer;
-            font-size: 14px;
-            text-transform: uppercase;
-        }
-
-        .nav-btns button.active {
-            background: var(--maroon);
-            color: var(--white);
-            border-color: var(--white);
-        }
-
-        /* CUSTOM MODAL SYSTEM (NO URL POPUPS) */
-        #modalOverlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 5000;
-        }
-
-        .modal-box {
-            background: var(--white);
-            border: 5px solid var(--navy);
-            width: 90%;
-            max-width: 500px;
-            margin: 15% auto;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 15px 15px 0px #000;
-        }
-
-        .modal-title {
-            color: var(--maroon);
-            font-size: 20px;
-            margin-bottom: 15px;
-            text-decoration: underline;
-            text-transform: uppercase;
-        }
-
-        .modal-body {
-            font-size: 14px;
-            margin-bottom: 25px;
-            line-height: 1.5;
-            color: #333;
-        }
-
-        .container {
-            width: 95%;
-            max-width: 1200px;
-            margin: 30px auto;
-        }
-
-        .info-panel {
-            background: #e8e8e8;
-            border-left: 10px solid var(--navy);
-            border-right: 2px solid #000;
-            border-top: 2px solid #000;
-            border-bottom: 2px solid #000;
-            padding: 20px;
-            margin-bottom: 30px;
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
-        }
-
-        .card {
-            background: var(--white);
-            border: 3px solid #000;
-            border-top: 8px solid var(--navy);
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .card-title {
-            color: var(--navy);
-            font-size: 18px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
-
-        .card-desc {
-            font-size: 12px;
-            color: #555;
-            margin-bottom: 15px;
-            min-height: 40px;
-        }
-
-        .price {
-            font-size: 28px;
-            color: var(--maroon);
-            margin: 20px 0;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 15px;
-        }
-
-        .btn-action {
-            background: var(--navy);
-            color: var(--white);
-            padding: 15px;
-            width: 100%;
-            border: 2px solid #000;
-            cursor: pointer;
-            font-size: 14px;
-            text-transform: uppercase;
-            transition: background 0.2s;
-        }
-
-        .btn-action:hover {
-            background: var(--maroon);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 2px solid #000;
-            background: #f9f9f9;
-            outline: none;
-        }
-
-        .notice {
-            background: #fff3cd;
-            border: 2px solid #856404;
-            color: #856404;
-            padding: 15px;
-            font-size: 12px;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
-
-        /* AGENT FAITH UI */
-        #chatbot {
-            position: fixed;
-            bottom: 90px;
-            right: 20px;
-            width: 340px;
-            max-width: 90vw;
-            background: var(--white);
-            border: 4px solid var(--navy);
-            display: none;
-            flex-direction: column;
-            z-index: 1000;
-            box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.3);
-        }
-
-        .chat-head {
-            background: var(--navy);
-            color: var(--white);
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            text-transform: uppercase;
-        }
-
-        .chat-body {
-            height: 260px;
-            overflow-y: auto;
-            padding: 15px;
-            background: #f0f0f0;
-            font-size: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            border-bottom: 2px solid #000;
-        }
-
-        .chat-input-area {
-            display: flex;
-        }
-
-        .chat-input-area input {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            outline: none;
-        }
-
-        .chat-input-area button {
-            background: var(--navy);
-            color: var(--white);
-            border: none;
-            padding: 15px 20px;
-            cursor: pointer;
-            border-left: 2px solid #000;
-        }
-
-        #chat-trigger {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--maroon);
-            color: var(--white);
-            padding: 15px 20px;
-            border: 3px solid var(--white);
-            border-radius: 30px;
-            cursor: pointer;
-            z-index: 1001;
-            text-transform: uppercase;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-        }
-
-        footer {
-            background: var(--navy);
-            color: var(--white);
-            padding: 40px 20px;
-            text-align: center;
-            border-top: 8px solid var(--maroon);
-            margin-top: 50px;
-        }
-
-        .footer-links a {
-            color: #add8e6;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 13px;
-            text-transform: uppercase;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body oncontextmenu="return false;">
+
+    <div id="global-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header" id="modal-header">
+                <span id="modal-title">SYSTEM NOTICE</span>
+            </div>
+            <div class="modal-body" id="modal-message">
+                Processing request...
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action" style="width: auto; padding: 10px 30px;"
+                    onclick="closeModal()">ACKNOWLEDGE</button>
+            </div>
+        </div>
+    </div>
 
     <header>
         <div class="logo">
             <h1>FESWIDE SOCIETY</h1>
         </div>
         <div class="nav-btns">
-            <button onclick="show('store')" id="b-store" class="active">KNOWLEDGE REPOSITORY</button>
-            <button onclick="show('dash')" id="b-dash">CONTRIBUTOR HUB</button>
+            <button onclick="switchTab('store')" id="b-store" class="active">KNOWLEDGE REPOSITORY</button>
+            <button onclick="switchTab('dash')" id="b-dash">CONTRIBUTOR HUB</button>
         </div>
     </header>
-
-    <div id="modalOverlay">
-        <div class="modal-box">
-            <h2 class="modal-title" id="mTitle">SYSTEM NOTIFICATION</h2>
-            <p class="modal-body" id="mBody"></p>
-            <button onclick="closeModal()" class="btn-action">ACKNOWLEDGE</button>
-        </div>
-    </div>
 
     <div class="container" id="store">
         <div class="info-panel">
             <strong>SYSTEM STATUS: ONLINE // SECURE CONNECTION ESTABLISHED</strong><br><br>
             Welcome to the Feswide Society index. All available AI training modules (Handshake AI & Outlier AI) are
-            rigorously verified by our Quality Assurance team. Purchasing a module grants immediate access to the
-            "Golden Trajectory" documents required for task passing.
+            rigorously verified by our Quality Assurance team.
         </div>
 
         <input type="text" class="form-control" id="sInput" placeholder="SEARCH DATABASE FOR SPECIFIC MODULES..."
-            onkeyup="search()">
+            onkeyup="searchModules()">
 
         <div class="grid">
             {% for p in products %}
@@ -329,7 +57,7 @@
                 <div>
                     <p class="price">KES {{ p.price }}</p>
                     <button class="btn-action"
-                        onclick="sysMsg('SECURE REDIRECT INITIATED', 'YOU ARE BEING ROUTED TO THE SECURE M-PESA PAYMENT GATEWAY. DO NOT CLOSE THIS WINDOW.')">PURCHASE
+                        onclick="showModal('info', 'SECURE REDIRECT INITIATED', 'YOU ARE BEING ROUTED TO THE SECURE M-PESA PAYMENT GATEWAY. DO NOT CLOSE THIS WINDOW.')">PURCHASE
                         ACCESS</button>
                 </div>
             </div>
@@ -344,17 +72,17 @@
                     style="color: var(--navy); border-bottom: 4px solid var(--maroon); padding-bottom: 10px; margin-bottom: 20px;">
                     UPLOAD PORTAL</h2>
                 <div class="notice">REQUIREMENT: Submit your completed Outlier or Handshake PDF for review. Approved
-                    submissions generate a KES 500/= payout to the provided M-Pesa number within 48 hours.</div>
+                    submissions generate a KES 500/= payout to the provided M-Pesa number.</div>
 
                 <select id="pform" class="form-control">
-                    <option>HANDSHAKE AI</option>
-                    <option>OUTLIER AI</option>
+                    <option value="Handshake AI">HANDSHAKE AI</option>
+                    <option value="Outlier AI">OUTLIER AI</option>
                 </select>
                 <input type="text" id="pname" class="form-control" placeholder="EXACT PROJECT NAME">
                 <input type="text" id="pmpesa" class="form-control" placeholder="M-PESA PAYOUT NUMBER (e.g. 2547...)">
                 <input type="file" id="pfile" accept=".pdf" class="form-control">
 
-                <button class="btn-action" onclick="up()">SUBMIT PDF FOR REVIEW</button>
+                <button class="btn-action" onclick="submitUpload()">SUBMIT PDF FOR REVIEW</button>
             </div>
 
             <div class="card" style="border-top-color: var(--brown);">
@@ -362,131 +90,41 @@
                     style="color: var(--brown); border-bottom: 4px solid var(--navy); padding-bottom: 10px; margin-bottom: 20px;">
                     VOTE BOX // CRACK REQUEST</h2>
                 <p style="font-size: 13px; color: #444; margin-bottom: 20px; line-height: 1.5;">Cannot locate your
-                    assigned project? Submit a crack request. Our operations team prioritizes high-demand projects,
-                    typically releasing solutions within 48 hours.</p>
+                    assigned project? Submit a crack request. Our operations team prioritizes high-demand projects.</p>
 
                 <input type="text" id="vname" class="form-control" placeholder="TARGET PROJECT NAME">
-                <button class="btn-action" style="background: var(--brown);" onclick="vote()">LOG REQUEST</button>
+                <button class="btn-action" style="background: var(--brown);" onclick="submitVote()">LOG REQUEST</button>
             </div>
         </div>
     </div>
 
-    <div id="chat-trigger" onclick="tChat()">AGENT FAITH [CHAT]</div>
+    <div id="chat-trigger" onclick="toggleChat()">AGENT FAITH</div>
     <div id="chatbot">
         <div class="chat-head">
             <span>SUPPORT TERMINAL</span>
-            <span onclick="tChat()" style="cursor:pointer;">[CLOSE]</span>
+            <span onclick="toggleChat()" style="cursor:pointer;">[CLOSE]</span>
         </div>
         <div class="chat-body" id="chatBody">
             <div
-                style="background: var(--navy); color: var(--white); padding: 10px; border: 1px solid #000; width: 85%;">
-                <b>FAITH:</b> Welcome. I am Agent Faith. How may I assist you with the Feswide database today?
+                style="background: var(--navy); color: var(--white); padding: 10px; border: 1px solid var(--border); width: 85%;">
+                <b>FAITH:</b> Welcome. I am Agent Faith. How may I assist you today?
             </div>
         </div>
         <div class="chat-input-area">
             <input type="text" id="cIn" placeholder="Enter query...">
-            <button onclick="sendMsg()">SEND</button>
+            <button onclick="sendChatMsg()">SEND</button>
         </div>
     </div>
 
     <footer>
         <div class="footer-links">
-            <a href="mailto:support@feswide.com">SUPPORT EMAIL</a> |
-            <a href="#">X / TWITTER</a> |
-            <a href="#">TELEGRAM SECURE CHANNEL</a>
+            <a href="mailto:support@feswide.com">SUPPORT EMAIL</a> | <a href="#">TELEGRAM SECURE CHANNEL</a>
         </div>
         <p style="font-size: 11px; margin-top: 25px;">&copy; 2026 FESWIDE SOCIETY // UNAUTHORIZED DUPLICATION PROHIBITED
         </p>
     </footer>
 
-    <script>
-        // Custom Modal Logic
-        function sysMsg(title, body) {
-            document.getElementById('mTitle').innerText = title;
-            document.getElementById('mBody').innerText = body;
-            document.getElementById('modalOverlay').style.display = 'block';
-        }
-        function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
-
-        // Tab Switching Logic
-        function show(v) {
-            document.getElementById('store').style.display = v == 'store' ? 'block' : 'none';
-            document.getElementById('dash').style.display = v == 'dash' ? 'block' : 'none';
-            document.getElementById('b-store').className = v == 'store' ? 'active' : '';
-            document.getElementById('b-dash').className = v == 'dash' ? 'active' : '';
-        }
-
-        // Live Search Logic
-        function search() {
-            let q = document.getElementById('sInput').value.toLowerCase();
-            let cards = document.querySelectorAll('#store .card');
-            for (let c of cards) {
-                let t = c.querySelector('.card-title').innerText.toLowerCase();
-                c.style.display = t.includes(q) ? 'flex' : 'none';
-            }
-        }
-
-        // API Submission Logic
-        async function up() {
-            let file = document.getElementById('pfile').files[0];
-            let pname = document.getElementById('pname').value;
-            let pmpesa = document.getElementById('pmpesa').value;
-
-            if (!file || !pname || !pmpesa) { sysMsg('ERROR', 'ALL FIELDS AND A PDF FILE ARE REQUIRED.'); return; }
-
-            let fd = new FormData();
-            fd.append('file', file);
-            fd.append('platform', document.getElementById('pform').value);
-            fd.append('project_name', pname);
-            fd.append('mpesa_number', pmpesa);
-
-            try {
-                let res = await fetch('/upload-answer', { method: 'POST', body: fd });
-                let d = await res.json();
-                sysMsg('UPLOAD STATUS', d.message || d.error);
-                document.getElementById('pname').value = '';
-                document.getElementById('pfile').value = '';
-            } catch (e) { sysMsg('SYSTEM ERROR', 'CONNECTION FAILED.'); }
-        }
-
-        async function vote() {
-            let n = document.getElementById('vname').value;
-            if (!n) { sysMsg('ERROR', 'PLEASE ENTER A PROJECT NAME.'); return; }
-            await fetch('/request-project', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ project_name: n, platform: 'VOTE' }) });
-            sysMsg('LOG SUCCESS', 'REQUEST LOGGED. FESWIDE SOCIETY WILL CRACK THIS IN LESS THAN 48HRS.');
-            document.getElementById('vname').value = '';
-        }
-
-        // Agent Faith Chat Logic
-        function tChat() { let c = document.getElementById('chatbot'); c.style.display = c.style.display == 'flex' ? 'none' : 'flex'; }
-
-        async function sendMsg() {
-            let i = document.getElementById('cIn');
-            let b = document.getElementById('chatBody');
-            if (!i.value) return;
-
-            b.innerHTML += `<div style="background:var(--white); color:#000; padding:10px; border:1px solid #000; width:85%; align-self:flex-end; margin-left:auto;"><b>YOU:</b> ${i.value}</div>`;
-
-            let query = i.value;
-            i.value = '';
-            b.scrollTop = b.scrollHeight;
-
-            let res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: query }) });
-            let d = await res.json();
-
-            setTimeout(() => {
-                b.innerHTML += `<div style="background:var(--navy); color:var(--white); padding:10px; border:1px solid #000; width:85%;"><b>FAITH:</b> ${d.reply}</div>`;
-                b.scrollTop = b.scrollHeight;
-            }, 500);
-        }
-
-        // Disable Inspect Element & Right Click Security
-        document.onkeydown = function (e) {
-            if (e.keyCode == 123) return false; // F12
-            if (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) return false; // Ctrl+Shift+I or J
-            if (e.ctrlKey && e.keyCode == 85) return false; // Ctrl+U
-        };
-    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 
 </html>
