@@ -8,9 +8,9 @@
     <style>
         :root {
             --navy: #0A2540;
-            --maroon: #8A1538;
+            --blue: #1A56DB;
             --white: #FFFFFF;
-            --bg: #F6F9FC;
+            --bg: #F3F4F6;
         }
 
         body {
@@ -30,13 +30,11 @@
             align-items: center;
             border-radius: 8px;
             margin-bottom: 30px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .header h1 {
             margin: 0;
             font-size: 20px;
-            letter-spacing: 1px;
         }
 
         .btn {
@@ -52,19 +50,19 @@
         }
 
         .btn-logout {
-            background: var(--maroon);
+            background: #DC2626;
         }
 
         .btn-blue {
-            background: var(--navy);
+            background: var(--blue);
         }
 
         .btn-red {
-            background: #d93025;
+            background: #DC2626;
         }
 
         .btn-green {
-            background: #188038;
+            background: #059669;
         }
 
         .panel {
@@ -100,17 +98,15 @@
         th {
             background: #f8f9fa;
             color: var(--navy);
-            font-weight: 700;
         }
 
         .form-control {
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 6px;
-            margin-right: 10px;
             margin-bottom: 10px;
-            font-size: 14px;
-            outline: none;
+            width: 100%;
+            font-family: inherit;
         }
     </style>
 </head>
@@ -129,50 +125,36 @@
     {% if role == 'superadmin' %}
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
         <div class="panel">
-            <h2>SUB-ADMIN CONTROL</h2>
-            <form action="/admin/create-subadmin" method="POST" style="margin-bottom: 20px; display: flex;">
-                <input type="text" name="username" class="form-control" placeholder="Operator ID" required
-                    style="flex:1;">
-                <input type="password" name="password" class="form-control" placeholder="Passkey" required
-                    style="flex:1;">
-                <button type="submit" class="btn btn-blue">ADD STAFF</button>
+            <h2>EDIT SITE MESSAGES</h2>
+            <form action="/admin/update-config" method="POST">
+                <label style="font-size:12px; font-weight:bold; color:#666;">Homepage Hero Text:</label>
+                <textarea name="hero_text" class="form-control" rows="3">{{ config.hero_text }}</textarea>
+
+                <label style="font-size:12px; font-weight:bold; color:#666;">Upload Notice Text:</label>
+                <textarea name="upload_notice" class="form-control" rows="2">{{ config.upload_notice }}</textarea>
+
+                <button type="submit" class="btn btn-blue">SAVE CHANGES</button>
             </form>
-            <table>
-                <tr>
-                    <th>Operator ID</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-                {% for a in admins %}
-                <tr>
-                    <td><strong>{{ a.username }}</strong></td>
-                    <td style="color: {% if a.is_active %}#188038{% else %}#d93025{% endif %}; font-weight: bold;">
-                        {% if a.is_active %}ACTIVE{% else %}SUSPENDED{% endif %}
-                    </td>
-                    <td>
-                        {% if a.username != 'superadmin' %}
-                        <button class="btn btn-red" onclick="toggleAdmin({{ a.id }})">TOGGLE ACCESS</button>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
         </div>
 
         <div class="panel">
-            <h2>SYSTEM AUDIT LOG</h2>
+            <h2>LIVE M-PESA TRANSACTIONS</h2>
             <div style="max-height: 250px; overflow-y: auto;">
                 <table>
                     <tr>
+                        <th>Phone</th>
+                        <th>Amount</th>
+                        <th>Status</th>
                         <th>Time</th>
-                        <th>Operator</th>
-                        <th>Action</th>
                     </tr>
-                    {% for log in logs %}
+                    {% for t in txns %}
                     <tr>
-                        <td style="font-size: 12px; color: #666;">{{ log.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
-                        <td><strong>{{ log.operator }}</strong></td>
-                        <td style="font-size: 13px;">{{ log.action }}</td>
+                        <td>{{ t.phone }}</td>
+                        <td>KES {{ t.amount }}</td>
+                        <td
+                            style="color: {% if t.status == 'Paid' %}#059669{% else %}#DC2626{% endif %}; font-weight:bold;">
+                            {{ t.status }}</td>
+                        <td style="font-size: 12px;">{{ t.timestamp.strftime('%H:%M:%S') }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -182,54 +164,16 @@
     {% endif %}
 
     <div class="panel">
-        <h2>CONTRIBUTOR UPLOADS</h2>
-        <div style="overflow-x: auto;">
-            <table>
-                <tr>
-                    <th>Date</th>
-                    <th>Platform</th>
-                    <th>Project Name</th>
-                    <th>M-Pesa Number</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-                {% for u in uploads %}
-                <tr>
-                    <td>{{ u.upload_date.strftime('%Y-%m-%d') }}</td>
-                    <td><strong>{{ u.platform }}</strong></td>
-                    <td>{{ u.project_name }}</td>
-                    <td style="color: var(--maroon); font-weight: bold;">{{ u.mpesa_number }}</td>
-                    <td
-                        style="font-weight: bold; color: {% if u.status == 'Paid' %}#188038{% else %}#b8860b{% endif %};">
-                        {{ u.status }}</td>
-                    <td>
-                        <a href="/admin/download/{{ u.filename }}" target="_blank" class="btn btn-blue">VIEW PDF</a>
-                        {% if u.status != 'Paid' %}
-                        <button class="btn btn-green" onclick="approveUpload({{ u.id }})">MARK PAID</button>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="6" style="text-align: center; color: #666;">No pending uploads.</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-    </div>
-
-    <div class="panel">
         <h2>STORE INVENTORY CONTROL</h2>
         {% if role == 'superadmin' %}
         <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
             <form action="/admin/add-product" method="POST" enctype="multipart/form-data"
-                style="display: flex; flex-wrap: wrap; align-items: center;">
-                <input type="text" name="name" class="form-control" placeholder="Module Title" required style="flex:1;">
-                <input type="text" name="description" class="form-control" placeholder="Description" required
-                    style="width: 300px;">
+                style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" name="name" class="form-control" placeholder="Module Title" required
+                    style="margin-bottom:0;">
                 <input type="number" name="price" class="form-control" placeholder="Price" value="999" required
-                    style="width: 100px;">
-                <input type="file" name="file" class="form-control" accept=".pdf" required>
+                    style="width:100px; margin-bottom:0;">
+                <input type="file" name="file" class="form-control" accept=".pdf" required style="margin-bottom:0;">
                 <button type="submit" class="btn btn-blue">PUBLISH</button>
             </form>
         </div>
@@ -246,13 +190,23 @@
                 {% for p in products %}
                 <tr>
                     <td><strong>{{ p.name }}</strong></td>
-                    <td>{{ p.description }}</td>
+                    <td>
+                        {% if role == 'superadmin' %}
+                        <form action="/admin/edit-product/{{ p.id }}" method="POST" style="display: flex; gap: 10px;">
+                            <input type="text" name="description" value="{{ p.description }}" class="form-control"
+                                style="margin-bottom:0; flex: 2;">
+                            <input type="number" name="price" value="{{ p.price }}" class="form-control"
+                                style="margin-bottom:0; width:80px;">
+                            <button type="submit" class="btn btn-green">SAVE</button>
+                        </form>
+                        {% else %}
+                        {{ p.description }}
+                        {% endif %}
+                    </td>
                     <td>KES {{ p.price }}</td>
                     <td>
                         {% if role == 'superadmin' %}
                         <button class="btn btn-red" onclick="deleteProd({{ p.id }})">DELETE</button>
-                        {% else %}
-                        <span style="color: #888; font-size: 12px;">RESTRICTED</span>
                         {% endif %}
                     </td>
                 </tr>
@@ -265,16 +219,6 @@
         async function deleteProd(id) {
             if (!confirm("Permanently delete this module?")) return;
             const res = await fetch('/admin/delete-product/' + id, { method: 'POST' });
-            if (res.ok) location.reload();
-        }
-        async function toggleAdmin(id) {
-            if (!confirm("Toggle sub-admin access?")) return;
-            const res = await fetch('/admin/toggle-admin/' + id, { method: 'POST' });
-            if (res.ok) location.reload();
-        }
-        async function approveUpload(id) {
-            if (!confirm("Mark this upload as paid?")) return;
-            const res = await fetch('/admin/approve-upload/' + id, { method: 'POST' });
             if (res.ok) location.reload();
         }
     </script>

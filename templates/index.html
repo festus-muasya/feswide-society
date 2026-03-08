@@ -6,22 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
         content="Feswide Society: The premium repository for Outlier and Handshake AI verified answers.">
+    <link rel="icon" href="/static/logo.png" type="image/png">
     <title>FESWIDE SOCIETY | Official Repository</title>
     <style>
         :root {
             --navy: #0A2540;
-            --maroon: #8A1538;
-            --brown: #7A5C4A;
-            --grey: #F6F9FC;
+            --blue: #1A56DB;
+            --grey: #F3F4F6;
             --white: #FFFFFF;
-            --text: #333333;
+            --text: #1F2937;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
@@ -64,16 +64,12 @@
             transition: 0.3s;
         }
 
-        .nav-btns button:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
         .nav-btns button.active {
-            background: var(--maroon);
-            border-color: var(--maroon);
+            background: var(--blue);
+            border-color: var(--blue);
         }
 
-        /* ADVANCED MODAL */
+        /* ADVANCED MODAL (NO BROWSER ALERTS) */
         #global-modal {
             display: none;
             position: fixed;
@@ -96,6 +92,19 @@
             text-align: center;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             overflow: hidden;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .modal-header {
@@ -113,9 +122,23 @@
             line-height: 1.6;
         }
 
+        .modal-input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 16px;
+            outline: none;
+            display: none;
+        }
+
         .modal-footer {
             padding: 20px;
             background: #f8f9fa;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
         }
 
         .container {
@@ -126,7 +149,7 @@
 
         .info-panel {
             background: var(--white);
-            border-left: 6px solid var(--navy);
+            border-left: 6px solid var(--blue);
             padding: 25px;
             margin-bottom: 30px;
             font-size: 15px;
@@ -174,7 +197,7 @@
 
         .price {
             font-size: 28px;
-            color: var(--maroon);
+            color: var(--navy);
             font-weight: bold;
             margin: 20px 0;
             padding-bottom: 20px;
@@ -182,7 +205,7 @@
         }
 
         .btn-action {
-            background: var(--navy);
+            background: var(--blue);
             color: var(--white);
             padding: 15px;
             width: 100%;
@@ -195,7 +218,16 @@
         }
 
         .btn-action:hover {
-            background: var(--maroon);
+            background: #1449B8;
+        }
+
+        .btn-secondary {
+            background: #E5E7EB;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #D1D5DB;
         }
 
         .form-control {
@@ -207,11 +239,6 @@
             background: #fdfdfd;
             font-size: 15px;
             outline: none;
-            transition: border 0.2s;
-        }
-
-        .form-control:focus {
-            border-color: var(--navy);
         }
 
         .notice {
@@ -231,7 +258,6 @@
             bottom: 90px;
             right: 20px;
             width: 340px;
-            max-width: 90vw;
             background: var(--white);
             border-radius: 12px;
             display: none;
@@ -271,14 +297,13 @@
 
         .chat-bot {
             background: var(--white);
-            color: var(--text);
             border: 1px solid #eee;
             align-self: flex-start;
             border-bottom-left-radius: 4px;
         }
 
         .chat-user {
-            background: var(--navy);
+            background: var(--blue);
             color: var(--white);
             align-self: flex-end;
             border-bottom-right-radius: 4px;
@@ -309,14 +334,14 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: var(--maroon);
+            background: var(--navy);
             color: var(--white);
             padding: 16px 24px;
             border-radius: 30px;
             cursor: pointer;
             z-index: 1001;
             font-weight: bold;
-            box-shadow: 0 4px 15px rgba(138, 21, 56, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             border: none;
         }
 
@@ -327,14 +352,6 @@
             text-align: center;
             margin-top: 60px;
         }
-
-        .footer-links a {
-            color: #a8c7fa;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 14px;
-            font-weight: 600;
-        }
     </style>
 </head>
 
@@ -342,11 +359,16 @@
 
     <div id="global-modal">
         <div class="modal-card">
-            <div class="modal-header" id="mTitle">SYSTEM NOTIFICATION</div>
-            <div class="modal-body" id="mBody"></div>
-            <div class="modal-footer">
-                <button class="btn-action" style="width: auto; padding: 10px 30px;"
-                    onclick="closeModal()">ACKNOWLEDGE</button>
+            <div class="modal-header" id="mTitle">NOTIFICATION</div>
+            <div class="modal-body">
+                <p id="mBody"></p>
+                <input type="text" id="mInput" class="modal-input" placeholder="e.g. 2547XXXXXXXX">
+            </div>
+            <div class="modal-footer" id="mFooter">
+                <button class="btn-action btn-secondary" style="width: auto; padding: 10px 20px;"
+                    onclick="closeModal()">CLOSE</button>
+                <button class="btn-action" id="mConfirm"
+                    style="width: auto; padding: 10px 20px; display: none;">CONFIRM</button>
             </div>
         </div>
     </div>
@@ -362,14 +384,8 @@
     </header>
 
     <div class="container" id="store">
-        <div class="info-panel">
-            <strong>Welcome to the Feswide Society Index</strong><br><br>
-            All available AI training modules for Handshake AI and Outlier AI are rigorously verified by our Quality
-            Assurance team. Purchasing a module grants immediate access to the accurate trajectory documents required
-            for task passing.
-        </div>
-
-        <input type="text" class="form-control" id="sInput" placeholder="Search database for specific modules..."
+        <div class="info-panel">{{ config.hero_text }}</div>
+        <input type="text" class="form-control" id="sInput" placeholder="Search for verified modules..."
             onkeyup="searchModules()">
 
         <div class="grid">
@@ -382,8 +398,7 @@
                 <div>
                     <p class="price">KES {{ p.price }}</p>
                     <button type="button" class="btn-action"
-                        onclick="showModal('SECURE REDIRECT INITIATED', 'You are being routed to the secure M-Pesa payment gateway. Please follow the prompt on your device.')">PURCHASE
-                        ACCESS</button>
+                        onclick="initiatePayment({{ p.id }}, '{{ p.name }}')">Purchase Download</button>
                 </div>
             </div>
             {% endfor %}
@@ -392,31 +407,26 @@
 
     <div class="container" id="dash" style="display:none;">
         <div class="grid">
-            <div class="card" style="border-top-color: var(--navy);">
+            <div class="card">
                 <h2 style="color: var(--navy); margin-bottom: 20px;">UPLOAD PORTAL</h2>
-                <div class="notice">Requirement: Submit your completed Outlier or Handshake PDF for review. Approved
-                    submissions generate a KES 500 payout to the provided M-Pesa number.</div>
-
+                <div class="notice">{{ config.upload_notice }}</div>
                 <select id="pform" class="form-control">
                     <option value="Handshake AI">Handshake AI</option>
                     <option value="Outlier AI">Outlier AI</option>
                 </select>
                 <input type="text" id="pname" class="form-control" placeholder="Exact Project Name">
-                <input type="text" id="pmpesa" class="form-control" placeholder="M-Pesa Payout Number">
+                <input type="text" id="pmpesa" class="form-control" placeholder="M-Pesa Payout Number (254...)">
                 <input type="file" id="pfile" accept=".pdf" class="form-control"
                     style="background: white; padding: 12px;">
-
                 <button type="button" class="btn-action" onclick="submitUpload()">SUBMIT DOCUMENT</button>
             </div>
 
-            <div class="card" style="border-top-color: var(--brown);">
-                <h2 style="color: var(--brown); margin-bottom: 20px;">REQUEST BOX</h2>
+            <div class="card">
+                <h2 style="color: var(--navy); margin-bottom: 20px;">REQUEST BOX</h2>
                 <p style="font-size: 14px; color: #555; margin-bottom: 25px; line-height: 1.6;">Cannot locate your
-                    assigned project? Submit a request here. Our engineering team prioritizes high-demand projects,
-                    typically releasing solutions within 48 hours.</p>
-
+                    assigned project? Submit a request here. High-demand projects are prioritized.</p>
                 <input type="text" id="vname" class="form-control" placeholder="Target Project Name">
-                <button type="button" class="btn-action" style="background: var(--brown);" onclick="submitVote()">SUBMIT
+                <button type="button" class="btn-action" style="background: #374151;" onclick="submitVote()">SUBMIT
                     REQUEST</button>
             </div>
         </div>
@@ -424,13 +434,10 @@
 
     <button id="chat-trigger" onclick="toggleChat()">SUPPORT ASSISTANT</button>
     <div id="chatbot">
-        <div class="chat-head">
-            <span>AGENT FAITH</span>
-            <span onclick="toggleChat()" style="cursor:pointer; font-size: 18px;">&times;</span>
-        </div>
+        <div class="chat-head"><span>AGENT FAITH</span><span onclick="toggleChat()"
+                style="cursor:pointer; font-size: 18px;">&times;</span></div>
         <div class="chat-body" id="chatBody">
-            <div class="chat-bubble chat-bot">Welcome. I am Agent Faith. How may I assist you with the database today?
-            </div>
+            <div class="chat-bubble chat-bot">Welcome. I am Agent Faith. How may I assist you?</div>
         </div>
         <div class="chat-input-area">
             <input type="text" id="cIn" placeholder="Type your message...">
@@ -439,22 +446,35 @@
     </div>
 
     <footer>
-        <div class="footer-links">
-            <a href="mailto:support@feswide.com">SUPPORT EMAIL</a>
-            <a href="#">TWITTER</a>
-            <a href="#">SECURE TELEGRAM</a>
-        </div>
-        <p style="font-size: 12px; margin-top: 30px; color: #888;">&copy; 2026 FESWIDE SOCIETY | UNAUTHORIZED
-            DUPLICATION PROHIBITED</p>
+        <p style="font-size: 12px; color: #a8c7fa;">&copy; 2026 FESWIDE SOCIETY | UNAUTHORIZED DUPLICATION PROHIBITED
+        </p>
     </footer>
 
     <script>
-        function showModal(title, body) {
+        let pollInterval;
+
+        function showModal(title, body, showInput = false, confirmCallback = null) {
             document.getElementById('mTitle').innerText = title;
             document.getElementById('mBody').innerText = body;
+
+            const input = document.getElementById('mInput');
+            const confirmBtn = document.getElementById('mConfirm');
+
+            if (showInput) { input.style.display = 'block'; input.value = ''; }
+            else { input.style.display = 'none'; }
+
+            if (confirmCallback) {
+                confirmBtn.style.display = 'block';
+                confirmBtn.onclick = confirmCallback;
+            } else { confirmBtn.style.display = 'none'; }
+
             document.getElementById('global-modal').style.display = 'flex';
         }
-        function closeModal() { document.getElementById('global-modal').style.display = 'none'; }
+
+        function closeModal() {
+            document.getElementById('global-modal').style.display = 'none';
+            if (pollInterval) clearInterval(pollInterval);
+        }
 
         function switchTab(view) {
             document.getElementById('store').style.display = view === 'store' ? 'block' : 'none';
@@ -472,12 +492,58 @@
             });
         }
 
+        // --- M-PESA PAYMENT LOGIC ---
+        function initiatePayment(productId, productName) {
+            showModal('M-PESA CHECKOUT', `Enter your M-Pesa phone number to purchase ${productName}.`, true, async () => {
+                let phone = document.getElementById('mInput').value;
+                if (!phone) { alert("Phone number required."); return; }
+
+                document.getElementById('mConfirm').style.display = 'none';
+                document.getElementById('mInput').style.display = 'none';
+                document.getElementById('mTitle').innerText = 'PROCESSING...';
+                document.getElementById('mBody').innerText = 'Triggering STK Push. Check your phone for the PIN prompt...';
+
+                try {
+                    let res = await fetch('/stk-push', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ phone: phone, product_id: productId })
+                    });
+                    let data = await res.json();
+
+                    if (data.status === 'success') {
+                        document.getElementById('mBody').innerText = 'Awaiting payment confirmation. Please do not close this window...';
+                        pollPayment(data.checkout_id);
+                    } else {
+                        document.getElementById('mTitle').innerText = 'ERROR';
+                        document.getElementById('mBody').innerText = data.error;
+                    }
+                } catch (e) { document.getElementById('mBody').innerText = 'Connection Error.'; }
+            });
+        }
+
+        function pollPayment(checkoutId) {
+            pollInterval = setInterval(async () => {
+                let res = await fetch('/check-payment/' + checkoutId);
+                let data = await res.json();
+                if (data.status === 'Paid') {
+                    clearInterval(pollInterval);
+                    document.getElementById('mTitle').innerText = 'PAYMENT SUCCESSFUL';
+                    document.getElementById('mBody').innerHTML = `<p style="margin-bottom:15px; color:green; font-weight:bold;">Transaction Verified!</p> <a href="/secure-download/${data.download_token}" target="_blank" style="background:#1A56DB; color:white; padding:12px 20px; text-decoration:none; border-radius:6px; display:inline-block;">DOWNLOAD SECURE PDF</a> <p style="font-size:11px; margin-top:10px; color:red;">This link will expire after 3 uses.</p>`;
+                } else if (data.status === 'Failed') {
+                    clearInterval(pollInterval);
+                    document.getElementById('mTitle').innerText = 'PAYMENT FAILED';
+                    document.getElementById('mBody').innerText = 'Transaction cancelled or failed.';
+                }
+            }, 3000);
+        }
+
+        // --- UPLOAD & VOTE LOGIC ---
         async function submitUpload() {
             let file = document.getElementById('pfile').files[0];
             let pname = document.getElementById('pname').value;
             let pmpesa = document.getElementById('pmpesa').value;
-
-            if (!file || !pname || !pmpesa) { showModal('VALIDATION ERROR', 'All fields and a PDF document are required.'); return; }
+            if (!file || !pname || !pmpesa) { showModal('ERROR', 'All fields and a PDF document are required.'); return; }
 
             let fd = new FormData();
             fd.append('file', file);
@@ -489,54 +555,37 @@
                 let res = await fetch('/upload-answer', { method: 'POST', body: fd });
                 let d = await res.json();
                 showModal(d.status === 'success' ? 'SUCCESS' : 'ERROR', d.message);
-                if (d.status === 'success') {
-                    document.getElementById('pname').value = '';
-                    document.getElementById('pfile').value = '';
-                }
-            } catch (e) { showModal('SYSTEM ERROR', 'Connection failed. Please try again.'); }
+                if (d.status === 'success') { document.getElementById('pname').value = ''; document.getElementById('pfile').value = ''; }
+            } catch (e) { showModal('ERROR', 'Connection failed. Please try again.'); }
         }
 
         async function submitVote() {
             let n = document.getElementById('vname').value;
-            if (!n) { showModal('VALIDATION ERROR', 'Please enter a target project name.'); return; }
+            if (!n) { showModal('ERROR', 'Please enter a target project name.'); return; }
             await fetch('/request-project', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ project_name: n, platform: 'REQUEST' }) });
-            showModal('REQUEST LOGGED', 'Feswide Society engineers will process this module in less than 48 hours.');
+            showModal('SUCCESS', 'Request logged. Engineers will process this module in less than 48 hours.');
             document.getElementById('vname').value = '';
         }
 
-        function toggleChat() {
-            let c = document.getElementById('chatbot');
-            c.style.display = c.style.display === 'flex' ? 'none' : 'flex';
-        }
+        // --- CHATBOT ---
+        function toggleChat() { let c = document.getElementById('chatbot'); c.style.display = c.style.display === 'flex' ? 'none' : 'flex'; }
 
         async function sendChatMsg() {
             let i = document.getElementById('cIn');
             let b = document.getElementById('chatBody');
             if (!i.value) return;
-
-            let query = i.value;
-            b.innerHTML += `<div class="chat-bubble chat-user">${query}</div>`;
-            i.value = '';
-            b.scrollTop = b.scrollHeight;
-
+            let q = i.value;
+            b.innerHTML += `<div class="chat-bubble chat-user">${q}</div>`;
+            i.value = ''; b.scrollTop = b.scrollHeight;
             try {
-                let res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: query }) });
+                let res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: q }) });
                 let d = await res.json();
-                setTimeout(() => {
-                    b.innerHTML += `<div class="chat-bubble chat-bot">${d.reply}</div>`;
-                    b.scrollTop = b.scrollHeight;
-                }, 600);
-            } catch (e) {
-                setTimeout(() => {
-                    b.innerHTML += `<div class="chat-bubble chat-bot" style="color:red;">Connection Error.</div>`;
-                    b.scrollTop = b.scrollHeight;
-                }, 600);
-            }
+                setTimeout(() => { b.innerHTML += `<div class="chat-bubble chat-bot">${d.reply}</div>`; b.scrollTop = b.scrollHeight; }, 500);
+            } catch (e) { setTimeout(() => { b.innerHTML += `<div class="chat-bubble chat-bot" style="color:red;">Network Error.</div>`; b.scrollTop = b.scrollHeight; }, 500); }
         }
 
-        document.onkeydown = function (e) {
-            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) return false;
-        };
+        // SECURITY 
+        document.onkeydown = function (e) { if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) return false; };
     </script>
 </body>
 

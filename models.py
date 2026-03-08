@@ -1,14 +1,14 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import uuid
 
 db = SQLAlchemy()
 
-class User(db.Model):
-    __tablename__ = 'users'
+class SiteConfig(db.Model):
+    __tablename__ = 'site_config'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    role = db.Column(db.String(20), default='user')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    key = db.Column(db.String(50), unique=True, nullable=False)
+    value = db.Column(db.Text, nullable=False)
 
 class Product(db.Model):
     __tablename__ = 'products'
@@ -17,6 +17,18 @@ class Product(db.Model):
     price = db.Column(db.Float, default=999.0)
     filename = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
+
+class Transaction(db.Model):
+    __tablename__ = 'transactions'
+    id = db.Column(db.Integer, primary_key=True)
+    checkout_request_id = db.Column(db.String(100), unique=True, nullable=False)
+    phone = db.Column(db.String(15), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    product_id = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.String(20), default='Pending') # Pending, Paid, Failed
+    download_token = db.Column(db.String(100), unique=True, default=lambda: str(uuid.uuid4()))
+    download_count = db.Column(db.Integer, default=0) # Limits downloads
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 class UserUpload(db.Model):
     __tablename__ = 'user_uploads'
