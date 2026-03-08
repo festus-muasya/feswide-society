@@ -2,14 +2,18 @@ import os
 from flask import Flask, render_template, request, jsonify, send_from_directory, abort
 from models import db, Transaction, UserUpload, User
 
-app = Flask(__name__)
+# ==========================================
+# 1. FLASK APP INITIALIZATION (VERCEL READ-ONLY FIX)
+# ==========================================
+# Force Flask to use the writable /tmp folder for its instance path
+app = Flask(__name__, instance_path='/tmp/instance')
 
 # ==========================================
-# 1. DATABASE CONFIGURATION 
+# 2. DATABASE CONFIGURATION 
 # ==========================================
-# Pulls your encoded Supabase string from Vercel. 
-# Falls back to local SQLite if you test on your own computer.
-database_url = os.environ.get('DATABASE_URL', 'sqlite:///feswide.db')
+# Pulls your Supabase string from Vercel. 
+# Falls back to a temporary SQLite database in /tmp if the variable is missing.
+database_url = os.environ.get('DATABASE_URL', 'sqlite:////tmp/feswide.db')
 
 # SQLAlchemy requires 'postgresql://' instead of 'postgres://'
 if database_url.startswith("postgres://"):
@@ -19,7 +23,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # ==========================================
-# 2. SECURITY & API CREDENTIALS
+# 3. SECURITY & API CREDENTIALS
 # ==========================================
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback_secret_key_for_local_testing')
 
@@ -30,7 +34,7 @@ DARAJA_PASSKEY = os.environ.get('DARAJA_PASSKEY', '')
 DARAJA_BUSINESS_SHORTCODE = os.environ.get('DARAJA_BUSINESS_SHORTCODE', '')
 
 # ==========================================
-# 3. FILE STORAGE (VERCEL READ-ONLY FIX)
+# 4. FILE STORAGE (VERCEL READ-ONLY FIX)
 # ==========================================
 # Secure answers are part of your GitHub repo, so they live in the main folder
 SECURE_ANSWERS_DIR = os.path.join(os.path.dirname(__file__), 'secure_answers')
@@ -46,17 +50,21 @@ os.makedirs(USER_UPLOADS_DIR, exist_ok=True)
 
 
 # ==========================================
-# 4. INITIALIZE DATABASE
+# 5. INITIALIZE DATABASE
 # ==========================================
 db.init_app(app)
 
 with app.app_context():
-    # Creates tables in Supabase if they don't exist yet
-    db.create_all()
+    try:
+        # Creates tables in Supabase if they don't exist yet
+        db.create_all()
+        print("Successfully connected to the database and ensured tables exist.")
+    except Exception as e:
+        print(f"FATAL DATABASE ERROR: {e}")
 
 
 # ==========================================
-# 5. PUBLIC & STOREFRONT ROUTES
+# 6. PUBLIC & STOREFRONT ROUTES
 # ==========================================
 
 @app.route('/')
@@ -134,7 +142,7 @@ def upload_answer():
 
 
 # ==========================================
-# 6. ADMIN DASHBOARD ROUTES
+# 7. ADMIN DASHBOARD ROUTES
 # ==========================================
 
 @app.route('/admin')
