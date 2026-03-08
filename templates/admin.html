@@ -5,17 +5,34 @@
     <meta charset="UTF-8">
     <title>Feswide Terminal</title>
     <style>
+        :root {
+            --navy: #002b5e;
+            --maroon: #8b0000;
+            --white: #ffffff;
+        }
+
         body {
             font-family: sans-serif;
             background: #f1f1f1;
             padding: 20px;
+            margin: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--navy);
+            padding: 10px 0;
+            margin-bottom: 20px;
         }
 
         .panel {
             background: white;
             border: 2px solid #000;
-            padding: 25px;
+            padding: 20px;
             margin-bottom: 20px;
+            box-shadow: 4px 4px 0 #ccc;
         }
 
         table {
@@ -29,75 +46,125 @@
             border: 1px solid #ccc;
             padding: 12px;
             text-align: left;
+            font-size: 14px;
         }
 
         th {
-            background: #002b5e;
+            background: var(--navy);
             color: white;
         }
 
-        .super-only {
-            border-left: 10px solid #8b0000;
-        }
-
-        input,
-        button {
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-
-        button {
-            background: #002b5e;
+        .btn {
+            padding: 10px 15px;
+            background: var(--navy);
             color: white;
             border: none;
             cursor: pointer;
             font-weight: bold;
         }
+
+        .btn-red {
+            background: var(--maroon);
+        }
+
+        .badge {
+            padding: 5px 10px;
+            font-weight: bold;
+            border-radius: 3px;
+        }
+
+        .paid {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .pending {
+            background: #fff3cd;
+            color: #856404;
+        }
     </style>
 </head>
 
 <body>
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2>FESWIDE SECURE TERMINAL [Role: {{ role|upper }}]</h2>
-        <a href="/logout" style="color:red; font-weight:bold;">[LOGOUT]</a>
+    <div class="header">
+        <h2>FESWIDE SECURE TERMINAL [{{ role|upper }}]</h2>
+        <div>
+            <span>Operator: <b>{{ username }}</b></span> |
+            <a href="/logout" style="color:var(--maroon); font-weight:bold; text-decoration:none;">[TERMINATE]</a>
+        </div>
     </div>
 
     <div class="panel">
-        <h3>Live Transaction Monitor</h3>
+        <h3>Live Transaction & Payment Monitor</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Method</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>IP Address</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in txns %}
+                <tr>
+                    <td>{{ t.checkout_request_id }}</td>
+                    <td><b>{{ t.payment_method }}</b> ({{ t.phone or 'Crypto' }})</td>
+                    <td>KES {{ t.amount }}</td>
+                    <td><span class="badge {% if t.status == 'Paid' %}paid{% else %}pending{% endif %}">{{ t.status
+                            }}</span></td>
+                    <td>{{ t.ip_address }}</td>
+                    <td>{{ t.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="panel">
+        <h3>Contributor Uploads Monitor</h3>
         <table>
             <tr>
-                <th>TXN ID</th>
-                <th>Network</th>
-                <th>Status</th>
+                <th>Project</th>
+                <th>Platform</th>
+                <th>File Name</th>
+                <th>Date</th>
             </tr>
-            {% for t in txns %}
+            {% for u in uploads %}
             <tr>
-                <td>{{ t.checkout_request_id }}</td>
-                <td>{{ t.phone or 'Crypto' }}</td>
-                <td>{{ t.status }}</td>
+                <td>{{ u.project_name }}</td>
+                <td>{{ u.platform }}</td>
+                <td>{{ u.filename }}</td>
+                <td>{{ u.timestamp.strftime('%Y-%m-%d') }}</td>
             </tr>
             {% endfor %}
         </table>
     </div>
 
     {% if role == 'superadmin' %}
-    <div class="panel super-only">
-        <h3 style="color:#8b0000">SUPERADMIN COMMAND CENTER</h3>
-
-        <h4>1. Generate Staff Account</h4>
-        <form action="/admin/create-subadmin" method="POST">
-            <input name="username" placeholder="Staff ID" required>
-            <input name="password" type="password" placeholder="Passkey" required>
-            <button type="submit">CREATE LOGIN</button>
+    <div class="panel" style="border-left: 10px solid var(--maroon);">
+        <h3 style="color: var(--maroon);">SUPERADMIN: Staff Management</h3>
+        <form action="/admin/create-subadmin" method="POST" style="display:flex; gap:10px;">
+            <input name="username" placeholder="New Staff ID" required style="flex:1; padding:10px;">
+            <input name="password" type="password" placeholder="Passkey" required style="flex:1; padding:10px;">
+            <button type="submit" class="btn">GENERATE LOGIN</button>
         </form>
+    </div>
 
-        <h4 style="margin-top:30px">2. Add Knowledge Module to Store</h4>
+    <div class="panel" style="border-left: 10px solid var(--maroon);">
+        <h3 style="color: var(--maroon);">SUPERADMIN: Inventory & Module Editor</h3>
         <form action="/admin/add-product" method="POST" enctype="multipart/form-data">
-            <input name="name" placeholder="Module Title" style="width:100%"><br>
-            <input name="price" placeholder="Price (KES)" style="width:100%"><br>
-            <input name="description" placeholder="Short Description" style="width:100%"><br>
-            <input type="file" name="file" accept=".pdf"><br>
-            <button type="submit">UPLOAD & PUBLISH</button>
+            <input name="name" placeholder="Module Title" required
+                style="width:100%; margin-bottom:10px; padding:10px; box-sizing:border-box;">
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <input name="price" placeholder="Price (KES)" required style="flex:1; padding:10px;">
+                <input type="file" name="file" accept=".pdf" required style="flex:1; padding:10px;">
+            </div>
+            <textarea name="description" placeholder="Description"
+                style="width:100%; height:60px; margin-bottom:10px; padding:10px; box-sizing:border-box;"></textarea>
+            <button type="submit" class="btn" style="width:100%;">UPLOAD & PUBLISH TO REPOSITORY</button>
         </form>
     </div>
     {% endif %}

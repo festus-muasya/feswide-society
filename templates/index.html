@@ -36,35 +36,6 @@
             border: 2px solid #000;
         }
 
-        .nav {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .nav button {
-            background: var(--navy);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            border: 2px solid var(--navy);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
         .btn {
             background: var(--navy);
             color: white;
@@ -76,37 +47,67 @@
             text-transform: uppercase;
         }
 
-        #global-modal {
-            display: none;
+        /* CHATTING AGENT STYLES */
+        .chat-btn {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            justify-content: center;
-            align-items: center;
+            bottom: 20px;
+            right: 20px;
+            background: var(--maroon);
+            color: white;
+            padding: 15px 25px;
+            font-weight: bold;
+            border: 2px solid #000;
+            cursor: pointer;
             z-index: 1000;
         }
 
-        .modal-content {
-            background: white;
-            padding: 30px;
-            width: 380px;
-            border: 4px solid var(--navy);
-        }
-
-        .hidden {
+        .chat-window {
             display: none;
+            position: fixed;
+            bottom: 85px;
+            right: 20px;
+            width: 320px;
+            background: white;
+            border: 2px solid #000;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-        input,
-        select {
-            width: 100%;
+        .chat-header {
+            background: var(--navy);
+            color: white;
             padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chat-body {
+            height: 280px;
+            padding: 15px;
+            overflow-y: auto;
+            font-size: 14px;
+            background: #fafafa;
+        }
+
+        .chat-input {
+            display: flex;
+            border-top: 2px solid var(--navy);
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            outline: none;
+        }
+
+        .chat-input button {
+            background: var(--navy);
+            color: white;
+            border: none;
+            padding: 0 15px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -115,95 +116,52 @@
     <div class="header">
         <h1>FESWIDE SOCIETY</h1>
     </div>
+
     <div class="container">
-        <div class="nav">
-            <button onclick="switchTab('store')">KNOWLEDGE REPOSITORY</button>
-            <button onclick="switchTab('dash')" style="background:var(--maroon)">CONTRIBUTOR HUB</button>
-        </div>
-
-        <div id="store">
-            <p style="border-left: 5px solid var(--navy); padding-left: 15px; font-weight: bold;">{{
-                config.get('hero_text') }}</p>
-            <div class="grid">
-                {% for p in products %}
-                <div class="card">
-                    <div>
-                        <h3 style="color:var(--navy); text-transform:uppercase;">{{ p.name }}</h3>
-                        <p style="font-size: 14px;">{{ p.description }}</p>
-                    </div>
-                    <div>
-                        <p style="font-size: 24px; font-weight: bold; color: var(--maroon);">KES {{ p.price }}</p>
-                        <button class="btn" onclick="openPayment('{{ p.id }}', '{{ p.name }}')">PURCHASE SECURE
-                            DOWNLOAD</button>
-                    </div>
-                </div>
-                {% endfor %}
+        <h3>{{ config.get('hero_text') }}</h3>
+        <div id="productGrid"
+            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+            {% for p in products %}
+            <div style="border: 2px solid var(--navy); padding: 20px;">
+                <h4 style="color:var(--navy); margin-top:0;">{{ p.name }}</h4>
+                <p style="color:var(--maroon); font-size: 22px; font-weight:bold;">KES {{ p.price }}</p>
+                <button class="btn" onclick="openPayment('{{ p.id }}', '{{ p.name }}')">PURCHASE</button>
             </div>
-        </div>
-
-        <div id="dash" class="hidden">
-            <h2>Upload Completed Rubric</h2>
-            <div class="card" style="max-width: 500px;">
-                <select id="pform">
-                    <option>Outlier AI</option>
-                    <option>Handshake AI</option>
-                </select>
-                <input type="text" id="pname" placeholder="Project Name">
-                <input type="text" id="pmpesa" placeholder="M-Pesa Number for Payout">
-                <input type="file" id="pfile" accept=".pdf">
-                <button class="btn" onclick="alert('System indexing file...')">SUBMIT FOR REVIEW</button>
-            </div>
+            {% endfor %}
         </div>
     </div>
 
-    <div id="global-modal">
-        <div class="modal-content">
-            <h2 id="mTitle" style="margin-top:0; color:var(--navy)"></h2>
-            <label>Select Payment Method:</label>
-            <select id="method" onchange="toggleInputs()">
-                <option value="mpesa">Lipa na M-Pesa (STK Push)</option>
-                <option value="binance">Binance Pay (USDT - BEP20)</option>
-            </select>
-            <div id="mInput"><input type="text" id="phone" placeholder="07XXXXXXXX"></div>
-            <div id="bInput" class="hidden">
-                <p style="font-size:12px; color:var(--maroon)">You will be redirected to Binance to pay exactly
-                    <b>USDT</b> (Converted from KES).</p>
-            </div>
-            <button class="btn" id="payBtn" onclick="processPay()">PROCEED TO CHECKOUT</button>
-            <button onclick="document.getElementById('global-modal').style.display='none'"
-                style="width:100%; background:none; border:none; margin-top:10px; cursor:pointer;">CANCEL</button>
+    <button class="chat-btn" onclick="toggleChat()">SUPPORT ASSISTANT</button>
+    <div class="chat-window" id="chatWin">
+        <div class="chat-header"><span>Agent Faith</span><span onclick="toggleChat()" style="cursor:pointer;">✖</span>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <p><b>Agent Faith:</b> How can I help you navigate the Feswide Index today?</p>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="cInput" placeholder="Enter message..."
+                onkeypress="if(event.key==='Enter') sendMsg()">
+            <button onclick="sendMsg()">SEND</button>
         </div>
     </div>
 
     <script>
-        let curId = null;
-        function switchTab(t) {
-            document.getElementById('store').classList.toggle('hidden', t !== 'store');
-            document.getElementById('dash').classList.toggle('hidden', t !== 'dash');
+        function toggleChat() {
+            let win = document.getElementById('chatWin');
+            win.style.display = (win.style.display === 'block') ? 'none' : 'block';
         }
-        function openPayment(id, name) {
-            curId = id; document.getElementById('mTitle').innerText = name;
-            document.getElementById('global-modal').style.display = 'flex';
-        }
-        function toggleInputs() {
-            let isBinance = document.getElementById('method').value === 'binance';
-            document.getElementById('mInput').classList.toggle('hidden', isBinance);
-            document.getElementById('bInput').classList.toggle('hidden', !isBinance);
-        }
-        async function processPay() {
-            let m = document.getElementById('method').value;
-            let btn = document.getElementById('payBtn'); btn.innerText = "INITIALIZING...";
-            let route = m === 'mpesa' ? '/stk-push' : '/binance-pay';
-            let body = { product_id: curId, phone: document.getElementById('phone').value };
+        async function sendMsg() {
+            let input = document.getElementById('cInput');
+            let body = document.getElementById('chatBody');
+            if (!input.value) return;
+            body.innerHTML += `<p style="text-align:right;">${input.value}</p>`;
+            let val = input.value; input.value = '';
+            body.scrollTop = body.scrollHeight;
 
-            try {
-                let res = await fetch(route, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-                let data = await res.json();
-                if (data.checkout_url) window.location.href = data.checkout_url;
-                else if (data.status === 'success') alert("Check your phone for STK Prompt!");
-                else alert("Gateway Error: " + (data.error || "Connection Failed"));
-            } catch (e) { alert("Network Timeout. Please try again."); }
-            finally { btn.innerText = "PROCEED TO CHECKOUT"; }
+            let res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: val }) });
+            let data = await res.json();
+            body.innerHTML += `<p><b>Agent Faith:</b> ${data.reply}</p>`;
+            body.scrollTop = body.scrollHeight;
         }
     </script>
 </body>

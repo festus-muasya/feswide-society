@@ -24,14 +24,8 @@ class AdminUser(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(20), nullable=False) # superadmin/subadmin
+    role = db.Column(db.String(20), default='subadmin') # Critical: 'superadmin' unlocks the full dashboard
     is_active = db.Column(db.Boolean, default=True)
-
-class ActivityLog(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    operator = db.Column(db.String(50), nullable=False)
-    action = db.Column(db.String(255), nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -39,7 +33,7 @@ class Transaction(db.Model):
     phone = db.Column(db.String(50), nullable=True)
     amount = db.Column(db.Float, nullable=False)
     product_id = db.Column(db.Integer, nullable=False)
-    payment_method = db.Column(db.String(20), default='M-Pesa') # M-Pesa or Binance
+    payment_method = db.Column(db.String(20), default='M-Pesa') # Tracks Binance vs M-Pesa
     status = db.Column(db.String(50), default='Pending')
     download_token = db.Column(db.String(100), default=lambda: str(uuid.uuid4()), unique=True)
     ip_address = db.Column(db.String(50), nullable=True)
