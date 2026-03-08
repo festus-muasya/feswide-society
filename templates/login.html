@@ -4,20 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Terminal Access</title>
-    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         body {
+            font-family: 'Roboto', sans-serif;
+            background: #e0e0e0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
         }
 
         .box {
             background: white;
-            border-top: 5px solid var(--navy);
+            border-top: 5px solid #002b5e;
             padding: 40px;
             text-align: center;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -33,18 +34,39 @@
             box-sizing: border-box;
             font-family: 'Roboto', sans-serif;
         }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #002b5e;
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            color: #002b5e;
+            margin-top: 0;
+        }
+
+        .text-red {
+            color: #8b0000;
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
     <div class="box">
-        <h2 style="color: var(--navy); margin-top: 0;">FESWIDE TERMINAL</h2>
+        <h2>FESWIDE TERMINAL</h2>
         <p style="color: #666;">AUTHORIZED ACCESS ONLY</p>
         {% if error %}<p class="text-red">{{ error }}</p>{% endif %}
         <form method="POST">
             <input type="text" name="username" placeholder="Operator ID" required>
             <input type="password" name="password" placeholder="Passkey" required>
-            <button type="submit" class="btn-purchase">LOGIN</button>
+            <button type="submit">LOGIN</button>
         </form>
     </div>
 </body>
