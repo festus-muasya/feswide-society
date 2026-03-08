@@ -38,14 +38,20 @@
             background: black;
             color: #00ff00;
             border: 1px solid #00ff00;
-            padding: 5px;
+            padding: 8px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        button {
+            cursor: pointer;
+            font-weight: bold;
         }
     </style>
 </head>
 
 <body>
     <h2>FESWIDE SECURE TERMINAL [Logged in as: {{ username }} | Role: {{ role|upper }}]</h2>
-    <a href="/logout" style="color:red;">[TERMINATE SESSION]</a>
+    <a href="/logout" style="color:red; font-weight:bold; text-decoration:none;">[TERMINATE SESSION]</a>
 
     <div class="panel">
         <h3>1. Pending Transactions (M-Pesa / Airtel)</h3>
@@ -53,6 +59,7 @@
             <tr>
                 <th>TXN ID</th>
                 <th>Phone/Network</th>
+                <th>Product ID</th>
                 <th>Status</th>
                 <th>Action</th>
             </tr>
@@ -60,6 +67,7 @@
             <tr>
                 <td>{{ t.checkout_request_id }}</td>
                 <td>{{ t.phone }}</td>
+                <td>{{ t.product_id }}</td>
                 <td>{{ t.status }}</td>
                 <td>
                     {% if t.status == 'Pending Manual' %}
@@ -98,22 +106,8 @@
             <input name="password" type="password" placeholder="Passkey" required>
             <button type="submit">CREATE SUB-ADMIN</button>
         </form>
-        <table style="border-color: yellow;">
-            <tr>
-                <th>Staff Member</th>
-                <th>Role</th>
-                <th>Status</th>
-            </tr>
-            {% for a in admins %}
-            <tr>
-                <td>{{ a.username }}</td>
-                <td>{{ a.role }}</td>
-                <td>{{ 'Active' if a.is_active else 'Suspended' }}</td>
-            </tr>
-            {% endfor %}
-        </table>
 
-        <h4>B. Edit Site Config</h4>
+        <h4 style="margin-top:20px;">B. Edit Site Config</h4>
         <form action="/admin/update-config" method="POST">
             <p>Hero Text:</p><input name="hero_text" value="{{ config.get('hero_text') }}" style="width:100%;">
             <p>Notice:</p><input name="upload_notice" value="{{ config.get('upload_notice') }}" style="width:100%;">

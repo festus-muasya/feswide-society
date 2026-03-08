@@ -18,7 +18,6 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'feswide_global_2026')
 db.init_app(app)
 
 # --- SUPABASE STORAGE CONFIG ---
-# (Note: These are different from DATABASE_URL. These handle PDF file uploads)
 sb_url = os.environ.get("SUPABASE_URL", "")
 sb_key = os.environ.get("SUPABASE_KEY", "")
 supabase: Client = create_client(sb_url, sb_key) if sb_url and sb_key else None
@@ -39,15 +38,14 @@ with app.app_context():
         if not SiteConfig.query.filter_by(key='hero_text').first():
             db.session.add(SiteConfig(key='hero_text', value="Feswide Society Index. Secure OPSEC Modules."))
         db.session.commit()
-        print("DATABASE SYNCED SUCCESSFULLY.")
     except Exception as e:
         print(f"CRITICAL DATABASE ERROR ON BOOT: {e}")
 
-# --- M-PESA & PAYMENT ROUTING ---
+# --- LIVE M-PESA DARAJA INTEGRATION ---
 def get_daraja_token():
     key = os.environ.get('DARAJA_CONSUMER_KEY', '').strip()
     secret = os.environ.get('DARAJA_CONSUMER_SECRET', '').strip()
-    url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials" 
+    url = "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials" 
     try:
         credentials = base64.b64encode(f"{key}:{secret}".encode()).decode('utf-8')
         r = requests.get(url, headers={"Authorization": f"Basic {credentials}"}, timeout=15)
@@ -64,10 +62,14 @@ def stk_push():
         
         token, err = get_daraja_token()
         if not token: 
-            return jsonify({"error": f"Safaricom Auth Failed: {err}"}), 500
+            return jsonify({"error": f"Safaricom Gateway Rejected Auth: Ensure live keys are in Vercel."}), 500
 
-        shortcode = os.environ.get('DARAJA_BUSINESS_SHORTCODE', '174379').strip()
-        passkey = os.environ.get('DARAJA_PASSKEY', 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919').strip()
+        shortcode = os.environ.get('DARAJA_BUSINESS_SHORTCODE', '').strip()
+        passkey = os.environ.get('DARAJA_PASSKEY', '').strip()
+        
+        if not shortcode or not passkey:
+            return jsonify({"error": "Missing Paybill/Till Shortcode in Vercel."}), 500
+
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         password = base64.b64encode((shortcode + passkey + timestamp).encode()).decode('utf-8')
 
@@ -77,21 +79,28 @@ def stk_push():
         cb_url = cb_url.replace("http://", "https://") if "localhost" not in cb_url else cb_url
 
         payload = {
-            "BusinessShortCode": shortcode, "Password": password, "Timestamp": timestamp,
-            "TransactionType": "CustomerPayBillOnline", "Amount": 1, 
-            "PartyA": phone, "PartyB": shortcode, "PhoneNumber": phone,
-            "CallBackURL": cb_url, "AccountReference": f"FW_{product.id}", "TransactionDesc": "Feswide Module"
+            "BusinessShortCode": shortcode, 
+            "Password": password, 
+            "Timestamp": timestamp,
+            "TransactionType": "CustomerPayBillOnline", 
+            "Amount": int(product.price), # REAL PRICE IN PRODUCTION
+            "PartyA": phone, 
+            "PartyB": shortcode, 
+            "PhoneNumber": phone,
+            "CallBackURL": cb_url, 
+            "AccountReference": f"FW_{product.id}", 
+            "TransactionDesc": "Feswide Module"
         }
 
-        r = requests.post("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", json=payload, headers={"Authorization": f"Bearer {token}"}, timeout=15)
+        r = requests.post("https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest", json=payload, headers={"Authorization": f"Bearer {token}"}, timeout=15)
         res = r.json()
         
         if res.get('ResponseCode') == '0':
-            db.session.add(Transaction(checkout_request_id=res.get('CheckoutRequestID'), phone=phone, amount=1, product_id=product.id, ip_address=request.remote_addr))
+            db.session.add(Transaction(checkout_request_id=res.get('CheckoutRequestID'), phone=phone, amount=product.price, product_id=product.id, ip_address=request.remote_addr))
             db.session.commit()
             return jsonify({"status": "success", "checkout_id": res.get('CheckoutRequestID')})
             
-        return jsonify({"error": res.get('errorMessage', 'Failed to trigger STK')}), 400
+        return jsonify({"error": res.get('errorMessage', res.get('CustomerMessage', 'STK Push Failed.'))}), 400
     except Exception as e: 
         return jsonify({"error": str(e)}), 500
 
@@ -156,7 +165,7 @@ def index():
         products = Product.query.all()
     except Exception as e:
         print(f"DB READ ERROR ON HOMEPAGE: {e}")
-        config = {'hero_text': 'DATABASE OFFLINE. CHECK LOGS.'}
+        config = {'hero_text': 'DATABASE OFFLINE. CHECK LOGS.', 'upload_notice': ''}
         products = []
     return render_template('index.html', products=products, config=config)
 
@@ -172,13 +181,9 @@ def upload_answer():
                 db.session.add(UserUpload(platform=request.form.get('platform'), project_name=request.form.get('project_name'), mpesa_number=request.form.get('mpesa_number'), filename=fname))
                 db.session.commit()
             except Exception: pass
-            return jsonify({"status": "success", "message": "Uploaded securely to Supabase."})
+            return jsonify({"status": "success", "message": "Uploaded securely to Feswide Supabase."})
         return jsonify({"status": "error", "message": "Supabase File Storage not configured."}), 500
     return jsonify({"status": "error", "message": "Invalid file. PDFs only."}), 400
-
-@app.route('/api/chat', methods=['POST'])
-def faith_chat():
-    return jsonify({"reply": "I am Agent Faith. Contact support@feswide.com for secure handling."})
 
 # --- ADMIN ROUTES ---
 @app.route('/login', methods=['GET', 'POST'])

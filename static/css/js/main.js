@@ -2,29 +2,26 @@ let pollInterval;
 let currentProductId = null;
 let currentProductName = null;
 
-// ==========================================
-// 1. PAYMENT MODAL & NETWORK SELECTOR
-// ==========================================
 function showPaymentModal(productId, productName) {
     currentProductId = productId;
     currentProductName = productName;
 
     document.getElementById('mTitle').innerText = `PURCHASE: ${productName}`;
     document.getElementById('mBody').innerHTML = `
-        <select id="networkSelect" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 2px solid var(--black); background: var(--panel-bg); color: var(--text-main); font-weight: bold; font-family: monospace;" onchange="handleNetworkChange()">
+        <select id="networkSelect" onchange="handleNetworkChange()">
             <option value="safaricom">Safaricom (M-Pesa)</option>
             <option value="airtel">Airtel Money</option>
         </select>
         
         <div id="safaricom-flow">
-            <input type="text" id="mInput" placeholder="Safaricom Number (07XXXXXXXX)" style="width: 100%; padding: 10px; border: 1px solid #374151; background: #1f2937; color: #fff; font-family: monospace;">
+            <input type="text" id="mInput" placeholder="Safaricom Number (07XXXXXXXX)">
         </div>
         
-        <div id="airtel-flow" style="display: none; background: #1f2937; padding: 15px; border: 1px solid #374151; font-size: 13px;">
-            <p style="color: var(--danger); font-weight: bold;">STK Push unsupported for Airtel.</p>
+        <div id="airtel-flow" style="display: none; background: #f8f9fa; padding: 15px; border: 1px solid #ccc; font-size: 13px;">
+            <p style="color: darkred; font-weight: bold;">STK Push unsupported for Airtel.</p>
             <p>1. Go to Airtel Money -> Send Money -> To M-Pesa.</p>
-            <p>2. Till: <b style="color: var(--accent-green);">174379</b> | Amount: <b style="color: var(--accent-green);">KES 999</b></p>
-            <input type="text" id="aInput" placeholder="Airtel Transaction ID" style="width: 100%; padding: 10px; margin-top:10px; border: 1px solid #374151; background: #111827; color: #fff; font-family: monospace;">
+            <p>2. Till: <b>Enter your Till here</b> | Amount: <b>Listed Price</b></p>
+            <input type="text" id="aInput" placeholder="Airtel Transaction ID" style="margin-top:10px;">
         </div>
     `;
 
@@ -47,9 +44,6 @@ function closeModal() {
     if (pollInterval) clearInterval(pollInterval);
 }
 
-// ==========================================
-// 2. PAYMENT API ROUTING
-// ==========================================
 function processPaymentRoute() {
     let network = document.getElementById('networkSelect').value;
     if (network === 'safaricom') {
@@ -65,7 +59,7 @@ function processPaymentRoute() {
 
 async function triggerSTKPush(phone) {
     document.getElementById('mConfirm').style.display = 'none';
-    document.getElementById('mBody').innerHTML = `<p style="font-weight:bold; color: var(--accent-blue);">TRIGGERING SECURE STK PUSH...</p>`;
+    document.getElementById('mBody').innerHTML = `<p style="font-weight:bold; color: #0a192f;">TRIGGERING SECURE STK PUSH...</p>`;
 
     try {
         let res = await fetch('/stk-push', {
@@ -76,19 +70,19 @@ async function triggerSTKPush(phone) {
         let data = await res.json();
 
         if (data.status === 'success') {
-            document.getElementById('mBody').innerHTML += '<p style="color: var(--text-muted);">Awaiting PIN confirmation on your device...</p>';
+            document.getElementById('mBody').innerHTML += '<p>Awaiting PIN confirmation on your device...</p>';
             pollPayment(data.checkout_id);
         } else {
-            document.getElementById('mBody').innerHTML = `<p style="color: var(--danger); font-weight: bold;">ERROR: ${data.error}</p>`;
+            document.getElementById('mBody').innerHTML = `<p style="color: darkred; font-weight: bold;">ERROR: ${data.error}</p>`;
         }
     } catch (e) {
-        document.getElementById('mBody').innerHTML = `<p style="color: var(--danger);">Network Error resolving gateway.</p>`;
+        document.getElementById('mBody').innerHTML = `<p style="color: darkred;">Network Error resolving gateway.</p>`;
     }
 }
 
 async function verifyManualPayment(txnId) {
     document.getElementById('mConfirm').style.display = 'none';
-    document.getElementById('mBody').innerHTML = `<p>Verifying Airtel Transaction <b style="color: var(--accent-green);">${txnId}</b>...</p>`;
+    document.getElementById('mBody').innerHTML = `<p>Verifying Airtel Transaction <b>${txnId}</b>...</p>`;
 
     try {
         await fetch('/verify-manual', {
@@ -96,9 +90,9 @@ async function verifyManualPayment(txnId) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ txn_id: txnId, product_id: currentProductId })
         });
-        document.getElementById('mBody').innerHTML = `<p style="font-weight:bold; color: var(--accent-blue);">VERIFICATION LOGGED.</p><p style="color: var(--text-muted);">A Feswide sub-admin will review and approve your transaction shortly.</p>`;
+        document.getElementById('mBody').innerHTML = `<p style="font-weight:bold; color: #0a192f;">VERIFICATION LOGGED.</p><p>A Feswide sub-admin will review and approve your transaction shortly.</p>`;
     } catch (e) {
-        document.getElementById('mBody').innerHTML = `<p style="color: var(--danger);">Failed to send verification.</p>`;
+        document.getElementById('mBody').innerHTML = `<p style="color: darkred;">Failed to send verification.</p>`;
     }
 }
 
@@ -111,24 +105,21 @@ function pollPayment(checkoutId) {
             clearInterval(pollInterval);
             document.getElementById('mTitle').innerText = 'PAYMENT SUCCESSFUL';
             document.getElementById('mBody').innerHTML = `
-                <a href="/secure-download/${data.download_token}" target="_blank" style="background: var(--accent-green); color: black; padding: 12px; text-decoration: none; border: none; display: inline-block; font-weight: bold; width: 100%; text-align: center; box-sizing: border-box;">DOWNLOAD SECURE PDF</a>
-                <p style="font-size: 11px; margin-top: 15px; color: var(--danger); font-weight: bold; text-align: center;">OPSEC WARNING: This link is mathematically bound to your current IP address. Sharing is futile and will result in invalidation.</p>
+                <a href="/secure-download/${data.download_token}" target="_blank" style="background: #155724; color: white; padding: 12px; text-decoration: none; border: 2px solid black; display: block; font-weight: bold; text-align: center;">DOWNLOAD SECURE PDF</a>
+                <p style="font-size: 11px; margin-top: 15px; color: darkred; font-weight: bold; text-align: center;">OPSEC WARNING: This link is mathematically bound to your current IP address.</p>
             `;
         } else if (data.status === 'Failed') {
             clearInterval(pollInterval);
-            document.getElementById('mBody').innerHTML = `<p style="color: var(--danger); font-weight: bold;">Transaction Failed or Cancelled.</p>`;
+            document.getElementById('mBody').innerHTML = `<p style="color: darkred; font-weight: bold;">Transaction Failed or Cancelled.</p>`;
         }
     }, 4000);
 }
 
-// ==========================================
-// 3. UI NAVIGATION & UPLOADS
-// ==========================================
 function switchTab(view) {
     document.getElementById('store').style.display = view === 'store' ? 'block' : 'none';
     document.getElementById('dash').style.display = view === 'dash' ? 'block' : 'none';
-    document.getElementById('b-store').className = view === 'store' ? 'nav-btn active' : 'nav-btn';
-    document.getElementById('b-dash').className = view === 'dash' ? 'nav-btn active' : 'nav-btn';
+    document.getElementById('b-store').className = view === 'store' ? 'active' : '';
+    document.getElementById('b-dash').className = view === 'dash' ? 'active' : '';
 }
 
 async function submitUpload() {
@@ -141,66 +132,23 @@ async function submitUpload() {
     fd.append('project_name', document.getElementById('pname').value);
     fd.append('mpesa_number', document.getElementById('pmpesa').value);
 
+    document.querySelector('#dash .btn').innerText = "UPLOADING...";
+
     try {
         let res = await fetch('/upload-answer', { method: 'POST', body: fd });
         let d = await res.json();
         alert(d.message);
     } catch (e) {
         alert("Upload failed. Check your network.");
+    } finally {
+        document.querySelector('#dash .btn').innerText = "SUBMIT FOR REVIEW";
     }
 }
 
-// ==========================================
-// 4. CHATBOT LOGIC
-// ==========================================
-function toggleChat() {
-    let c = document.getElementById('chatbot');
-    c.style.display = c.style.display === 'block' ? 'none' : 'block';
-}
-
-async function sendChatMsg() {
-    let i = document.getElementById('cIn');
-    let b = document.getElementById('chatBody');
-    if (!i.value) return;
-
-    let q = i.value;
-    b.innerHTML += `<div class="chat-bubble chat-user">${q}</div>`;
-    i.value = '';
-    b.scrollTop = b.scrollHeight;
-
-    try {
-        let res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: q }) });
-        let d = await res.json();
-        setTimeout(() => {
-            b.innerHTML += `<div class="chat-bubble chat-bot">${d.reply}</div>`;
-            b.scrollTop = b.scrollHeight;
-        }, 600);
-    } catch (e) {
-        setTimeout(() => {
-            b.innerHTML += `<div class="chat-bubble chat-bot" style="color: var(--danger);">NETWORK ERROR.</div>`;
-            b.scrollTop = b.scrollHeight;
-        }, 600);
-    }
-}
-
-// ==========================================
-// 5. OPSEC ANTI-INSPECTION PROTOCOLS
-// ==========================================
+// Anti-inspection
 document.addEventListener('contextmenu', event => event.preventDefault());
-
 document.addEventListener('keydown', function (e) {
-    if (e.keyCode == 123 ||
-        (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) ||
-        (e.ctrlKey && (e.keyCode == 85 || e.keyCode == 83))) {
-        e.preventDefault();
-        alert("Feswide OPSEC: Inspection Disabled.");
-        return false;
+    if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && (e.keyCode == 85 || e.keyCode == 83))) {
+        e.preventDefault(); alert("Feswide OPSEC: Inspection Disabled."); return false;
     }
 });
-
-let devtools = function () { };
-devtools.toString = function () {
-    alert("Unauthorized Inspection Detected.");
-    return '-';
-}
-console.log('%c', devtools);
