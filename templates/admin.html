@@ -3,28 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Feswide Terminal</title>
+    <title>Terminal</title>
     <style>
-        :root {
-            --navy: #002b5e;
-            --maroon: #8b0000;
-            --white: #ffffff;
-        }
-
         body {
             font-family: sans-serif;
             background: #f1f1f1;
             padding: 20px;
-            margin: 0;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 3px solid var(--navy);
-            padding: 10px 0;
-            margin-bottom: 20px;
         }
 
         .panel {
@@ -32,142 +16,110 @@
             border: 2px solid #000;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 4px 4px 0 #ccc;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         th,
         td {
             border: 1px solid #ccc;
-            padding: 12px;
+            padding: 10px;
             text-align: left;
-            font-size: 14px;
         }
 
         th {
-            background: var(--navy);
+            background: #002b5e;
             color: white;
         }
 
         .btn {
-            padding: 10px 15px;
-            background: var(--navy);
+            padding: 8px 12px;
+            background: #002b5e;
             color: white;
             border: none;
             cursor: pointer;
-            font-weight: bold;
-        }
-
-        .btn-red {
-            background: var(--maroon);
-        }
-
-        .badge {
-            padding: 5px 10px;
-            font-weight: bold;
-            border-radius: 3px;
-        }
-
-        .paid {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .pending {
-            background: #fff3cd;
-            color: #856404;
         }
     </style>
 </head>
 
-<body>
-    <div class="header">
-        <h2>FESWIDE SECURE TERMINAL [{{ role|upper }}]</h2>
-        <div>
-            <span>Operator: <b>{{ username }}</b></span> |
-            <a href="/logout" style="color:var(--maroon); font-weight:bold; text-decoration:none;">[TERMINATE]</a>
-        </div>
+<body oncontextmenu="return false;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2>TERMINAL [{{ role|upper }}]</h2>
+        <a href="/logout" style="color:red; font-weight:bold;">[LOGOUT]</a>
     </div>
 
     <div class="panel">
-        <h3>Live Transaction & Payment Monitor</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Method</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>IP Address</th>
-                    <th>Timestamp</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for t in txns %}
-                <tr>
-                    <td>{{ t.checkout_request_id }}</td>
-                    <td><b>{{ t.payment_method }}</b> ({{ t.phone or 'Crypto' }})</td>
-                    <td>KES {{ t.amount }}</td>
-                    <td><span class="badge {% if t.status == 'Paid' %}paid{% else %}pending{% endif %}">{{ t.status
-                            }}</span></td>
-                    <td>{{ t.ip_address }}</td>
-                    <td>{{ t.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="panel">
-        <h3>Contributor Uploads Monitor</h3>
+        <h3>Transactions</h3>
         <table>
             <tr>
-                <th>Project</th>
-                <th>Platform</th>
-                <th>File Name</th>
+                <th>ID</th>
+                <th>Method</th>
+                <th>Status</th>
                 <th>Date</th>
             </tr>
-            {% for u in uploads %}
+            {% for t in txns %}
             <tr>
-                <td>{{ u.project_name }}</td>
-                <td>{{ u.platform }}</td>
-                <td>{{ u.filename }}</td>
-                <td>{{ u.timestamp.strftime('%Y-%m-%d') }}</td>
+                <td>{{ t.checkout_request_id }}</td>
+                <td>{{ t.payment_method }}</td>
+                <td>{{ t.status }}</td>
+                <td>{{ t.timestamp.strftime('%Y-%m-%d') }}</td>
             </tr>
             {% endfor %}
         </table>
     </div>
 
     {% if role == 'superadmin' %}
-    <div class="panel" style="border-left: 10px solid var(--maroon);">
-        <h3 style="color: var(--maroon);">SUPERADMIN: Staff Management</h3>
-        <form action="/admin/create-subadmin" method="POST" style="display:flex; gap:10px;">
-            <input name="username" placeholder="New Staff ID" required style="flex:1; padding:10px;">
-            <input name="password" type="password" placeholder="Passkey" required style="flex:1; padding:10px;">
-            <button type="submit" class="btn">GENERATE LOGIN</button>
+    <div class="panel" style="border-left: 5px solid red;">
+        <h3>Staff Management</h3>
+        <form action="/admin/create-subadmin" method="POST">
+            <input name="username" placeholder="Username">
+            <input name="password" type="password" placeholder="Password">
+            <button type="submit" class="btn">GENERATE STAFF LOGIN</button>
         </form>
     </div>
 
-    <div class="panel" style="border-left: 10px solid var(--maroon);">
-        <h3 style="color: var(--maroon);">SUPERADMIN: Inventory & Module Editor</h3>
+    <div class="panel" style="border-left: 5px solid red;">
+        <h3>Inventory Manager</h3>
         <form action="/admin/add-product" method="POST" enctype="multipart/form-data">
-            <input name="name" placeholder="Module Title" required
-                style="width:100%; margin-bottom:10px; padding:10px; box-sizing:border-box;">
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <input name="price" placeholder="Price (KES)" required style="flex:1; padding:10px;">
-                <input type="file" name="file" accept=".pdf" required style="flex:1; padding:10px;">
-            </div>
-            <textarea name="description" placeholder="Description"
-                style="width:100%; height:60px; margin-bottom:10px; padding:10px; box-sizing:border-box;"></textarea>
-            <button type="submit" class="btn" style="width:100%;">UPLOAD & PUBLISH TO REPOSITORY</button>
+            <input name="name" placeholder="Name" required>
+            <input name="price" placeholder="Price" required>
+            <input type="file" name="file" accept=".pdf" required>
+            <button type="submit" class="btn">ADD MODULE</button>
         </form>
+        <hr>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+            {% for p in products %}
+            <tr>
+                <td>{{ p.name }}</td>
+                <td>{{ p.price }}</td>
+                <td>
+                    <form action="/admin/delete-product/{{ p.id }}" method="POST">
+                        <button type="submit"
+                            style="background:red; color:white; border:none; cursor:pointer;">DELETE</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
     {% endif %}
+
+    <script>
+        document.onkeydown = function (e) {
+            if (event.keyCode == 123) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+        };
+    </script>
 </body>
 
 </html>
