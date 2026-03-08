@@ -7,7 +7,9 @@ from supabase import create_client, Client
 
 app = Flask(__name__)
 
-# --- CONFIG & DATABASE ---
+# ==========================================
+# 1. CORE CONFIGURATION & SECURE DATABASE
+# ==========================================
 database_url = os.environ.get('DATABASE_URL', 'sqlite:////tmp/feswide.db')
 if database_url.startswith("postgres://"): 
     database_url = database_url.replace("postgres://", "postgresql://", 1)
@@ -17,7 +19,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'feswide_global_2026')
 db.init_app(app)
 
-# --- SUPABASE STORAGE CONFIG ---
+# ==========================================
+# 2. SUPABASE FILE STORAGE
+# ==========================================
 sb_url = os.environ.get("SUPABASE_URL", "")
 sb_key = os.environ.get("SUPABASE_KEY", "")
 supabase: Client = create_client(sb_url, sb_key) if sb_url and sb_key else None
@@ -26,7 +30,7 @@ def log_action(operator, action):
     try:
         db.session.add(ActivityLog(operator=operator, action=action))
         db.session.commit()
-    except Exception as e:
+    except Exception:
         pass
 
 # ANTI-CRASH BOOT SEQUENCE & INVENTORY SEEDING
@@ -36,12 +40,12 @@ with app.app_context():
         if not AdminUser.query.first():
             db.session.add(AdminUser(username='superadmin', password='FeswideMaster2026!', role='superadmin'))
         if not SiteConfig.query.filter_by(key='hero_text').first():
-            db.session.add(SiteConfig(key='hero_text', value="Welcome to the Feswide Society Index. All available AI training modules are rigorously verified by our Quality Assurance team."))
+            db.session.add(SiteConfig(key='hero_text', value="Welcome to the Feswide Society Index. All available modules are rigorously verified."))
             db.session.add(SiteConfig(key='upload_notice', value="Requirement: Submit your completed PDF for review."))
         
-        # RESTORING YOUR DEFAULT INVENTORY SO IT IS NEVER EMPTY
+        # Ensures the store is never completely empty on first boot
         if not Product.query.first():
-            desc = "Verified Feswide Golden Trajectory answers. Secure download restricted to buyer."
+            desc = "Verified Feswide Golden Trajectory answers. Secure download restricted to buyer IP."
             db.session.add_all([
                 Product(name="AETHER MULTILINGUAL QUALITY CHECK", price=999.0, filename="aether.pdf", description=desc),
                 Product(name="AETHER CODER SCREENING", price=999.0, filename="coder.pdf", description=desc),
@@ -52,14 +56,17 @@ with app.app_context():
     except Exception as e:
         print(f"CRITICAL DATABASE ERROR ON BOOT: {e}")
 
-# --- LIVE M-PESA DARAJA INTEGRATION (PRODUCTION ONLY) ---
+# ==========================================
+# 3. LIVE M-PESA DARAJA INTEGRATION (PRODUCTION)
+# ==========================================
 def get_daraja_token():
     key = os.environ.get('DARAJA_CONSUMER_KEY', '').strip()
     secret = os.environ.get('DARAJA_CONSUMER_SECRET', '').strip()
+    # STRICTLY USING PRODUCTION ENDPOINT
     url = "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials" 
     try:
         credentials = base64.b64encode(f"{key}:{secret}".encode()).decode('utf-8')
-        r = requests.get(url, headers={"Authorization": f"Basic {credentials}"}, timeout=15)
+        r = requests.get(url, headers={"Authorization": f"Basic {credentials}"}, timeout=20)
         return r.json().get('access_token'), None if r.status_code == 200 else r.text
     except Exception as e: 
         return None, str(e)
@@ -71,9 +78,12 @@ def stk_push():
         phone, product_id = data.get('phone'), data.get('product_id')
         product = Product.query.get(product_id)
         
+        if not product:
+            return jsonify({"error": "Invalid Module ID."}), 400
+
         token, err = get_daraja_token()
         if not token: 
-            return jsonify({"error": f"Gateway Auth Rejected. Check live keys in Vercel."}), 500
+            return jsonify({"error": "Gateway Auth Rejected. Check live keys in Vercel."}), 500
 
         shortcode = os.environ.get('DARAJA_BUSINESS_SHORTCODE', '').strip()
         passkey = os.environ.get('DARAJA_PASSKEY', '').strip()
@@ -84,7 +94,9 @@ def stk_push():
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         password = base64.b64encode((shortcode + passkey + timestamp).encode()).decode('utf-8')
 
+        # Standardize phone number format for Daraja
         if phone.startswith('0'): phone = '254' + phone[1:]
+        elif phone.startswith('+'): phone = phone[1:]
         
         cb_url = request.host_url.rstrip('/') + "/daraja-callback"
         cb_url = cb_url.replace("http://", "https://") if "localhost" not in cb_url else cb_url
@@ -94,7 +106,7 @@ def stk_push():
             "Password": password, 
             "Timestamp": timestamp,
             "TransactionType": "CustomerPayBillOnline", 
-            "Amount": int(product.price), 
+            "Amount": int(product.price), # CHARGING ACTUAL DATABASE PRICE
             "PartyA": phone, 
             "PartyB": shortcode, 
             "PhoneNumber": phone,
@@ -103,7 +115,8 @@ def stk_push():
             "TransactionDesc": "Feswide Module"
         }
 
-        r = requests.post("https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest", json=payload, headers={"Authorization": f"Bearer {token}"}, timeout=15)
+        # STRICTLY USING PRODUCTION STK PUSH ENDPOINT
+        r = requests.post("https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest", json=payload, headers={"Authorization": f"Bearer {token}"}, timeout=20)
         res = r.json()
         
         if res.get('ResponseCode') == '0':
@@ -113,7 +126,7 @@ def stk_push():
             
         return jsonify({"error": res.get('errorMessage', res.get('CustomerMessage', 'STK Push Failed.'))}), 400
     except Exception as e: 
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Server Error: {str(e)}"}), 500
 
 @app.route('/verify-manual', methods=['POST'])
 def verify_manual():
@@ -147,12 +160,16 @@ def check_payment(checkout_id):
     except Exception:
         return jsonify({"status": "Error"})
 
+# ==========================================
+# 4. SECURE OPSEC DOWNLOAD SYSTEM
+# ==========================================
 @app.route('/secure-download/<token>')
 def secure_download(token):
     try:
         txn = Transaction.query.filter_by(download_token=token).first()
         if not txn or txn.status != 'Paid': abort(403)
         
+        # IP-Binding Security: Prevents link sharing
         if txn.ip_address and txn.ip_address != request.remote_addr:
             return "SECURITY BREACH DETECTED: IP Address mismatch. Link invalidated.", 403
         if txn.download_count >= 3: 
@@ -169,13 +186,15 @@ def secure_download(token):
     except Exception as e:
         return f"Download Error: {e}", 500
 
-# --- USER ROUTES ---
+# ==========================================
+# 5. PUBLIC ROUTES
+# ==========================================
 @app.route('/')
 def index():
     try:
         config = {c.key: c.value for c in SiteConfig.query.all()}
         products = Product.query.all()
-    except Exception as e:
+    except Exception:
         config = {'hero_text': 'DATABASE OFFLINE. CHECK LOGS.', 'upload_notice': ''}
         products = []
     return render_template('index.html', products=products, config=config)
@@ -194,13 +213,15 @@ def upload_answer():
             except Exception: pass
             return jsonify({"status": "success", "message": "Uploaded securely to Feswide Supabase."})
         return jsonify({"status": "error", "message": "Supabase File Storage not configured."}), 500
-    return jsonify({"status": "error", "message": "Invalid file. PDFs only."}), 400
+    return jsonify({"status": "error", "message": "Invalid file format. Secure PDFs only."}), 400
 
 @app.route('/api/chat', methods=['POST'])
 def faith_chat():
     return jsonify({"reply": "I am Agent Faith. Contact support@feswide.com for secure handling."})
 
-# --- ADMIN ROUTES ---
+# ==========================================
+# 6. SUPERADMIN / SUBADMIN TERMINAL
+# ==========================================
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
