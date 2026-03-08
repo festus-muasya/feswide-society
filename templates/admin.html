@@ -3,121 +3,306 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Terminal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FESWIDE COMMAND CENTER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --navy: #0a192f;
+            --maroon: #800000;
+            --orange: #ffcc80;
+            --white: #ffffff;
+            --light-grey: #f4f7f9;
+        }
+
         body {
-            font-family: sans-serif;
-            background: #f1f1f1;
-            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            background: var(--light-grey);
+            margin: 0;
+            color: #333;
+        }
+
+        /* Sidebar & Header */
+        .header {
+            background: var(--navy);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 4px solid var(--maroon);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 20px;
+            letter-spacing: 1px;
+        }
+
+        .logout-btn {
+            background: var(--maroon);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        /* Main Layout */
+        .main-container {
+            padding: 30px 5%;
+            max-width: 1400px;
+            margin: auto;
         }
 
         .panel {
             background: white;
-            border: 2px solid #000;
-            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel h3 {
+            margin-top: 0;
+            color: var(--navy);
+            border-bottom: 2px solid var(--light-grey);
+            padding-bottom: 10px;
             margin-bottom: 20px;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        th,
-        td {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: left;
+            font-size: 14px;
         }
 
         th {
-            background: #002b5e;
-            color: white;
+            background: #f8f9fa;
+            color: #666;
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid #eee;
         }
 
-        .btn {
-            padding: 8px 12px;
-            background: #002b5e;
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .paid {
+            background: #e6fffa;
+            color: #234e52;
+        }
+
+        .pending {
+            background: #fffaf0;
+            color: #7b341e;
+        }
+
+        /* Superadmin Specific Styles */
+        .super-only {
+            border-left: 6px solid var(--maroon);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            background: var(--navy);
             color: white;
             border: none;
+            border-radius: 4px;
             cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .delete-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        /* Maintenance Alert Box */
+        .alert-box {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            padding: 15px;
+            border-radius: 6px;
+            color: #c53030;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: none;
         }
     </style>
 </head>
 
 <body oncontextmenu="return false;">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2>TERMINAL [{{ role|upper }}]</h2>
-        <a href="/logout" style="color:red; font-weight:bold;">[LOGOUT]</a>
+
+    <div class="header">
+        <h2>FESWIDE TERMINAL [{{ role|upper }}]</h2>
+        <div>
+            <span style="font-size: 14px; margin-right: 15px;">Active ID: <b>{{ username }}</b></span>
+            <a href="/logout" class="logout-btn">TERMINATE SESSION</a>
+        </div>
     </div>
 
-    <div class="panel">
-        <h3>Transactions</h3>
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Method</th>
-                <th>Status</th>
-                <th>Date</th>
-            </tr>
-            {% for t in txns %}
-            <tr>
-                <td>{{ t.checkout_request_id }}</td>
-                <td>{{ t.payment_method }}</td>
-                <td>{{ t.status }}</td>
-                <td>{{ t.timestamp.strftime('%Y-%m-%d') }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
+    <div class="main-container">
 
-    {% if role == 'superadmin' %}
-    <div class="panel" style="border-left: 5px solid red;">
-        <h3>Staff Management</h3>
-        <form action="/admin/create-subadmin" method="POST">
-            <input name="username" placeholder="Username">
-            <input name="password" type="password" placeholder="Password">
-            <button type="submit" class="btn">GENERATE STAFF LOGIN</button>
-        </form>
-    </div>
+        <div class="panel">
+            <h3>Payment Gateway Logs (M-Pesa / Binance)</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Request ID</th>
+                            <th>Platform</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in txns %}
+                        <tr>
+                            <td><code>{{ t.checkout_request_id }}</code></td>
+                            <td>{{ t.payment_method }}</td>
+                            <td>KES {{ t.amount }}</td>
+                            <td><span class="badge {% if t.status == 'Paid' %}paid{% else %}pending{% endif %}">{{
+                                    t.status }}</span></td>
+                            <td>{{ t.timestamp.strftime('%d %b, %H:%M') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-    <div class="panel" style="border-left: 5px solid red;">
-        <h3>Inventory Manager</h3>
-        <form action="/admin/add-product" method="POST" enctype="multipart/form-data">
-            <input name="name" placeholder="Name" required>
-            <input name="price" placeholder="Price" required>
-            <input type="file" name="file" accept=".pdf" required>
-            <button type="submit" class="btn">ADD MODULE</button>
-        </form>
-        <hr>
-        <table>
-            <tr>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Action</th>
-            </tr>
-            {% for p in products %}
-            <tr>
-                <td>{{ p.name }}</td>
-                <td>{{ p.price }}</td>
-                <td>
-                    <form action="/admin/delete-product/{{ p.id }}" method="POST">
-                        <button type="submit"
-                            style="background:red; color:white; border:none; cursor:pointer;">DELETE</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
+        {% if role == 'superadmin' %}
+        <div class="panel super-only">
+            <h3 style="color: var(--maroon);">Broadcast System Message</h3>
+            <form action="/admin/update-config" method="POST">
+                <div class="form-grid">
+                    <div>
+                        <label>Entire Page Message (Hero Text)</label>
+                        <input name="hero_text" value="{{ config_text }}"
+                            placeholder="Enter message to display on storefront...">
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button type="submit" class="action-btn" style="background: var(--maroon);">UPDATE SITE
+                            CONTENT</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="panel super-only">
+            <h3 style="color: var(--maroon);">Staff Access Control</h3>
+            <form action="/admin/create-subadmin" method="POST">
+                <div class="form-grid">
+                    <input name="username" placeholder="Staff Username" required>
+                    <input name="password" type="password" placeholder="Assign Passkey" required>
+                    <button type="submit" class="action-btn">CREATE SUB-ADMIN</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="panel super-only">
+            <h3 style="color: var(--maroon);">Inventory Management</h3>
+            <form action="/admin/add-product" method="POST" enctype="multipart/form-data">
+                <div class="form-grid">
+                    <input name="name" placeholder="Module Title" required>
+                    <input name="price" placeholder="Price (KES)" required>
+                    <input type="file" name="file" accept=".pdf" required>
+                </div>
+                <textarea name="description" placeholder="Short accuracy description..."
+                    style="height: 60px; margin-top: 15px;"></textarea>
+                <button type="submit" class="action-btn" style="width: 100%;">PUBLISH NEW MODULE</button>
+            </form>
+
+            <h4 style="margin-top: 30px; font-size: 13px; color: #888;">CURRENT MODULE REPOSITORY</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Module Name</th>
+                        <th>Price</th>
+                        <th>Filesystem</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr>
+                        <td>{{ p.name }}</td>
+                        <td>KES {{ p.price }}</td>
+                        <td><code>{{ p.filename }}</code></td>
+                        <td>
+                            <form action="/admin/delete-product/{{ p.id }}" method="POST"
+                                onsubmit="return confirm('Secure Delete?')">
+                                <button type="submit" class="delete-btn">REMOVE</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
     </div>
-    {% endif %}
 
     <script>
+        /**
+         * OPSEC: HARDENED SOURCE PROTECTION
+         * Disables DevTools and View Source functionality
+         */
         document.onkeydown = function (e) {
             if (event.keyCode == 123) return false;
             if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
             if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false;
         };
     </script>
 </body>
