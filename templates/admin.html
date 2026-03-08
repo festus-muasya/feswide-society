@@ -7,17 +7,14 @@
     <style>
         body {
             font-family: sans-serif;
-            background: #f4f4f4;
-            color: #000;
+            background: #f1f1f1;
             padding: 20px;
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 3px solid #002b5e;
-            padding-bottom: 10px;
+        .panel {
+            background: white;
+            border: 2px solid #000;
+            padding: 25px;
             margin-bottom: 20px;
         }
 
@@ -25,8 +22,6 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
-            background: white;
-            border: 1px solid #ccc;
         }
 
         th,
@@ -41,34 +36,34 @@
             color: white;
         }
 
-        .panel {
-            background: white;
-            border: 1px solid #ccc;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        button,
-        input {
-            padding: 10px;
-            border: 1px solid #ccc;
-        }
-
         .super-only {
-            border-left: 5px solid #8b0000;
+            border-left: 10px solid #8b0000;
+        }
+
+        input,
+        button {
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background: #002b5e;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
         }
     </style>
 </head>
 
 <body>
-    <div class="header">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
         <h2>FESWIDE SECURE TERMINAL [Role: {{ role|upper }}]</h2>
-        <a href="/logout" style="color:#8b0000; font-weight:bold;">[LOGOUT]</a>
+        <a href="/logout" style="color:red; font-weight:bold;">[LOGOUT]</a>
     </div>
 
     <div class="panel">
-        <h3>Transactions Monitor</h3>
+        <h3>Live Transaction Monitor</h3>
         <table>
             <tr>
                 <th>TXN ID</th>
@@ -78,7 +73,7 @@
             {% for t in txns %}
             <tr>
                 <td>{{ t.checkout_request_id }}</td>
-                <td>{{ t.phone }}</td>
+                <td>{{ t.phone or 'Crypto' }}</td>
                 <td>{{ t.status }}</td>
             </tr>
             {% endfor %}
@@ -87,21 +82,22 @@
 
     {% if role == 'superadmin' %}
     <div class="panel super-only">
-        <h3 style="color: #8b0000;">SUPERADMIN CONTROLS</h3>
+        <h3 style="color:#8b0000">SUPERADMIN COMMAND CENTER</h3>
 
-        <h4>1. Generate Staff Login</h4>
+        <h4>1. Generate Staff Account</h4>
         <form action="/admin/create-subadmin" method="POST">
-            <input name="username" placeholder="New Staff ID" required>
+            <input name="username" placeholder="Staff ID" required>
             <input name="password" type="password" placeholder="Passkey" required>
-            <button type="submit" style="background:#002b5e; color:white;">CREATE SUB-ADMIN</button>
+            <button type="submit">CREATE LOGIN</button>
         </form>
 
-        <h4 style="margin-top:20px;">2. Add Knowledge Module</h4>
+        <h4 style="margin-top:30px">2. Add Knowledge Module to Store</h4>
         <form action="/admin/add-product" method="POST" enctype="multipart/form-data">
-            <input name="name" placeholder="Module Name" style="width:100%; margin-bottom:10px;">
-            <input name="price" placeholder="Price (KES)" style="width:100%; margin-bottom:10px;">
-            <input type="file" name="file" accept=".pdf" style="width:100%; margin-bottom:10px;">
-            <button type="submit" style="background:#002b5e; color:white;">UPLOAD TO STORE</button>
+            <input name="name" placeholder="Module Title" style="width:100%"><br>
+            <input name="price" placeholder="Price (KES)" style="width:100%"><br>
+            <input name="description" placeholder="Short Description" style="width:100%"><br>
+            <input type="file" name="file" accept=".pdf"><br>
+            <button type="submit">UPLOAD & PUBLISH</button>
         </form>
     </div>
     {% endif %}
