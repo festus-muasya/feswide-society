@@ -3,483 +3,263 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FESWIDE SOCIETY // Premium Repository</title>
+    <title>FESWIDE SOCIETY // Official Repository</title>
     <style>
         :root {
-            --primary-blue: #0A2540;
-            --accent-blue: #635BFF;
-            --text-dark: #333;
-            --light-bg: #F6F9FC;
-            --success-green: #00D924;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --navy: #003366;
+            --maroon: #800000;
+            --brown: #8B4513;
+            --grey: #e0e0e0;
+            --white: #ffffff;
         }
 
         body {
-            background-color: var(--light-bg);
-            color: var(--text-dark);
-            line-height: 1.6;
+            background: var(--grey);
+            font-family: Arial, sans-serif;
+            margin: 0;
         }
 
-        /* HEADER */
         header {
-            background: white;
-            padding: 1rem 2rem;
+            background: var(--navy);
+            padding: 20px;
+            color: white;
+            border-bottom: 5px solid var(--maroon);
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo h1 {
-            color: var(--primary-blue);
-            font-size: 1.5rem;
-            letter-spacing: -0.5px;
-        }
-
-        .logo span {
-            color: var(--accent-blue);
         }
 
         .nav-btns button {
-            background: white;
-            color: var(--text-dark);
-            border: 1px solid #ddd;
-            padding: 8px 16px;
-            border-radius: 6px;
+            background: var(--grey);
+            border: 1px solid var(--navy);
+            padding: 10px;
             cursor: pointer;
-            margin-left: 10px;
-            font-weight: 600;
-            transition: 0.2s;
+            font-weight: bold;
         }
 
-        .nav-btns button.active,
-        .nav-btns button:hover {
-            background: var(--light-bg);
-            border-color: var(--accent-blue);
-            color: var(--accent-blue);
+        .nav-btns button.active {
+            background: var(--maroon);
+            color: white;
         }
 
-        /* HERO & SEARCH */
-        .hero {
-            text-align: center;
-            padding: 4rem 1rem 2rem;
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
         }
 
-        .hero h2 {
-            font-size: 2.5rem;
-            color: var(--primary-blue);
-            margin-bottom: 1rem;
-        }
-
-        .search-container {
+        .search-box {
+            background: white;
+            padding: 20px;
+            border: 1px solid #ccc;
             position: relative;
-            max-width: 600px;
-            margin: 0 auto 3rem;
+            margin-bottom: 30px;
         }
 
         .search-input {
             width: 100%;
-            padding: 15px 20px;
-            font-size: 1.1rem;
-            border: 2px solid white;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            outline: none;
-            transition: 0.3s;
+            padding: 10px;
+            border: 1px solid #999;
         }
 
-        .search-input:focus {
-            border-color: var(--accent-blue);
-        }
-
-        .suggestions-box {
+        .suggestions {
             display: none;
             position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            margin-top: 10px;
-            text-align: left;
-            overflow: hidden;
+            width: 95%;
+            border: 1px solid var(--navy);
             z-index: 10;
         }
 
-        .suggestion-item {
-            padding: 12px 20px;
-            border-bottom: 1px solid #eee;
+        .s-item {
+            padding: 10px;
             cursor: pointer;
-            transition: 0.2s;
+            border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
         }
 
-        .suggestion-item:hover {
-            background: var(--light-bg);
-            color: var(--accent-blue);
-        }
-
-        /* CARDS */
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 1rem 4rem;
+        .s-item:hover {
+            background: var(--navy);
+            color: white;
         }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
 
         .card {
             background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            transition: 0.3s;
+            border: 1px solid #ccc;
+            border-top: 5px solid var(--navy);
+            padding: 20px;
             text-align: center;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .card h3 {
-            color: var(--primary-blue);
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-            min-height: 50px;
-        }
-
-        .card .price {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--text-dark);
-            margin-bottom: 20px;
         }
 
         .btn-buy {
-            background: var(--accent-blue);
+            background: var(--navy);
             color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
             width: 100%;
-            transition: 0.2s;
-            margin-top: auto;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
         }
 
-        .btn-buy:hover {
-            background: #4b44d4;
-        }
-
-        /* USER DASHBOARD */
-        #userDashboard {
-            display: none;
+        .panel {
             background: white;
-            padding: 3rem;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .notice {
+            background: #fff3cd;
+            padding: 15px;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            font-weight: bold;
+            margin-bottom: 20px;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
-            text-align: left;
+            margin-bottom: 15px;
         }
 
         .form-group label {
             display: block;
+            margin-bottom: 5px;
             font-weight: bold;
-            margin-bottom: 8px;
-            color: var(--primary-blue);
         }
 
         .form-control {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 1rem;
-            outline: none;
+            padding: 8px;
+            border: 1px solid #999;
         }
 
-        .upload-box {
-            border: 2px dashed var(--accent-blue);
-            padding: 3rem;
-            text-align: center;
-            border-radius: 8px;
-            background: #f8f9fc;
-            cursor: pointer;
-        }
-
-        /* CHATBOT */
         #chatbot {
             position: fixed;
-            bottom: 20px;
+            bottom: 0;
             right: 20px;
-            width: 320px;
+            width: 280px;
+            border: 2px solid var(--navy);
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             display: none;
             flex-direction: column;
-            z-index: 9999;
-            overflow: hidden;
-        }
-
-        .chat-head {
-            background: var(--primary-blue);
-            color: white;
-            padding: 15px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-body {
-            height: 250px;
-            padding: 15px;
-            overflow-y: auto;
-            background: var(--light-bg);
-            font-size: 0.9rem;
-        }
-
-        .chat-msg {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-
-        .chat-input {
-            display: flex;
-            padding: 10px;
-            background: white;
-            border-top: 1px solid #ddd;
-        }
-
-        .chat-input input {
-            flex: 1;
-            border: none;
-            outline: none;
-            padding: 5px;
         }
 
         .chat-btn {
             position: fixed;
-            bottom: 20px;
+            bottom: 10px;
             right: 20px;
-            background: var(--accent-blue);
+            background: var(--maroon);
             color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
+            padding: 10px;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(99, 91, 255, 0.4);
-            z-index: 9998;
-            border: none;
-        }
-
-        footer {
-            text-align: center;
-            padding: 2rem;
-            background: white;
-            margin-top: 2rem;
-            border-top: 1px solid #eee;
-        }
-
-        footer p,
-        footer a {
-            color: var(--text-dark);
-            font-size: 0.9rem;
-            font-weight: bold;
-            text-decoration: none;
         }
     </style>
 </head>
 
 <body>
-
     <header>
-        <div class="logo">
-            <h1>FESWIDE<span>.SOCIETY</span></h1>
-        </div>
+        <h1>FESWIDE SOCIETY</h1>
         <div class="nav-btns">
-            <button onclick="switchView('store')" id="btn-store" class="active">Knowledge Store</button>
-            <button onclick="switchView('dashboard')" id="btn-dashboard">Contributor Dashboard</button>
+            <button onclick="show('store')" id="b-store" class="active">REPOSITORY</button>
+            <button onclick="show('dash')" id="b-dash">CONTRIBUTOR PORTAL</button>
         </div>
     </header>
-
-    <div class="hero" id="heroSection">
-        <h2>Premium Outlier & Handshake Repository</h2>
-        <div class="search-container">
-            <input type="text" class="search-input" id="searchInput"
-                placeholder="Search for projects, modules, or answers..." onkeyup="fetchSuggestions()">
-            <div class="suggestions-box" id="suggestionsBox"></div>
-        </div>
-    </div>
-
-    <div class="container" id="mainStore">
-        <div class="grid">
-            {% for product in products %}
-            <div class="card">
-                <h3>{{ product.name }}</h3>
-                <div class="price">KES {{ product.price }}</div>
-                <button class="btn-buy" onclick="alert('M-Pesa API Triggered for {{ product.name }}!')">Purchase
-                    Securely</button>
+    <div class="container">
+        <div id="store">
+            <div class="search-box">
+                <input type="text" id="sInput" class="search-input" placeholder="Search Database..."
+                    onkeyup="doSearch()">
+                <div id="sBox" class="suggestions"></div>
             </div>
-            {% endfor %}
+            <div class="grid">
+                {% for p in products %}
+                <div class="card">
+                    <h3>{{ p.name }}</h3>
+                    <p style="font-size: 20px; font-weight: bold; color: var(--maroon);">KES {{ p.price }}</p>
+                    <button class="btn-buy" onclick="alert('Checkout for {{p.name}}')">PURCHASE</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div id="dash" style="display:none;">
+            <div class="panel">
+                <h2 style="color: var(--navy); border-bottom: 2px solid var(--maroon);">CONTRIBUTOR UPLOAD</h2>
+                <div class="notice">KES 500/= payout after manual review (approx. 48hrs).</div>
+                <div class="form-group">
+                    <label>Platform:</label>
+                    <select id="pform" class="form-control">
+                        <option>Handshake AI</option>
+                        <option>Outlier AI</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Project Name:</label>
+                    <input type="text" id="pname" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>M-Pesa Number:</label>
+                    <input type="text" id="pmpesa" class="form-control" placeholder="2547...">
+                </div>
+                <input type="file" id="pfile" accept=".pdf" style="margin-top: 10px;">
+                <button class="btn-buy" onclick="up()" style="margin-top: 15px;">SUBMIT PDF</button>
+            </div>
+            <div class="panel" style="border-top: 5px solid var(--brown);">
+                <h2 style="color: var(--brown);">VOTE BOX (REQUEST CRACK)</h2>
+                <input type="text" id="vname" class="form-control" placeholder="Project Name">
+                <button class="btn-buy" style="background: var(--brown); margin-top: 10px;" onclick="vote()">SUBMIT
+                    REQUEST</button>
+            </div>
         </div>
     </div>
-
-    <div class="container" id="userDashboard">
-        <h2 style="color: var(--primary-blue); margin-bottom: 20px;">Upload Answers & Get Paid</h2>
-        <p style="margin-bottom: 30px; color: #666;">Securely submit your verified answers to the Feswide Admin team.
-        </p>
-
-        <div class="form-group">
-            <label>Select Platform</label>
-            <select id="platformSelect" class="form-control">
-                <option value="Handshake AI">Handshake AI</option>
-                <option value="Outlier AI">Outlier AI</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Project / Task Name</label>
-            <input type="text" id="projectName" class="form-control"
-                placeholder="e.g., Flamingo Math, Project Atlas...">
-        </div>
-
-        <div class="upload-box" onclick="document.getElementById('fileUpload').click()">
-            <h3 style="color: var(--accent-blue);">+ Select PDF Document</h3>
-            <p style="font-size: 0.85rem; color: #888; margin-top: 10px;">Only .pdf files are accepted</p>
-            <input type="file" id="fileUpload" accept=".pdf" style="display: none;" onchange="submitUpload()">
-        </div>
-    </div>
-
-    <button class="chat-btn" onclick="toggleChat()">💬</button>
+    <div class="chat-btn" onclick="tChat()">SUPPORT</div>
     <div id="chatbot">
-        <div class="chat-head">
-            Agent Faith <span>🟢 Online</span>
-            <span style="cursor: pointer;" onclick="toggleChat()">✖</span>
-        </div>
-        <div class="chat-body" id="chatBody">
-            <div class="chat-msg"><strong>Faith:</strong> Hello! Welcome to Feswide Society. Are you looking to purchase
-                a module or upload Handshake/Outlier answers?</div>
-        </div>
-        <div class="chat-input">
-            <input type="text" placeholder="Type a message..." id="chatText">
-            <button
-                style="background: none; border: none; color: var(--accent-blue); font-weight: bold; cursor: pointer;">Send</button>
-        </div>
+        <div style="background: var(--navy); color: white; padding: 10px;">Agent Faith</div>
+        <div style="height: 150px; padding: 10px; background: #eee; font-size: 12px;">Welcome to Feswide Society.</div>
     </div>
-
-    <footer>
-        <p>Support: <a href="mailto:support@feswide.com">support@feswide.com</a></p>
-        <p style="margin-top: 10px; color: #888; font-weight: normal;">&copy; 2026 FESWIDE SOCIETY. Africa Access
-            Exclusively.</p>
-    </footer>
-
     <script>
-        // Tab Switcher
-        function switchView(view) {
-            document.getElementById('btn-store').classList.remove('active');
-            document.getElementById('btn-dashboard').classList.remove('active');
-
-            if (view === 'store') {
-                document.getElementById('mainStore').style.display = 'block';
-                document.getElementById('heroSection').style.display = 'block';
-                document.getElementById('userDashboard').style.display = 'none';
-                document.getElementById('btn-store').classList.add('active');
-            } else {
-                document.getElementById('mainStore').style.display = 'none';
-                document.getElementById('heroSection').style.display = 'none';
-                document.getElementById('userDashboard').style.display = 'block';
-                document.getElementById('btn-dashboard').classList.add('active');
-            }
+        function show(v) {
+            document.getElementById('store').style.display = v == 'store' ? 'block' : 'none';
+            document.getElementById('dash').style.display = v == 'dash' ? 'block' : 'none';
+            document.getElementById('b-store').className = v == 'store' ? 'active' : '';
+            document.getElementById('b-dash').className = v == 'dash' ? 'active' : '';
         }
-
-        // Live Search Auto-Suggest
-        async function fetchSuggestions() {
-            const query = document.getElementById('searchInput').value;
-            const box = document.getElementById('suggestionsBox');
-
-            if (query.length < 2) {
-                box.style.display = 'none';
-                return;
-            }
-
-            const res = await fetch(`/api/search?q=${query}`);
-            const data = await res.json();
-
-            box.innerHTML = '';
-            if (data.length > 0) {
-                data.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'suggestion-item';
-                    div.innerHTML = `<span>${item.name}</span> <span style="color:var(--success-green); font-weight:bold;">${item.price ? 'KES ' + item.price : '🔎'}</span>`;
-                    box.appendChild(div);
+        async function doSearch() {
+            let q = document.getElementById('sInput').value;
+            let b = document.getElementById('sBox');
+            if (q.length < 2) { b.style.display = 'none'; return; }
+            let res = await fetch('/api/search?q=' + q);
+            let data = await res.json();
+            b.innerHTML = '';
+            if (data.length) {
+                data.forEach(i => {
+                    let d = document.createElement('div'); d.className = 's-item';
+                    d.innerHTML = `<span>${i.name}</span> <span>${i.price ? 'KES ' + i.price : ''}</span>`;
+                    b.appendChild(d);
                 });
-                box.style.display = 'block';
-            } else {
-                box.style.display = 'none';
+                b.style.display = 'block';
             }
         }
-
-        // Upload to Admin
-        async function submitUpload() {
-            const fileInput = document.getElementById('fileUpload').files[0];
-            const platform = document.getElementById('platformSelect').value;
-            const project = document.getElementById('projectName').value;
-
-            if (!project) { alert("Please enter the Project Name first!"); return; }
-            if (!fileInput) return;
-
-            const formData = new FormData();
-            formData.append("file", fileInput);
-            formData.append("platform", platform);
-            formData.append("project_name", project);
-
-            try {
-                const response = await fetch('/upload-answer', { method: 'POST', body: formData });
-                const result = await response.json();
-                alert(result.message || result.error);
-                document.getElementById('projectName').value = '';
-            } catch (error) {
-                alert("Secure upload failed. Try again.");
-            }
+        async function up() {
+            let fd = new FormData();
+            fd.append('file', document.getElementById('pfile').files[0]);
+            fd.append('platform', document.getElementById('pform').value);
+            fd.append('project_name', document.getElementById('pname').value);
+            fd.append('mpesa_number', document.getElementById('pmpesa').value);
+            let res = await fetch('/upload-answer', { method: 'POST', body: fd });
+            let d = await res.json(); alert(d.message || d.error);
         }
-
-        // Chatbot Toggle
-        function toggleChat() {
-            const chat = document.getElementById('chatbot');
-            chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
+        async function vote() {
+            let n = document.getElementById('vname').value;
+            await fetch('/request-project', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ project_name: n, platform: 'Requested' }) });
+            alert("Feswide society will crack them in less than 48hrs. Check back soon.");
         }
+        function tChat() { let c = document.getElementById('chatbot'); c.style.display = c.style.display == 'flex' ? 'none' : 'flex'; }
     </script>
 </body>
 

@@ -7,7 +7,7 @@ class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     phone = db.Column(db.String(15), unique=True, nullable=False)
-    role = db.Column(db.String(20), default='user') # 'user', 'subadmin', 'superadmin'
+    role = db.Column(db.String(20), default='user') # Roles: user, subadmin, superadmin
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Product(db.Model):
@@ -32,9 +32,10 @@ class UserUpload(db.Model):
     __tablename__ = 'user_uploads'
     id = db.Column(db.Integer, primary_key=True)
     uploader_phone = db.Column(db.String(15), nullable=False)
-    platform = db.Column(db.String(50), nullable=False) # Handshake AI or Outlier AI
+    platform = db.Column(db.String(50), nullable=False) 
     project_name = db.Column(db.String(150), nullable=False)
     filename = db.Column(db.String(200), nullable=False)
+    mpesa_number = db.Column(db.String(15), nullable=False)
     status = db.Column(db.String(20), default='Reviewing') 
     upload_date = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -43,3 +44,10 @@ class SearchQuery(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     query = db.Column(db.String(150), unique=True, nullable=False)
     search_count = db.Column(db.Integer, default=1)
+
+class ProjectRequest(db.Model):
+    __tablename__ = 'project_requests'
+    id = db.Column(db.Integer, primary_key=True)
+    project_name = db.Column(db.String(150), nullable=False)
+    platform = db.Column(db.String(50), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

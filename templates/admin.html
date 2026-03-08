@@ -3,203 +3,108 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin // Feswide Society</title>
     <style>
-        :root {
-            --primary-blue: #0A2540;
-            --accent-red: #d93025;
-            --success-green: #00D924;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #F6F9FC;
-            margin: 0;
-            padding: 2rem;
+            font-family: Arial;
+            background: #eee;
+            padding: 20px;
         }
 
-        .dashboard {
-            max-width: 1200px;
-            margin: 0 auto;
+        .box {
             background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .role-badge {
-            background: var(--primary-blue);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            text-transform: uppercase;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-top: 5px solid #003366;
+            margin-bottom: 20px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 3rem;
         }
 
         th,
         td {
-            padding: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
             text-align: left;
-            border-bottom: 1px solid #eee;
         }
 
         th {
-            background: #f8f9fc;
-            color: var(--primary-blue);
-        }
-
-        .btn {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            background: #003366;
             color: white;
-            font-weight: bold;
-        }
-
-        .btn-green {
-            background: var(--success-green);
-        }
-
-        .btn-red {
-            background: var(--accent-red);
-        }
-
-        .btn-blue {
-            background: var(--primary-blue);
-        }
-
-        .add-product-box {
-            background: #f8f9fc;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            border: 1px solid #eee;
-        }
-
-        .add-product-box input {
-            padding: 10px;
-            margin-right: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
         }
     </style>
 </head>
 
 <body>
-
-    <div class="dashboard">
-        <div class="header">
-            <h2>Feswide Admin Control</h2>
-            <div>
-                <span class="role-badge">Logged in as: {{ role }}</span>
-                <button class="btn btn-blue" onclick="window.location.href='/'" style="margin-left: 10px;">Exit to
-                    Store</button>
-            </div>
-        </div>
-
-        <h3 style="color: var(--primary-blue); margin-bottom: 15px;">Live Store Inventory</h3>
-
-        {% if role == 'superadmin' %}
-        <div class="add-product-box">
-            <h4>Upload New Product to Store</h4>
-            <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center;">
-                <input type="text" id="prodName" placeholder="Product Name (e.g., Flamingo Answers)">
-                <input type="number" id="prodPrice" placeholder="Price (KES)">
-                <input type="file" id="prodFile" accept=".pdf">
-                <button class="btn btn-blue" onclick="addNewProduct()">Add to Store</button>
-            </div>
-        </div>
-        {% endif %}
-
+    <div class="box">
+        <h2>PENDING UPLOADS</h2>
         <table>
             <tr>
-                <th>ID</th>
-                <th>Product Name</th>
-                <th>Price</th>
-                <th>Actions</th>
-            </tr>
-            {% for product in products %}
-            <tr>
-                <td>{{ product.id }}</td>
-                <td>{{ product.name }}</td>
-                <td>KES {{ product.price }}</td>
-                <td>
-                    {% if role == 'superadmin' %}
-                    <button class="btn btn-red" onclick="deleteProduct({{ product.id }})">Delete</button>
-                    {% else %}
-                    <span style="color: #888; font-size: 0.85rem;">Restricted</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-
-        <h3 style="color: var(--primary-blue); margin-bottom: 15px;">Contributor Uploads (Handshake & Outlier)</h3>
-        <table>
-            <tr>
-                <th>Phone</th>
                 <th>Platform</th>
-                <th>Project Name</th>
-                <th>Status</th>
+                <th>Project</th>
+                <th>Mpesa</th>
                 <th>Action</th>
             </tr>
-            {% for upload in uploads %}
+            {% for u in uploads %}
             <tr>
-                <td>{{ upload.uploader_phone }}</td>
-                <td><strong>{{ upload.platform }}</strong></td>
-                <td>{{ upload.project_name }}</td>
-                <td>{{ upload.status }}</td>
-                <td>
-                    {% if upload.status == 'Reviewing' %}
-                    <button class="btn btn-green" onclick="alert('Approving triggers payout!')">Approve & Pay</button>
-                    {% else %}
-                    Completed
-                    {% endif %}
-                </td>
+                <td>{{u.platform}}</td>
+                <td>{{u.project_name}}</td>
+                <td>{{u.mpesa_number}}</td>
+                <td><button>Approve</button></td>
             </tr>
             {% endfor %}
         </table>
     </div>
-
+    <div class="box">
+        <h2>REQUESTED CRACKS (VOTE BOX)</h2>
+        <table>
+            <tr>
+                <th>Project</th>
+                <th>Date</th>
+            </tr>
+            {% for r in requests %}
+            <tr>
+                <td>{{r.project_name}}</td>
+                <td>{{r.created_at.strftime('%Y-%m-%d')}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="box">
+        <h2>STORE INVENTORY</h2>
+        {% if role == 'superadmin' %}
+        <div style="margin-bottom: 10px;">
+            <input type="text" id="n" placeholder="Name"> <input type="number" id="p" placeholder="Price"> <input
+                type="file" id="f">
+            <button onclick="add()">Add Product</button>
+        </div>
+        {% endif %}
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+            {% for p in products %}
+            <tr>
+                <td>{{p.name}}</td>
+                <td>{{p.price}}</td>
+                <td>{% if role == 'superadmin' %}<button onclick="del({{p.id}})">Delete</button>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
     <script>
-        async function addNewProduct() {
-            const name = document.getElementById('prodName').value;
-            const price = document.getElementById('prodPrice').value;
-            const file = document.getElementById('prodFile').files[0];
-
-            if (!name || !price || !file) { alert("Fill all fields!"); return; }
-
-            const fd = new FormData();
-            fd.append('name', name); fd.append('price', price); fd.append('file', file);
-
-            const res = await fetch('/admin/add-product', { method: 'POST', body: fd });
-            if (res.ok) location.reload();
+        async function add() {
+            let fd = new FormData(); fd.append('name', document.getElementById('n').value);
+            fd.append('price', document.getElementById('p').value); fd.append('file', document.getElementById('f').files[0]);
+            await fetch('/admin/add-product', { method: 'POST', body: fd }); location.reload();
         }
-
-        async function deleteProduct(id) {
-            if (!confirm("Are you sure you want to permanently delete this from the store?")) return;
-            const res = await fetch(`/admin/delete-product/${id}`, { method: 'POST' });
-            if (res.ok) location.reload();
-        }
+        async function del(id) { await fetch('/admin/delete-product/' + id, { method: 'POST' }); location.reload(); }
     </script>
-
 </body>
 
 </html>
