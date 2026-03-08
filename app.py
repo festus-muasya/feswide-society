@@ -3,23 +3,40 @@ from models import db, Transaction, UserUpload, User
 import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///feswide.db'
-app.config['SECRET_KEY'] = 'your_secure_secret_key'
 
-# Absolute paths for secure file storage
+# --- DATABASE CONFIGURATION FOR VERCEL & LOCAL TESTING ---
+# Looks for a DATABASE_URL environment variable (used in production on Vercel).
+# If it doesn't exist, it falls back to a local SQLite database for your testing.
+database_url = os.environ.get('DATABASE_URL', 'sqlite:///feswide.db')
+
+# Vercel/SQLAlchemy requires PostgreSQL URLs to start with 'postgresql://' instead of 'postgres://'
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_secure_fallback_key')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# --- FILE STORAGE CONFIGURATION ---
+# Note: On Vercel, these local folders will reset. You will eventually want to 
+# swap this logic out for a cloud storage solution like Amazon S3 or Supabase Storage.
 SECURE_ANSWERS_DIR = os.path.abspath('secure_answers')
 USER_UPLOADS_DIR = os.path.abspath('user_uploads')
 
-# Ensure directories exist
+# Ensure directories exist locally
 os.makedirs(SECURE_ANSWERS_DIR, exist_ok=True)
 os.makedirs(USER_UPLOADS_DIR, exist_ok=True)
 
+# Initialize Database
 db.init_app(app)
 
 with app.app_context():
     db.create_all()
 
-# --- PUBLIC ROUTES ---
+
+# ==========================================
+# PUBLIC & STOREFRONT ROUTES
+# ==========================================
 
 @app.route('/')
 def index():
@@ -35,7 +52,7 @@ def pay_stk():
     # TODO: Insert actual Daraja API STK Push request logic here
     mock_checkout_id = "ws_CO_1234567890" 
     
-    # Save pending transaction to DB
+    # Save pending transaction to the database
     new_txn = Transaction(checkout_request_id=mock_checkout_id, phone=phone, amount=amount, document_name=item)
     db.session.add(new_txn)
     db.session.commit()
@@ -91,7 +108,10 @@ def upload_answer():
         
         return jsonify({"message": "File securely sent to Superadmin."})
 
-# --- ADMIN ROUTES ---
+
+# ==========================================
+# ADMIN DASHBOARD ROUTES
+# ==========================================
 
 @app.route('/admin')
 def admin_dashboard():
@@ -132,6 +152,7 @@ def manage_user(user_id, role):
         return jsonify({"success": True, "message": f"User role updated to {role}."})
         
     return jsonify({"success": False, "message": "Invalid role."}), 400
+
 
 if __name__ == '__main__':
     app.run(debug=True)
