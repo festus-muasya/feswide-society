@@ -34,13 +34,11 @@ class ActivityLog(db.Model):
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     checkout_request_id = db.Column(db.String(100), unique=True, nullable=False)
-    phone = db.Column(db.String(50), nullable=True)
+    phone = db.Column(db.String(50))
     amount = db.Column(db.Float, nullable=False)
-    product_id = db.Column(db.Integer, nullable=False)
+    product_id = db.Column(db.Integer)
     payment_method = db.Column(db.String(20), default='M-Pesa')
     status = db.Column(db.String(50), default='Pending')
-    download_token = db.Column(db.String(100), default=lambda: str(uuid.uuid4()), unique=True)
-    ip_address = db.Column(db.String(50), nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 class SiteConfig(db.Model):
@@ -59,6 +57,6 @@ class Opportunity(db.Model):
 
 class ChatTicket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    whatsapp = db.Column(db.String(50))
+    whatsapp = db.Column(db.String(50), nullable=False)
     error_desc = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)

@@ -4,25 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FESWIDE SOCIETY | SECURE INDEX</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <title>FESWIDE SOCIETY</title>
     <style>
         :root {
             --navy: #0a192f;
             --maroon: #800000;
             --orange: #ff9800;
-            --wheat: #f5deb3;
+            --milky: #fdfcf0;
             --green: #2e7d32;
             --white: #ffffff;
         }
 
-        /* 1. GLOBAL STYLES & MOBILE FIT */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--wheat);
+            background: var(--milky);
             margin: 0;
-            padding: 0;
-            color: #333;
             user-select: none;
         }
 
@@ -39,10 +35,8 @@
             z-index: 1000;
         }
 
-        /* 2. ORANGE OPPORTUNITY BUTTON */
         .opp-btn {
             background: var(--orange);
-            color: #000;
             border: 2px solid #000;
             padding: 12px 25px;
             font-weight: bold;
@@ -58,7 +52,15 @@
             padding: 0 20px;
         }
 
-        /* 3. TABS & MARKETPLACE */
+        .broadcast-box {
+            background: var(--white);
+            border: 2px solid #000;
+            padding: 15px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            text-align: center;
+        }
+
         .tab-nav {
             display: flex;
             border-bottom: 2px solid #000;
@@ -70,7 +72,6 @@
             padding: 15px 20px;
             cursor: pointer;
             font-weight: bold;
-            text-transform: uppercase;
             color: #555;
             white-space: nowrap;
         }
@@ -91,12 +92,8 @@
             border: 2px solid #000;
             padding: 25px;
             box-shadow: 6px 6px 0 #000;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
         }
 
-        /* 4. GREEN PRICING */
         .price {
             font-size: 28px;
             font-weight: bold;
@@ -109,12 +106,12 @@
             color: var(--white);
             border: none;
             padding: 15px;
+            width: 100%;
             font-weight: bold;
             cursor: pointer;
             text-transform: uppercase;
         }
 
-        /* 5. MPESA PAYMENT CARD */
         #payment-modal {
             display: none;
             position: fixed;
@@ -137,12 +134,6 @@
             border-bottom: 10px solid #4caf50;
         }
 
-        .mpesa-logo {
-            width: 140px;
-            margin-bottom: 25px;
-        }
-
-        /* 6. AGENT JOHN UI */
         .john-toggle {
             position: fixed;
             bottom: 20px;
@@ -153,7 +144,6 @@
             border-radius: 50px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             z-index: 1000;
         }
 
@@ -168,63 +158,20 @@
             z-index: 1000;
         }
 
-        .chat-header {
-            background: var(--navy);
-            color: white;
-            padding: 12px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .chat-body {
-            height: 250px;
-            padding: 15px;
-            overflow-y: auto;
-            background: #fafafa;
-            font-size: 14px;
-        }
-
-        .chat-input {
-            display: flex;
-            border-top: 1px solid #000;
-        }
-
-        .chat-input input {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            outline: none;
-        }
-
         .hidden {
             display: none;
-        }
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #000;
-            box-sizing: border-box;
         }
     </style>
 </head>
 
 <body oncontextmenu="return false;">
-
     <div class="header">
-        <h1 style="margin:0; font-size: 20px; letter-spacing: 2px;">FESWIDE SOCIETY</h1>
+        <h1 style="margin:0; font-size: 20px;">FESWIDE SOCIETY</h1>
         <button class="opp-btn" onclick="openModal('opp')">Opportunities</button>
     </div>
 
     <div class="container">
-        <div
-            style="background: var(--white); border: 2px solid #000; padding: 15px; margin-bottom: 25px; font-weight: bold;">
-            SYSTEM STATUS: {{ config_text }}
-        </div>
+        {% if config_text %}<div class="broadcast-box">{{ config_text }}</div>{% endif %}
 
         <div class="tab-nav">
             <div class="tab active" onclick="switchTab('modules', this)">Repository</div>
@@ -236,132 +183,49 @@
             <div class="grid">
                 {% for p in products %}
                 <div class="card">
-                    <div>
-                        <h3 style="margin-top:0; color:var(--navy); text-transform:uppercase;">{{ p.name }}</h3>
-                        <p style="font-size: 14px; color: #555;">{{ p.description }}</p>
-                    </div>
-                    <div>
-                        <div class="price">KES {{ p.price }}</div>
-                        <button class="purchase-btn" onclick="openPayment('{{ p.id }}')">Secure Purchase</button>
-                    </div>
+                    <h3 style="text-transform:uppercase; margin-top:0;">{{ p.name }}</h3>
+                    <p style="font-size: 14px; color: #555;">{{ p.description }}</p>
+                    <div class="price">KES {{ p.price }}</div>
+                    <button class="purchase-btn" onclick="openPayment('{{ p.id }}')">Purchase</button>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
-        <div id="section-hiring" class="tab-content hidden">
-            <div class="card" style="margin-bottom:25px; border-left: 10px solid var(--maroon);">
-                <h3 style="margin-top:0;">Post a Task Request</h3>
-                <form action="/post-opportunity" method="POST">
-                    <input type="hidden" name="type" value="Hiring">
-                    <select name="platform">
-                        <option>Outlier AI</option>
-                        <option>Handshake AI</option>
-                    </select>
-                    <input name="rate" placeholder="Commission % or Salary (e.g. 40%)" required>
-                    <input name="whatsapp" placeholder="WhatsApp Number (Format: 254...)" required>
-                    <textarea name="desc" placeholder="Describe the project requirements..." required></textarea>
-                    <button class="opp-btn" style="width:100%">Post Publicly</button>
-                </form>
-            </div>
-            <div class="grid">
-                {% for h in hiring %}
-                <div class="card">
-                    <b style="color:var(--maroon)">{{ h.platform }}</b>
-                    <h3>Looking for Tasker</h3>
-                    <p>{{ h.description }}</p>
-                    <p>Rate: <b>{{ h.rate }}</b></p>
-                    <a href="https://wa.me/{{ h.whatsapp }}"
-                        style="color:var(--green); font-weight:bold; text-decoration:none;">Contact on WhatsApp →</a>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <div id="section-taskers" class="tab-content hidden">
-            <div class="card" style="margin-bottom:25px; border-left: 10px solid var(--navy);">
-                <h3 style="margin-top:0;">List Your Tasker Profile</h3>
-                <form action="/post-opportunity" method="POST">
-                    <input type="hidden" name="type" value="Tasker">
-                    <select name="platform">
-                        <option>Outlier AI</option>
-                        <option>Handshake AI</option>
-                    </select>
-                    <input name="whatsapp" placeholder="WhatsApp Number" required>
-                    <textarea name="desc" placeholder="List your expertise and platforms..." required></textarea>
-                    <button class="opp-btn" style="width:100%; background:var(--navy); color:white">Register
-                        Profile</button>
-                </form>
-            </div>
-            <div class="grid">
-                {% for t in taskers %}
-                <div class="card">
-                    <b style="color:var(--navy)">{{ t.platform }}</b>
-                    <h3>Verified Tasker</h3>
-                    <p>{{ t.description }}</p>
-                    <a href="https://wa.me/{{ t.whatsapp }}"
-                        style="color:var(--green); font-weight:bold; text-decoration:none;">Contact Tasker →</a>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
     </div>
 
     <div id="payment-modal">
         <div class="mpesa-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" class="mpesa-logo"
-                alt="M-Pesa">
-            <h3 style="margin-top:0;">M-PESA STK PUSH</h3>
-            <p style="font-size: 13px; color: #666;">Enter your number below to receive the secure payment prompt.</p>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" width="120"
+                style="margin-bottom:20px;">
+            <h3>Lipa na M-Pesa</h3>
             <input type="text" id="phone" placeholder="07XXXXXXXX" required>
             <button onclick="triggerPayment()"
-                style="background:#4caf50; color:white; border:none; padding:15px; width:100%; font-weight:bold; cursor:pointer; border-radius:4px;">PROCEED
+                style="background:#4caf50; color:white; padding:15px; width:100%; border:none; font-weight:bold; cursor:pointer;">PROCEED
                 TO PAY</button>
             <button onclick="document.getElementById('payment-modal').style.display='none'"
-                style="background:none; border:none; margin-top:15px; cursor:pointer; font-size:12px; font-weight:bold;">CANCEL</button>
-        </div>
-    </div>
-
-    <div id="modal-opp"
-        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; justify-content:center; align-items:center;">
-        <div class="mpesa-card" style="width:400px; border-bottom-color: var(--orange);">
-            <h2 style="margin-top:0">SUBMIT ANSWERS</h2>
-            <p style="font-size: 13px;">Get paid <b>KES 500/=</b> per verified answer trajectory. Review takes 48hrs
-                max.</p>
-            <form
-                onsubmit="event.preventDefault(); alert('Uploading to Feswide Society... Verification cycle started.'); document.getElementById('modal-opp').style.display='none';">
-                <select>
-                    <option>Outlier AI</option>
-                    <option>Handshake AI</option>
-                </select>
-                <input placeholder="Exact Project Name" required>
-                <input placeholder="M-Pesa Number or Binance UID" required>
-                <input type="file" required>
-                <button class="opp-btn" style="width:100%">SUBMIT FOR KES 500</button>
-            </form>
-            <button onclick="document.getElementById('modal-opp').style.display='none'"
-                style="background:none; border:none; margin-top:15px; cursor:pointer;">CLOSE</button>
+                style="background:none; border:none; margin-top:15px; cursor:pointer; font-size:12px;">CANCEL</button>
         </div>
     </div>
 
     <div class="john-toggle" onclick="toggleJohn()">CHAT WITH JOHN</div>
     <div class="john-window" id="johnWin">
-        <div class="chat-header"><span>John Assistant</span><span onclick="toggleJohn()" style="cursor:pointer">✖</span>
+        <div
+            style="background:var(--navy); color:white; padding:12px; font-weight:bold; display:flex; justify-content:space-between;">
+            <span>John Assistant</span><span onclick="toggleJohn()" style="cursor:pointer">✖</span></div>
+        <div id="chatBody" style="height:250px; padding:15px; overflow-y:auto; background:#fafafa; font-size:14px;">
         </div>
-        <div class="chat-body" id="chatBody">
-            <p><b>John:</b> Hello. I can help with pricing, opportunities, or technical errors. How can I assist you
-                today?</p>
-        </div>
-        <div class="chat-input" id="chatInputArea">
-            <input type="text" id="chatIn" placeholder="Type here...">
+        <div id="chatInputArea" style="display:flex; border-top:1px solid #000;">
+            <input type="text" id="chatIn" placeholder="Type here..."
+                style="flex:1; border:none; padding:12px; outline:none;">
             <button onclick="sendChat()"
                 style="background:var(--navy); color:white; border:none; padding:0 15px; cursor:pointer;">SEND</button>
         </div>
         <div id="chatControls" class="hidden" style="display:flex; border-top:1px solid #000;">
             <button onclick="sendChat('yes')"
-                style="flex:1; padding:10px; background:var(--green); color:white; border:none; cursor:pointer;">YES</button>
+                style="flex:1; padding:10px; background:var(--green); color:white; border:none;">YES</button>
             <button onclick="sendChat('no')"
-                style="flex:1; padding:10px; background:var(--maroon); color:white; border:none; cursor:pointer;">NO</button>
+                style="flex:1; padding:10px; background:var(--maroon); color:white; border:none;">NO</button>
         </div>
     </div>
 
@@ -380,60 +244,33 @@
         function openPayment(id) { currentProdId = id; document.getElementById('payment-modal').style.display = 'flex'; }
         function toggleJohn() { let w = document.getElementById('johnWin'); w.style.display = w.style.display === 'block' ? 'none' : 'block'; }
 
-        // M-PESA LOGIC
         async function triggerPayment() {
-            let phone = document.getElementById('phone').value;
-            if (!phone) return alert("Safaricom number required.");
-
             try {
-                let res = await fetch('/stk-push', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ product_id: currentProdId, phone: phone })
-                });
+                let res = await fetch('/stk-push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: currentProdId, phone: document.getElementById('phone').value }) });
                 let data = await res.json();
-                if (data.error) alert(data.error); // Returns "API under maintenance" ifkeys fail
-                else alert("STK Push sent. Complete payment on your phone.");
-            } catch {
-                alert("API under maintenance");
-            }
+                if (data.error) alert(data.error);
+                else alert("Prompt sent.");
+            } catch { alert("API under maintenance"); }
         }
 
-        // JOHN ASSISTANT LOGIC
         async function sendChat(choice = null) {
             let input = document.getElementById('chatIn');
             let body = document.getElementById('chatBody');
             let val = choice ? choice : input.value;
             if (!val) return;
-
             body.innerHTML += `<div style="text-align:right; margin:10px 0;"><b>You:</b> ${val}</div>`;
             input.value = "";
-
-            let res = await fetch('/api/john', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: val, ...johnState })
-            });
+            let res = await fetch('/api/john', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: val, ...johnState }) });
             let data = await res.json();
-
-            // Handling John's State
             if (data.ask_wa) johnState.awaiting_wa = true;
             if (data.ask_desc) johnState.error_context = val;
-            if (data.ask_end) {
-                johnState.confirm_end = true;
-                document.getElementById('chatInputArea').classList.add('hidden');
-                document.getElementById('chatControls').classList.remove('hidden');
-            }
+            if (data.ask_end) { johnState.confirm_end = true; document.getElementById('chatInputArea').classList.add('hidden'); document.getElementById('chatControls').classList.remove('hidden'); }
             if (data.close) { toggleJohn(); return; }
-
             body.innerHTML += `<div style="color:var(--navy); margin:10px 0;"><b>John:</b> ${data.reply}</div>`;
             body.scrollTop = body.scrollHeight;
         }
 
-        // OPSEC: DISABLE INSPECT
-        document.onkeydown = function (e) {
-            if (event.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) return false;
-        };
+        document.onkeydown = function (e) { if (event.keyCode == 123 || (e.ctrlKey && e.keyCode == 85)) return false; };
     </script>
 </body>
 
