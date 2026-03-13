@@ -25,6 +25,7 @@
             padding: 0;
             color: #333;
             user-select: none;
+            /* Disable text selection for security */
         }
 
         .header {
@@ -126,9 +127,8 @@
             text-transform: uppercase;
         }
 
-        /* MODAL & MPESA CARD STYLES */
-        #payment-modal,
-        #modal-submission {
+        /* MODAL STYLES */
+        .modal {
             display: none;
             position: fixed;
             top: 0;
@@ -141,21 +141,26 @@
             align-items: center;
         }
 
-        .mpesa-card {
+        .modal-card {
             background: var(--pure-white);
             padding: 40px;
             border-radius: 12px;
-            width: 350px;
+            width: 380px;
             text-align: center;
             border-bottom: 10px solid #4caf50;
         }
 
-        .mpesa-logo {
-            width: 140px;
-            margin-bottom: 25px;
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #000;
+            box-sizing: border-box;
         }
 
-        /* CHATBOT UI */
+        /* AGENT JOHN CHAT */
         .john-toggle {
             position: fixed;
             bottom: 20px;
@@ -180,18 +185,25 @@
             z-index: 1000;
         }
 
-        .hidden {
-            display: none;
+        .chat-header {
+            background: var(--navy);
+            color: white;
+            padding: 12px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
         }
 
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #000;
-            box-sizing: border-box;
+        .chat-body {
+            height: 250px;
+            padding: 15px;
+            overflow-y: auto;
+            background: #fafafa;
+            font-size: 14px;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -200,7 +212,7 @@
 
     <div class="header">
         <h1>FESWIDE SOCIETY</h1>
-        <button class="opp-btn" onclick="openSubmissionModal()">Opportunities</button>
+        <button class="opp-btn" onclick="openModal('submission')">Opportunities</button>
     </div>
 
     <div class="container">
@@ -243,8 +255,8 @@
                         <option>Handshake AI</option>
                     </select>
                     <input name="rate" placeholder="Commission % or Salary" required>
-                    <input name="whatsapp" placeholder="WhatsApp (254...)" required>
-                    <textarea name="desc" placeholder="Brief details about the task..." required></textarea>
+                    <input name="whatsapp" placeholder="WhatsApp Number (e.g. 254...)" required>
+                    <textarea name="desc" placeholder="Details about the task..." required></textarea>
                     <button class="opp-btn" style="width:100%">Post Publicly</button>
                 </form>
             </div>
@@ -272,7 +284,7 @@
                         <option>Handshake AI</option>
                     </select>
                     <input name="whatsapp" placeholder="WhatsApp Number" required>
-                    <textarea name="desc" placeholder="Describe your expertise and platforms..." required></textarea>
+                    <textarea name="desc" placeholder="Describe your expertise..." required></textarea>
                     <button class="opp-btn" style="width:100%; background:var(--navy); color:white">Register
                         Profile</button>
                 </form>
@@ -291,23 +303,24 @@
         </div>
     </div>
 
-    <div id="payment-modal">
-        <div class="mpesa-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" class="mpesa-logo">
+    <div id="payment-modal" class="modal">
+        <div class="modal-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" width="140"
+                style="margin-bottom:25px;">
             <h3>Lipa na M-Pesa</h3>
             <p style="font-size: 13px; color: #666;">Enter your number below for the STK prompt.</p>
             <input type="text" id="phone" placeholder="07XXXXXXXX" required>
             <button onclick="triggerPayment()"
                 style="background:#4caf50; color:white; border:none; padding:15px; width:100%; font-weight:bold; cursor:pointer; border-radius:4px;">PROCEED
                 TO PAY</button>
-            <button onclick="document.getElementById('payment-modal').style.display='none'"
+            <button onclick="closeModal('payment')"
                 style="background:none; border:none; margin-top:15px; cursor:pointer; font-size:12px;">CANCEL</button>
         </div>
     </div>
 
-    <div id="modal-submission">
-        <div class="mpesa-card" style="width:400px; border-bottom-color: var(--orange);">
-            <h2 style="margin-top:0">Submit Verified Answers</h2>
+    <div id="modal-submission" class="modal">
+        <div class="modal-card" style="border-bottom-color: var(--orange);">
+            <h2 style="margin-top:0">SUBMIT ANSWERS</h2>
             <p style="font-size: 13px;">Earn <b>KES 500/=</b> per verified answer trajectory.</p>
             <form id="ansForm">
                 <select name="platform">
@@ -316,12 +329,12 @@
                 </select>
                 <input name="project" placeholder="Exact Project Name" required>
                 <input name="payment_id" placeholder="M-Pesa Number for KES 500" required>
-                <input type="file" name="file" required>
+                <input type="file" name="file" required style="border:none;">
                 <button type="button" onclick="submitAnswers()" class="opp-btn" style="width:100%">SUBMIT FOR KES
                     500</button>
             </form>
-            <button onclick="closeSubmissionModal()"
-                style="background:none; border:none; margin-top:15px; cursor:pointer;">CLOSE</button>
+            <button onclick="closeModal('submission')"
+                style="background:none; border:none; margin-top:15px; cursor:pointer; font-size:12px;">CLOSE</button>
         </div>
     </div>
 
@@ -330,11 +343,12 @@
         <div class="chat-header"><span>John Assistant</span><span onclick="toggleJohn()" style="cursor:pointer">✖</span>
         </div>
         <div class="chat-body" id="chatBody">
-            <p><b>John:</b> Hello. I can help with pricing, opportunities, or technical errors. How can I assist you
-                today?</p>
+            <p><b>John:</b> Hello. I assist with module pricing, marketplace opportunities, and technical errors. How
+                can I help you?</p>
         </div>
-        <div class="chat-input" id="chatInputArea">
-            <input type="text" id="chatIn" placeholder="Type here...">
+        <div class="chat-input" id="chatInputArea" style="display:flex; border-top:1px solid #000;">
+            <input type="text" id="chatIn" placeholder="Type here..."
+                style="flex:1; border:none; padding:12px; outline:none;">
             <button onclick="sendChat()"
                 style="background:var(--navy); color:white; border:none; padding:0 15px; cursor:pointer;">SEND</button>
         </div>
@@ -357,33 +371,30 @@
             btn.classList.add('active');
         }
 
-        function openSubmissionModal() { document.getElementById('modal-submission').style.display = 'flex'; }
-        function closeSubmissionModal() { document.getElementById('modal-submission').style.display = 'none'; }
-        function openPayment(id) { currentProdId = id; document.getElementById('payment-modal').style.display = 'flex'; }
+        function openModal(id) { document.getElementById('modal-' + id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById('modal-' + id).style.display = 'none'; }
+        function openPayment(id) { currentProdId = id; openModal('payment'); }
         function toggleJohn() { let w = document.getElementById('johnWin'); w.style.display = w.style.display === 'block' ? 'none' : 'block'; }
 
-        // M-PESA TRIGGER
         async function triggerPayment() {
             try {
                 let res = await fetch('/stk-push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: currentProdId, phone: document.getElementById('phone').value }) });
                 let data = await res.json();
-                if (data.error) alert(data.error);
+                if (data.error) alert(data.error); // Returns Maintenance message
                 else alert("Prompt sent.");
             } catch { alert("API under maintenance"); }
         }
 
-        // SUBMISSION LOGIC
         async function submitAnswers() {
             const formData = new FormData(document.getElementById('ansForm'));
             try {
                 const res = await fetch('/submit-answers', { method: 'POST', body: formData });
                 const result = await res.json();
                 alert(result.message || result.error);
-                if (res.ok) { closeSubmissionModal(); document.getElementById('ansForm').reset(); }
+                if (res.ok) { closeModal('submission'); document.getElementById('ansForm').reset(); }
             } catch { alert("Submission failed."); }
         }
 
-        // JOHN ASSISTANT
         async function sendChat(choice = null) {
             let input = document.getElementById('chatIn');
             let body = document.getElementById('chatBody');
@@ -405,7 +416,7 @@
             body.scrollTop = body.scrollHeight;
         }
 
-        // OPSEC PROTECTION
+        // OPSEC PROTECTION: Disable View Source & F12
         document.onkeydown = function (e) { if (event.keyCode == 123 || (e.ctrlKey && e.keyCode == 85)) return false; };
     </script>
 </body>
