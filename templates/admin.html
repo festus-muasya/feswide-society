@@ -3,14 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COMMAND CENTER | FESWIDE SOCIETY</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>FESWIDE | COMMAND CENTER</title>
     <style>
         :root {
             --navy: #0a192f;
             --maroon: #800000;
-            --orange: #ff9800;
             --white: #ffffff;
             --bg: #f4f7f9;
             --green: #2e7d32;
@@ -18,145 +15,89 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
+            background: var(--bg);
             margin: 0;
-            color: #333;
-            user-select: none;
-            /* OPSEC */
+            font-size: 13px;
         }
 
-        /* HEADER & TERMINAL IDENTITY */
         .header {
             background: var(--navy);
-            color: var(--white);
+            color: white;
             padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 5px solid var(--maroon);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            border-bottom: 4px solid var(--maroon);
         }
 
-        .header h2 {
-            margin: 0;
-            font-size: 18px;
-            letter-spacing: 1px;
-        }
-
-        .logout-link {
-            color: #ff9b9b;
-            font-weight: bold;
-            text-decoration: none;
-            font-size: 12px;
-        }
-
-        .main-content {
+        .main {
             padding: 30px 5%;
-            max-width: 1400px;
-            margin: auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
-        /* PANEL ARCHITECTURE */
         .panel {
-            background: var(--white);
+            background: white;
             border: 1px solid #ddd;
-            padding: 25px;
-            margin-bottom: 25px;
-            border-radius: 4px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
-        .panel h3 {
-            margin-top: 0;
+        .full {
+            grid-column: 1 / span 2;
+        }
+
+        h3 {
             color: var(--navy);
-            border-bottom: 2px solid var(--bg);
-            padding-bottom: 12px;
-            margin-bottom: 20px;
-            font-size: 14px;
             text-transform: uppercase;
-        }
-
-        /* TABLE STYLES */
-        .table-container {
-            overflow-x: auto;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            margin-top: 10px;
         }
 
         th {
-            background: #f8f9fa;
-            color: #666;
             text-align: left;
-            padding: 12px;
+            background: #f8f9fa;
+            padding: 10px;
             border-bottom: 2px solid #eee;
         }
 
         td {
-            padding: 12px;
+            padding: 10px;
             border-bottom: 1px solid #eee;
         }
 
-        .badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .type-hiring {
-            background: #fff5f5;
-            color: #c53030;
-        }
-
-        .type-tasker {
-            background: #f0fff4;
-            color: #2f855a;
-        }
-
-        /* MODERATION CONTROLS */
-        .super-only {
-            border-left: 8px solid var(--maroon);
-        }
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-top: 5px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-
-        .action-btn {
-            padding: 12px 20px;
-            background: var(--navy);
-            color: var(--white);
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 12px;
-            text-transform: uppercase;
-        }
-
-        .delete-btn {
+        .btn-del {
             background: #e53e3e;
             color: white;
             border: none;
-            padding: 6px 12px;
-            border-radius: 3px;
+            padding: 5px 10px;
             cursor: pointer;
-            font-size: 10px;
+            border-radius: 3px;
+        }
+
+        .btn-add {
+            background: var(--navy);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .status-success {
+            color: var(--green);
+            font-weight: bold;
+        }
+
+        .status-failed {
+            color: var(--maroon);
+            font-weight: bold;
         }
     </style>
 </head>
@@ -164,151 +105,134 @@
 <body oncontextmenu="return false;">
 
     <div class="header">
-        <h2>FESWIDE SECURE TERMINAL [{{ role|upper }}]</h2>
-        <div>
-            <span style="font-size: 12px; margin-right: 20px;">Operator: <b>{{ username }}</b></span>
-            <a href="/logout" class="logout-link">[ LOGOUT ]</a>
-        </div>
+        <h2>TERMINAL: {{ role|upper }}</h2>
+        <div><b>Operator:</b> {{ username }} | <a href="/logout" style="color:#ff9b9b; text-decoration:none;">[ LOGOUT
+                ]</a></div>
     </div>
 
-    <div class="main-content">
+    <div class="main">
 
-        {% if role == 'superadmin' %}
-        <div class="panel super-only">
-            <h3 style="color: var(--maroon);">Broadcast Site Update</h3>
-            <p style="font-size: 12px; color: #666;">This message appears on the storefront header (No "SYSTEM STATUS"
-                prefix).</p>
-            <form action="/admin/update-config" method="POST" style="display:flex; gap:15px; align-items: flex-end;">
-                <div style="flex:1;">
-                    <input name="hero_text" value="{{ config_text }}" placeholder="Enter update message..." required>
-                </div>
-                <button type="submit" class="action-btn"
-                    style="background: var(--maroon); height: 43px;">Broadcast</button>
+        <div class="panel">
+            <h3>Frontend Control</h3>
+            <form action="/admin/update-config" method="POST">
+                <label>Hero Broadcast Text:</label>
+                <input type="text" name="hero_text" value="{{ config_text }}"
+                    style="width:100%; padding:8px; margin:10px 0;">
+                <button type="submit" class="btn-add">Update Frontend</button>
             </form>
         </div>
-        {% endif %}
-
-        {% if role == 'superadmin' %}
-        <div class="panel super-only">
-            <h3 style="color: var(--maroon);">Marketplace Moderator (Delete Posts)</h3>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Platform</th>
-                            <th>WhatsApp</th>
-                            <th>Details</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for h in hiring %}
-                        <tr>
-                            <td><span class="badge type-hiring">HIRING</span></td>
-                            <td>{{ h.platform }}</td>
-                            <td><a href="https://wa.me/{{ h.whatsapp }}" target="_blank"
-                                    style="color:var(--green); font-weight:bold;">{{ h.whatsapp }}</a></td>
-                            <td>{{ h.description[:50] }}...</td>
-                            <td>
-                                <form action="/admin/delete-opportunity/{{ h.id }}" method="POST"
-                                    onsubmit="return confirm('Permanent deletion?')">
-                                    <button type="submit" class="delete-btn">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-
-                        {% for t in taskers %}
-                        <tr>
-                            <td><span class="badge type-tasker">TASKER</span></td>
-                            <td>{{ t.platform }}</td>
-                            <td><a href="https://wa.me/{{ t.whatsapp }}" target="_blank"
-                                    style="color:var(--green); font-weight:bold;">{{ t.whatsapp }}</a></td>
-                            <td>{{ t.description[:50] }}...</td>
-                            <td>
-                                <form action="/admin/delete-opportunity/{{ t.id }}" method="POST"
-                                    onsubmit="return confirm('Permanent deletion?')">
-                                    <button type="submit" class="delete-btn">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        {% endif %}
 
         <div class="panel">
-            <h3 style="color: #d69e2e;">Agent John: Error Tickets</h3>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>WhatsApp Contact</th>
-                            <th>Error Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for ticket in tickets %}
-                        <tr>
-                            <td>{{ ticket.timestamp.strftime('%H:%M | %d %b') }}</td>
-                            <td>
-                                <a href="https://wa.me/{{ ticket.whatsapp }}" target="_blank"
-                                    style="color:var(--green); font-weight:bold; text-decoration:none;">
-                                    {{ ticket.whatsapp }} →
-                                </a>
-                            </td>
-                            <td>{{ ticket.error_desc }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            <h3>Subadmin Management</h3>
+            <form action="/admin/add-subadmin" method="POST" style="margin-bottom:15px;">
+                <input name="u" placeholder="New Username" required style="width:40%; padding:5px;">
+                <input name="p" placeholder="New Password" required style="width:40%; padding:5px;">
+                <button type="submit" class="btn-add" style="padding:5px 10px;">Create</button>
+            </form>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in admins %}
+                    <tr>
+                        <td>{{ u.username }}</td>
+                        <td>{{ u.role }}</td>
+                        <td>{% if u.role != 'superadmin' %}<a href="/admin/del-user/{{ u.id }}"
+                                class="btn-del">Remove</a>{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 
-        <div class="panel">
-            <h3>Payment Gateway Logs</h3>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>TXN ID</th>
-                            <th>Network</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                            <th>Timestamp</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for t in txns %}
-                        <tr>
-                            <td><code>{{ t.checkout_request_id }}</code></td>
-                            <td>{{ t.payment_method }}</td>
-                            <td>KES {{ t.amount }}</td>
-                            <td><b>{{ t.status }}</b></td>
-                            <td>{{ t.timestamp.strftime('%H:%M') }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        <div class="panel full">
+            <h3>Verified Repository Inventory</h3>
+            <form action="/admin/add-product" method="POST" style="display:flex; gap:10px; margin-bottom:15px;">
+                <input name="n" placeholder="Doc Name" required style="flex:1;">
+                <input name="pr" placeholder="Price (KES)" required style="width:100px;">
+                <input name="fn" placeholder="File.pdf" required style="flex:1;">
+                <button type="submit" class="btn-add">Add Document</button>
+            </form>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Document Name</th>
+                        <th>Price</th>
+                        <th>Filename</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr>
+                        <td>{{ p.name }}</td>
+                        <td>KES {{ p.price }}</td>
+                        <td>{{ p.filename }}</td>
+                        <td><a href="/admin/del-product/{{ p.id }}" class="btn-del">Delete</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel full">
+            <h3>Transaction Sentinel (M-Pesa Logs)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Request ID</th>
+                        <th>Phone</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in txns %}
+                    <tr>
+                        <td><code>{{ t.checkout_request_id }}</code></td>
+                        <td>{{ t.phone }}</td>
+                        <td>KES {{ t.amount }}</td>
+                        <td class="status-{{ t.status|lower }}">{{ t.status }}</td>
+                        <td>{{ t.timestamp.strftime('%H:%M | %d %b') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel full">
+            <h3>Opportunity Submissions (Reward Tracker)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Project</th>
+                        <th>Payout No.</th>
+                        <th>File</th>
+                        <th>Submitted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in submissions %}
+                    <tr>
+                        <td>{{ sub.platform }}</td>
+                        <td>{{ sub.project_name }}</td>
+                        <td><b style="color:var(--green)">{{ sub.payment_id }}</b></td>
+                        <td><a href="#" style="color:var(--navy);">[ Download Trajectory ]</a></td>
+                        <td>{{ sub.timestamp.strftime('%d/%m/%Y') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 
     </div>
-
-    <script>
-        /**
-         * OPSEC: SOURCE PROTECTION
-         * Disables DevTools (F12) and View Source
-         */
-        document.onkeydown = function (e) {
-            if (event.keyCode == 123 || (e.ctrlKey && e.keyCode == 85)) return false;
-            if (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) return false;
-        };
-    </script>
 </body>
 
 </html>

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FESWIDE SOCIETY | SECURE INDEX</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --navy: #0a192f;
@@ -15,6 +15,7 @@
             /* Extra Milky White Theme */
             --pure-white: #ffffff;
             --green: #2e7d32;
+            --glass: rgba(255, 255, 255, 0.7);
         }
 
         /* GLOBAL STYLES & OPSEC */
@@ -25,7 +26,6 @@
             padding: 0;
             color: #333;
             user-select: none;
-            /* Disable text selection for security */
         }
 
         .header {
@@ -41,7 +41,7 @@
             z-index: 1000;
         }
 
-        /* ORANGE OPPORTUNITIES BUTTON */
+        /* UPDATED OPPORTUNITIES NAVIGATION */
         .opp-btn {
             background: var(--orange);
             color: #000;
@@ -52,6 +52,8 @@
             text-transform: uppercase;
             border-radius: 4px;
             box-shadow: 3px 3px 0 #000;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .container {
@@ -60,7 +62,6 @@
             padding: 0 20px;
         }
 
-        /* BROADCAST BOX (Removed "System Status" Prefix) */
         .broadcast-box {
             background: var(--pure-white);
             border: 2px solid #000;
@@ -70,7 +71,6 @@
             text-align: center;
         }
 
-        /* TABS & NAVIGATION */
         .tab-nav {
             display: flex;
             border-bottom: 2px solid #000;
@@ -108,7 +108,6 @@
             justify-content: space-between;
         }
 
-        /* GREEN PRICING LABEL */
         .price {
             font-size: 28px;
             font-weight: bold;
@@ -116,7 +115,6 @@
             margin: 15px 0;
         }
 
-        /* SIMPLIFIED PURCHASE BUTTON */
         .purchase-btn {
             background: var(--navy);
             color: var(--pure-white);
@@ -160,7 +158,7 @@
             box-sizing: border-box;
         }
 
-        /* AGENT JOHN CHAT */
+        /* MODERNIZED AGENT JOHN UI (Glassmorphism) */
         .john-toggle {
             position: fixed;
             bottom: 20px;
@@ -172,6 +170,7 @@
             font-weight: bold;
             cursor: pointer;
             z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         .john-win {
@@ -179,27 +178,53 @@
             position: fixed;
             bottom: 85px;
             right: 20px;
-            width: 320px;
-            background: white;
-            border: 2px solid #000;
+            width: 340px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             z-index: 1000;
+            overflow: hidden;
         }
 
         .chat-header {
             background: var(--navy);
             color: white;
-            padding: 12px;
+            padding: 15px;
             font-weight: bold;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
 
         .chat-body {
-            height: 250px;
+            height: 300px;
             padding: 15px;
             overflow-y: auto;
-            background: #fafafa;
+            background: rgba(255, 255, 255, 0.5);
             font-size: 14px;
+        }
+
+        .chat-bubble {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+
+        .bubble-john {
+            background: var(--navy);
+            color: white;
+            border-bottom-left-radius: 0;
+        }
+
+        .bubble-user {
+            background: var(--white);
+            color: #333;
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+            border: 1px solid #ddd;
         }
 
         .hidden {
@@ -212,14 +237,12 @@
 
     <div class="header">
         <h1>FESWIDE SOCIETY</h1>
-        <button class="opp-btn" onclick="openModal('submission')">Opportunities</button>
+        <a href="/opportunities" class="opp-btn">Opportunities</a>
     </div>
 
     <div class="container">
         {% if config_text %}
-        <div class="broadcast-box">
-            {{ config_text }}
-        </div>
+        <div class="broadcast-box">{{ config_text }}</div>
         {% endif %}
 
         <div class="tab-nav">
@@ -255,8 +278,8 @@
                         <option>Handshake AI</option>
                     </select>
                     <input name="rate" placeholder="Commission % or Salary" required>
-                    <input name="whatsapp" placeholder="WhatsApp Number (e.g. 254...)" required>
-                    <textarea name="desc" placeholder="Details about the task..." required></textarea>
+                    <input name="whatsapp" placeholder="WhatsApp Number" required>
+                    <textarea name="desc" placeholder="Details..." required></textarea>
                     <button class="opp-btn" style="width:100%">Post Publicly</button>
                 </form>
             </div>
@@ -266,7 +289,6 @@
                     <b style="color:var(--maroon)">{{ h.platform }}</b>
                     <h3>Hiring for Project</h3>
                     <p>{{ h.description }}</p>
-                    <p>Rate: <b>{{ h.rate }}</b></p>
                     <a href="https://wa.me/{{ h.whatsapp }}" target="_blank"
                         style="color:var(--green); font-weight:bold; text-decoration:none;">Contact →</a>
                 </div>
@@ -284,7 +306,7 @@
                         <option>Handshake AI</option>
                     </select>
                     <input name="whatsapp" placeholder="WhatsApp Number" required>
-                    <textarea name="desc" placeholder="Describe your expertise..." required></textarea>
+                    <textarea name="desc" placeholder="Expertise..." required></textarea>
                     <button class="opp-btn" style="width:100%; background:var(--navy); color:white">Register
                         Profile</button>
                 </form>
@@ -307,56 +329,35 @@
         <div class="modal-card">
             <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" width="140"
                 style="margin-bottom:25px;">
-            <h3>Lipa na M-Pesa</h3>
-            <p style="font-size: 13px; color: #666;">Enter your number below for the STK prompt.</p>
+            <h3>Checkout</h3>
             <input type="text" id="phone" placeholder="07XXXXXXXX" required>
             <button onclick="triggerPayment()"
-                style="background:#4caf50; color:white; border:none; padding:15px; width:100%; font-weight:bold; cursor:pointer; border-radius:4px;">PROCEED
-                TO PAY</button>
+                style="background:#4caf50; color:white; border:none; padding:15px; width:100%; font-weight:bold; cursor:pointer; border-radius:4px;">PROCEED</button>
             <button onclick="closeModal('payment')"
-                style="background:none; border:none; margin-top:15px; cursor:pointer; font-size:12px;">CANCEL</button>
+                style="background:none; border:none; margin-top:15px; cursor:pointer;">CANCEL</button>
         </div>
     </div>
 
-    <div id="modal-submission" class="modal">
-        <div class="modal-card" style="border-bottom-color: var(--orange);">
-            <h2 style="margin-top:0">SUBMIT ANSWERS</h2>
-            <p style="font-size: 13px;">Earn <b>KES 500/=</b> per verified answer trajectory.</p>
-            <form id="ansForm">
-                <select name="platform">
-                    <option>Outlier AI</option>
-                    <option>Handshake AI</option>
-                </select>
-                <input name="project" placeholder="Exact Project Name" required>
-                <input name="payment_id" placeholder="M-Pesa Number for KES 500" required>
-                <input type="file" name="file" required style="border:none;">
-                <button type="button" onclick="submitAnswers()" class="opp-btn" style="width:100%">SUBMIT FOR KES
-                    500</button>
-            </form>
-            <button onclick="closeModal('submission')"
-                style="background:none; border:none; margin-top:15px; cursor:pointer; font-size:12px;">CLOSE</button>
-        </div>
-    </div>
-
-    <div class="john-toggle" onclick="toggleJohn()">CHAT WITH JOHN</div>
+    <div class="john-toggle" onclick="toggleJohn()">Live Support</div>
     <div class="john-win" id="johnWin">
-        <div class="chat-header"><span>John Assistant</span><span onclick="toggleJohn()" style="cursor:pointer">✖</span>
+        <div class="chat-header"><span>Agent John</span><span onclick="toggleJohn()" style="cursor:pointer">✖</span>
         </div>
         <div class="chat-body" id="chatBody">
-            <p><b>John:</b> Hello. I assist with module pricing, marketplace opportunities, and technical errors. How
-                can I help you?</p>
+            <div class="chat-bubble bubble-john">Hello. I assist with module pricing, marketplace opportunities, and
+                technical errors. How can I help you today?</div>
         </div>
-        <div class="chat-input" id="chatInputArea" style="display:flex; border-top:1px solid #000;">
+        <div class="chat-input" id="chatInputArea"
+            style="display:flex; border-top:1px solid rgba(0,0,0,0.1); background: white;">
             <input type="text" id="chatIn" placeholder="Type here..."
-                style="flex:1; border:none; padding:12px; outline:none;">
+                style="flex:1; border:none; padding:15px; outline:none; background:transparent;">
             <button onclick="sendChat()"
-                style="background:var(--navy); color:white; border:none; padding:0 15px; cursor:pointer;">SEND</button>
+                style="background:var(--navy); color:white; border:none; padding:0 20px; cursor:pointer;">SEND</button>
         </div>
-        <div id="chatControls" class="hidden" style="display:flex; border-top:1px solid #000;">
+        <div id="chatControls" class="hidden" style="display:flex; border-top:1px solid #eee;">
             <button onclick="sendChat('yes')"
-                style="flex:1; padding:10px; background:var(--green); color:white; border:none;">YES</button>
+                style="flex:1; padding:15px; background:var(--green); color:white; border:none; cursor:pointer;">YES</button>
             <button onclick="sendChat('no')"
-                style="flex:1; padding:10px; background:var(--maroon); color:white; border:none;">NO</button>
+                style="flex:1; padding:15px; background:var(--maroon); color:white; border:none; cursor:pointer;">NO</button>
         </div>
     </div>
 
@@ -371,28 +372,17 @@
             btn.classList.add('active');
         }
 
-        function openModal(id) { document.getElementById('modal-' + id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById('modal-' + id).style.display = 'none'; }
-        function openPayment(id) { currentProdId = id; openModal('payment'); }
+        function closeModal(id) { document.getElementById('payment-modal').style.display = 'none'; }
+        function openPayment(id) { currentProdId = id; document.getElementById('payment-modal').style.display = 'flex'; }
         function toggleJohn() { let w = document.getElementById('johnWin'); w.style.display = w.style.display === 'block' ? 'none' : 'block'; }
 
         async function triggerPayment() {
             try {
                 let res = await fetch('/stk-push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: currentProdId, phone: document.getElementById('phone').value }) });
                 let data = await res.json();
-                if (data.error) alert(data.error); // Returns Maintenance message
+                if (data.error) alert(data.error);
                 else alert("Prompt sent.");
             } catch { alert("API under maintenance"); }
-        }
-
-        async function submitAnswers() {
-            const formData = new FormData(document.getElementById('ansForm'));
-            try {
-                const res = await fetch('/submit-answers', { method: 'POST', body: formData });
-                const result = await res.json();
-                alert(result.message || result.error);
-                if (res.ok) { closeModal('submission'); document.getElementById('ansForm').reset(); }
-            } catch { alert("Submission failed."); }
         }
 
         async function sendChat(choice = null) {
@@ -400,7 +390,7 @@
             let body = document.getElementById('chatBody');
             let val = choice ? choice : input.value;
             if (!val) return;
-            body.innerHTML += `<div style="text-align:right; margin:10px 0;"><b>You:</b> ${val}</div>`;
+            body.innerHTML += `<div class="chat-bubble bubble-user">${val}</div>`;
             input.value = "";
             let res = await fetch('/api/john', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: val, ...johnState }) });
             let data = await res.json();
@@ -412,11 +402,10 @@
                 document.getElementById('chatControls').classList.remove('hidden');
             }
             if (data.close) { toggleJohn(); location.reload(); }
-            body.innerHTML += `<div style="color:var(--navy); margin-top:10px;"><b>John:</b> ${data.reply}</div>`;
+            body.innerHTML += `<div class="chat-bubble bubble-john">${data.reply}</div>`;
             body.scrollTop = body.scrollHeight;
         }
 
-        // OPSEC PROTECTION: Disable View Source & F12
         document.onkeydown = function (e) { if (event.keyCode == 123 || (e.ctrlKey && e.keyCode == 85)) return false; };
     </script>
 </body>
