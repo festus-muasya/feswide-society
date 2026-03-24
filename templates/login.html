@@ -3,92 +3,50 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>LOGIN</title>
+    <title>ACCESS | FESWIDE SOCIETY</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
-        :root {
-            --navy: #0a192f;
-            --maroon: #800000;
-            --milky: #fdfcf0;
-        }
-
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--milky);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072') no-repeat center center fixed;
+            background-size: cover;
         }
 
-        .auth-card {
-            background: white;
-            border: 2px solid #000;
-            padding: 40px;
-            box-shadow: 10px 10px 0 #000;
-            width: 350px;
-        }
-
-        h2 {
-            color: var(--navy);
-            text-transform: uppercase;
-            border-bottom: 3px solid var(--maroon);
-            margin-top: 0;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #000;
-            box-sizing: border-box;
-        }
-
-        .btn-navy {
-            width: 100%;
-            padding: 15px;
-            background: var(--navy);
-            color: white;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-            margin-top: 10px;
-        }
-
-        .btn-google {
-            width: 100%;
-            padding: 12px;
-            background: #fff;
-            border: 1px solid #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            margin-top: 20px;
-            text-decoration: none;
-            color: #333;
-            font-size: 14px;
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
 
-<body>
-    <div class="auth-card">
-        <h2>{% if mode == 'login' %}LOGIN{% else %}REGISTER{% endif %}</h2>
-        <form method="POST" action="{% if mode == 'login' %}/login{% else %}/register{% endif %}">
-            {% if mode == 'register' %}<input type="text" name="name" placeholder="FULL NAME" required>{% endif %}
-            <input type="email" name="email" placeholder="EMAIL ADDRESS" required>
-            <input type="password" name="password" placeholder="PASSKEY" required>
-            <button type="submit" class="btn-navy">VERIFY IDENTITY</button>
+<body class="h-screen flex items-center justify-center p-6 select-none" oncontextmenu="return false;">
+    <div class="glass w-full max-w-md p-10 rounded-3xl shadow-2xl text-white">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold tracking-tighter">FESWIDE <span class="text-orange-500">OPS</span></h1>
+            <p class="text-sm text-gray-300">Identity Verification Terminal</p>
+        </div>
+        {% if error %}<p
+            class="bg-red-500/20 text-red-200 p-3 rounded-lg text-xs mb-6 text-center border border-red-500">{{ error }}
+        </p>{% endif %}
+        <form method="POST" class="space-y-4">
+            {% if mode == 'register' %}<input type="text" name="name" placeholder="FULL OPERATOR NAME" required
+                class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-orange-500">{%
+            endif %}
+            <input type="email" name="email" placeholder="EMAIL ADDRESS" required
+                class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-orange-500">
+            <input type="password" name="password" placeholder="SECURE PASSKEY" required
+                class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-orange-500">
+            <button type="submit"
+                class="w-full bg-orange-600 hover:bg-orange-700 p-4 rounded-xl font-bold uppercase transition-all shadow-lg shadow-orange-900/20">Authorize</button>
         </form>
-        <a href="/auth/google" class="btn-google">
+        <a href="/auth/google"
+            class="w-full mt-6 flex items-center justify-center gap-3 bg-white text-black p-4 rounded-xl font-semibold hover:bg-gray-100 transition-all">
             <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20"> Continue with Google
         </a>
-        <div style="margin-top: 20px; text-align: center; font-size: 12px;">
-            {% if mode == 'login' %}<a href="/register">Need Identity? Register →</a>{% else %}<a href="/login">Return
-                to Login →</a>{% endif %}
+        <div class="mt-8 text-center text-xs text-gray-400">
+            {% if mode == 'login' %}Need Identity? <a href="/register" class="text-orange-500 font-bold">Register</a>{%
+            else %}Registered? <a href="/login" class="text-orange-500 font-bold">Login</a>{% endif %}
         </div>
     </div>
 </body>

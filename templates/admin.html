@@ -3,236 +3,49 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Admin</title>
+    <title>COMMAND CENTER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <style>
-        :root {
-            --navy: #0a192f;
-            --maroon: #800000;
-            --white: #ffffff;
-            --bg: #f4f7f9;
-            --green: #2e7d32;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            margin: 0;
-            font-size: 13px;
-        }
-
-        .header {
-            background: var(--navy);
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 4px solid var(--maroon);
-        }
-
-        .main {
-            padding: 30px 5%;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .panel {
-            background: white;
-            border: 1px solid #ddd;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .full {
-            grid-column: 1 / span 2;
-        }
-
-        h3 {
-            color: var(--navy);
-            text-transform: uppercase;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        th {
-            text-align: left;
-            background: #f8f9fa;
-            padding: 10px;
-            border-bottom: 2px solid #eee;
-        }
-
-        td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .btn-del {
-            background: #e53e3e;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 3px;
-        }
-
-        .btn-add {
-            background: var(--navy);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .status-success {
-            color: var(--green);
-            font-weight: bold;
-        }
-
-        .status-failed {
-            color: var(--maroon);
-            font-weight: bold;
-        }
-    </style>
 </head>
 
-<body oncontextmenu="return false;">
-
-    <div class="header">
-        <h2>TERMINAL: {{ role|upper }}</h2>
-        <div><b>Operator:</b> {{ username }} | <a href="/logout" style="color:#ff9b9b; text-decoration:none;">[ LOGOUT
-                ]</a></div>
-    </div>
-
-    <div class="main">
-
-        <div class="panel">
-            <h3>Frontend Control</h3>
-            <form action="/admin/update-config" method="POST">
-                <label>Hero Broadcast Text:</label>
-                <input type="text" name="hero_text" value="{{ config_text }}"
-                    style="width:100%; padding:8px; margin:10px 0;">
-                <button type="submit" class="btn-add">Update Frontend</button>
-            </form>
+<body class="bg-gray-100 p-10">
+    <div class="max-w-7xl mx-auto space-y-10">
+        <div class="flex justify-between items-center bg-[#0a192f] text-white p-6 rounded-xl">
+            <h1 class="text-2xl font-bold">TERMINAL: {{ role|upper }}</h1>
+            <a href="/logout" class="text-red-400 font-bold">[ LOGOUT ]</a>
         </div>
-
-        <div class="panel">
-            <h3>Subadmin Management</h3>
-            <form action="/admin/add-subadmin" method="POST" style="margin-bottom:15px;">
-                <input name="u" placeholder="New Username" required style="width:40%; padding:5px;">
-                <input name="p" placeholder="New Password" required style="width:40%; padding:5px;">
-                <button type="submit" class="btn-add" style="padding:5px 10px;">Create</button>
-            </form>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Role</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for u in admins %}
-                    <tr>
-                        <td>{{ u.username }}</td>
-                        <td>{{ u.role }}</td>
-                        <td>{% if u.role != 'superadmin' %}<a href="/admin/del-user/{{ u.id }}"
-                                class="btn-del">Remove</a>{% endif %}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="font-bold border-b pb-4 mb-4">SUBADMIN MONITOR</h3>
+                <table class="w-full text-sm">
+                    {% for a in admins %}<tr>
+                        <td class="py-2">{{ a.username }}</td>
+                        <td>{{ a.role }}</td>
+                    </tr>{% endfor %}
+                </table>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="font-bold border-b pb-4 mb-4">AI SUBMISSION MONITOR</h3>
+                <table class="w-full text-xs">
+                    <thead>
+                        <tr class="text-left bg-gray-50">
+                            <th>USER ID</th>
+                            <th>PLATFORM</th>
+                            <th>PROJECT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sub, user in submissions %}
+                        <tr>
+                            <td class="py-2 font-mono">{{ user.public_id }}</td>
+                            <td>{{ sub.platform }}</td>
+                            <td>{{ sub.project_name }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-
-        <div class="panel full">
-            <h3>Verified Repository Inventory</h3>
-            <form action="/admin/add-product" method="POST" style="display:flex; gap:10px; margin-bottom:15px;">
-                <input name="n" placeholder="Doc Name" required style="flex:1;">
-                <input name="pr" placeholder="Price (KES)" required style="width:100px;">
-                <input name="fn" placeholder="File.pdf" required style="flex:1;">
-                <button type="submit" class="btn-add">Add Document</button>
-            </form>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Document Name</th>
-                        <th>Price</th>
-                        <th>Filename</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for p in products %}
-                    <tr>
-                        <td>{{ p.name }}</td>
-                        <td>KES {{ p.price }}</td>
-                        <td>{{ p.filename }}</td>
-                        <td><a href="/admin/del-product/{{ p.id }}" class="btn-del">Delete</a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="panel full">
-            <h3>Transaction Sentinel (M-Pesa Logs)</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Request ID</th>
-                        <th>Phone</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Time</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for t in txns %}
-                    <tr>
-                        <td><code>{{ t.checkout_request_id }}</code></td>
-                        <td>{{ t.phone }}</td>
-                        <td>KES {{ t.amount }}</td>
-                        <td class="status-{{ t.status|lower }}">{{ t.status }}</td>
-                        <td>{{ t.timestamp.strftime('%H:%M | %d %b') }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="panel full">
-            <h3>Opportunity Submissions (Reward Tracker)</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Platform</th>
-                        <th>Project</th>
-                        <th>Payout No.</th>
-                        <th>File</th>
-                        <th>Submitted</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for sub in submissions %}
-                    <tr>
-                        <td>{{ sub.platform }}</td>
-                        <td>{{ sub.project_name }}</td>
-                        <td><b style="color:var(--green)">{{ sub.payment_id }}</b></td>
-                        <td><a href="#" style="color:var(--navy);">[ Download Trajectory ]</a></td>
-                        <td>{{ sub.timestamp.strftime('%d/%m/%Y') }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
     </div>
 </body>
 
