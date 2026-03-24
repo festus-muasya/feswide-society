@@ -3,13 +3,17 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <title>LOGIN</title>
     <style>
+        :root {
+            --navy: #0a192f;
+            --maroon: #800000;
+            --milky: #fdfcf0;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background: #f0f2f5;
+            background: var(--milky);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -17,61 +21,75 @@
             margin: 0;
         }
 
-        .login-card {
+        .auth-card {
             background: white;
+            border: 2px solid #000;
             padding: 40px;
-            border-radius: 4px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 360px;
-            border-top: 5px solid #0a192f;
+            box-shadow: 10px 10px 0 #000;
+            width: 350px;
         }
 
         h2 {
-            color: #0a192f;
+            color: var(--navy);
             text-transform: uppercase;
-            letter-spacing: 2px;
-            text-align: center;
+            border-bottom: 3px solid var(--maroon);
+            margin-top: 0;
         }
 
         input {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
-            border: 1px solid #ddd;
+            border: 1px solid #000;
             box-sizing: border-box;
         }
 
-        button {
+        .btn-navy {
             width: 100%;
             padding: 15px;
-            background: #0a192f;
+            background: var(--navy);
             color: white;
             border: none;
             font-weight: bold;
             cursor: pointer;
             text-transform: uppercase;
+            margin-top: 10px;
         }
 
-        .err {
-            color: #800000;
-            font-size: 12px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 10px;
+        .btn-google {
+            width: 100%;
+            padding: 12px;
+            background: #fff;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
         }
     </style>
 </head>
 
-<body oncontextmenu="return false;">
-    <div class="login-card">
-        <h2>Command Center</h2>
-        {% if error %}<div class="err">{{ error }}</div>{% endif %}
-        <form method="POST">
-            <input type="text" name="username" placeholder="OPERATOR ID" required autocomplete="off">
+<body>
+    <div class="auth-card">
+        <h2>{% if mode == 'login' %}LOGIN{% else %}REGISTER{% endif %}</h2>
+        <form method="POST" action="{% if mode == 'login' %}/login{% else %}/register{% endif %}">
+            {% if mode == 'register' %}<input type="text" name="name" placeholder="FULL NAME" required>{% endif %}
+            <input type="email" name="email" placeholder="EMAIL ADDRESS" required>
             <input type="password" name="password" placeholder="PASSKEY" required>
-            <button type="submit">Verify Identity</button>
+            <button type="submit" class="btn-navy">VERIFY IDENTITY</button>
         </form>
+        <a href="/auth/google" class="btn-google">
+            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20"> Continue with Google
+        </a>
+        <div style="margin-top: 20px; text-align: center; font-size: 12px;">
+            {% if mode == 'login' %}<a href="/register">Need Identity? Register →</a>{% else %}<a href="/login">Return
+                to Login →</a>{% endif %}
+        </div>
     </div>
 </body>
 
