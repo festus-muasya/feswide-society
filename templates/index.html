@@ -7,20 +7,28 @@
     <title>DASHBOARD | FESWIDE SOCIETY</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
     <style>
+        /* Modern Glassmorphism & Opsec UI */
         .glass-nav {
-            background: rgba(10, 25, 47, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(10, 25, 47, 0.98);
+            backdrop-filter: blur(12px);
         }
 
         .card-neo {
-            transition: all 0.3s ease;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .card-neo:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Hardened Text Protection */
+        body {
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
     </style>
 </head>
@@ -29,40 +37,57 @@
 
     <nav class="glass-nav text-white p-4 sticky top-0 z-50 border-b-4 border-orange-600 shadow-2xl">
         <div class="max-w-7xl mx-auto flex justify-between items-center px-4">
-            <div class="flex items-center gap-4">
-                <h1 class="text-2xl font-black tracking-tighter uppercase italic">Feswide <span
-                        class="text-orange-500">Society</span></h1>
+            <div class="flex items-center gap-6">
+                <h1 onclick="window.location.href='/'"
+                    class="text-2xl font-black tracking-tighter uppercase italic cursor-pointer">
+                    Feswide <span class="text-orange-500">Society</span>
+                </h1>
+                <a href="/opportunities"
+                    class="hidden md:block bg-white/5 hover:bg-orange-600 px-5 py-2 rounded-xl text-[10px] font-bold tracking-widest transition-all border border-white/10">
+                    OPPORTUNITIES
+                </a>
             </div>
 
-            <form action="/" method="GET" class="flex-1 max-w-xl mx-10 hidden lg:block">
+            <form action="/" method="GET" class="flex-1 max-w-md mx-10 hidden lg:block">
                 <div class="relative">
                     <input list="keywords" name="search"
-                        class="w-full bg-white/10 border border-white/10 p-3 rounded-2xl outline-none focus:bg-white/20 transition-all text-sm"
-                        placeholder="Search Verified Trajectories (Aether, Blackbeard, Kobra)...">
+                        class="w-full bg-white/5 border border-white/10 p-3 pl-5 rounded-2xl outline-none focus:bg-white/10 focus:border-orange-500 transition-all text-sm"
+                        placeholder="Search verified trajectories...">
                     <datalist id="keywords">
                         <option value="Aether Quality Check">
+                        <option value="Aether Code Screening">
+                        <option value="Blackbeard">
                         <option value="Blackbeard Multimodal">
+                        <option value="Something Big">
+                        <option value="Code Review">
+                        <option value="Real Coder">
+                        <option value="Avalon">
                         <option value="Kobra Clips">
                         <option value="Cacatua Chorus">
-                        <option value="Something Big">
                     </datalist>
                 </div>
             </form>
 
             {% if user %}
-            <div class="flex items-center gap-4 bg-white/5 p-2 pr-4 rounded-full border border-white/10">
-                <div class="w-10 h-10 bg-orange-600 rounded-full flex items-center justify-center font-bold shadow-lg">
-                    {{ initials }}</div>
-                <div class="text-left">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-orange-500">Verified Operator</p>
-                    <p class="text-xs font-mono text-gray-300">{{ user.public_id }}</p>
+            <div class="flex items-center gap-4 bg-white/5 p-2 pr-5 rounded-full border border-white/10">
+                <div
+                    class="w-11 h-11 bg-orange-600 rounded-full flex items-center justify-center font-bold text-lg shadow-lg border-2 border-white/20">
+                    {{ initials }}
                 </div>
-                <a href="/logout" class="ml-4 text-gray-500 hover:text-white text-xs font-bold">[ EXIT ]</a>
+                <div class="text-left">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-orange-500 leading-none">Verified
+                        Operator</p>
+                    <p class="text-xs font-mono text-gray-300 mt-1">{{ user.public_id }}</p>
+                </div>
+                <a href="/logout"
+                    class="ml-4 text-gray-500 hover:text-red-500 text-[10px] font-bold uppercase transition-colors">[
+                    Exit ]</a>
             </div>
             {% else %}
             <a href="/login"
-                class="bg-orange-600 hover:bg-orange-700 px-8 py-3 rounded-2xl font-bold text-sm tracking-widest transition-all">AUTHORIZE
-                ACCESS</a>
+                class="bg-orange-600 hover:bg-orange-700 px-8 py-3 rounded-2xl font-bold text-sm tracking-widest transition-all shadow-lg shadow-orange-900/20">
+                AUTHORIZE ACCESS
+            </a>
             {% endif %}
         </div>
     </nav>
@@ -70,71 +95,112 @@
     <main class="max-w-7xl mx-auto p-6 lg:p-12">
 
         {% if user %}
-        <section class="mb-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-6 rounded-[2rem] border shadow-sm">
-                <p class="text-xs font-bold text-gray-400 uppercase">Total Submissions</p>
-                <h2 class="text-3xl font-black text-[#0a192f]">{{ user.uploads|length }}</h2>
+        <section class="mb-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Total Submissions</p>
+                <h2 class="text-4xl font-black text-[#0a192f]">{{ user.uploads|length }}</h2>
             </div>
-            <div class="bg-white p-6 rounded-[2rem] border shadow-sm">
-                <p class="text-xs font-bold text-gray-400 uppercase">Identity Status</p>
-                <h2 class="text-3xl font-black text-green-600">Active</h2>
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Identity Status</p>
+                <h2 class="text-4xl font-black text-green-600 flex items-center gap-2">
+                    Active <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                </h2>
             </div>
-            <div class="bg-white p-6 rounded-[2rem] border shadow-sm flex items-center justify-between">
+            <div
+                class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-bold text-gray-400 uppercase">Marketplace</p>
-                    <h2 class="text-xl font-black text-[#0a192f]">Available Tasks</h2>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Marketplace</p>
+                    <h2 class="text-2xl font-black text-[#0a192f]">Available Tasks</h2>
                 </div>
-                <a href="/opportunities" class="bg-orange-600 text-white p-3 rounded-xl text-xs font-bold">GO →</a>
+                <a href="/opportunities"
+                    class="bg-orange-600 hover:bg-[#0a192f] text-white p-4 rounded-2xl font-black text-xs transition-all">GO
+                    →</a>
             </div>
         </section>
         {% endif %}
 
-        <div class="flex justify-between items-end mb-8">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
             <div>
-                <h2 class="text-3xl font-black text-[#0a192f] tracking-tighter uppercase">Verified Repository</h2>
-                <p class="text-sm text-gray-500">100% Accuracy Guaranteed Trajectories</p>
+                <h2 class="text-4xl font-black text-[#0a192f] tracking-tighter uppercase italic">Verified Repository
+                </h2>
+                <p class="text-sm text-slate-400 mt-2 font-medium">100% Accuracy Guaranteed Trajectories for Elite
+                    Taskers.</p>
             </div>
-            <span
-                class="bg-orange-100 text-orange-700 px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Free
-                Access Offer</span>
+            <div
+                class="bg-orange-100 text-orange-700 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em]">
+                Free Access Offer
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {% for p in products %}
-            <div class="bg-white card-neo p-8 rounded-[2.5rem] flex flex-col justify-between">
+            <div
+                class="bg-white card-neo p-10 rounded-[3rem] border border-slate-100 flex flex-col justify-between group">
                 <div>
-                    <div class="w-12 h-1 bg-orange-600 mb-6"></div>
-                    <h3 class="text-xl font-black text-[#0a192f] mb-4 uppercase leading-tight">{{ p.name }}</h3>
-                    <p class="text-sm text-slate-500 leading-relaxed mb-8">{{ p.description }}</p>
+                    <div
+                        class="w-16 h-1.5 bg-orange-600 mb-8 rounded-full group-hover:w-full transition-all duration-500">
+                    </div>
+                    <h3
+                        class="text-2xl font-black text-[#0a192f] group-hover:text-orange-600 transition-colors uppercase leading-tight tracking-tighter">
+                        {{ p.name }}
+                    </h3>
                 </div>
-                <button onclick="alert('Secure Transfer Initiated...')"
-                    class="w-full bg-[#0a192f] text-white p-4 rounded-2xl font-bold uppercase text-[10px] tracking-widest hover:bg-orange-600 transition-colors">Free
-                    Download</button>
+
+                <a href="{{ url_for('download_file', filename=p.filename) }}"
+                    class="w-full mt-10 bg-[#0a192f] text-white p-5 rounded-3xl font-black uppercase text-[11px] tracking-[0.2em] text-center hover:bg-orange-600 transition-all shadow-xl shadow-slate-200">
+                    Free Download
+                </a>
             </div>
             {% endfor %}
         </div>
     </main>
 
-    <footer class="bg-[#0a192f] text-gray-500 p-12 mt-20 border-t border-white/5">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-            <div class="text-left">
-                <h2 class="text-white font-black text-xl italic">FESWIDE <span class="text-orange-600">SOCIETY</span>
-                </h2>
-                <p class="text-[10px] mt-2 max-w-xs">Global operations headquarted in Moscow. Providing elite trajectory
-                    solutions for advanced AI platforms.</p>
+    <footer class="bg-[#0a192f] text-gray-500 p-16 mt-24 border-t border-white/5">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-start gap-12">
+            <div class="max-w-md">
+                <h2 class="text-white font-black text-2xl tracking-tighter italic">FESWIDE <span
+                        class="text-orange-600">SOCIETY</span></h2>
+                <p class="text-xs leading-relaxed mt-4 text-gray-400">
+                    Providing high-fidelity trajectory solutions and verified datasets for advanced AI systems.
+                    Registered operations headquarted in the Russian Federation.
+                </p>
             </div>
-            <div class="text-center md:text-right">
-                <p class="text-[10px] uppercase tracking-widest text-gray-400">Operational Headquarters</p>
-                <p class="text-xs text-white mt-1">12 Presnenskaya Naberezhnaya, Tower A, Moscow, Russia, 123317</p>
-                <p class="text-xs text-orange-500 mt-2 font-mono">SECURE: +7 495 123-45-67 | ops@feswide.ru</p>
+            <div class="space-y-4">
+                <p class="text-[10px] uppercase tracking-[0.3em] text-orange-500 font-black">Operational Headquarters
+                </p>
+                <p class="text-sm text-white font-medium">12 Presnenskaya Naberezhnaya, Tower A, Moscow, Russia, 123317
+                </p>
+                <div class="flex flex-col md:flex-row gap-6 mt-6">
+                    <p class="text-xs text-gray-300 font-mono italic">SECURE LINE: +7 495 123-45-67</p>
+                    <p class="text-xs text-gray-300 font-mono italic">DIRECT: ops@feswide.ru</p>
+                </div>
             </div>
+        </div>
+        <div
+            class="max-w-7xl mx-auto mt-16 pt-8 border-t border-white/5 text-[9px] uppercase tracking-widest text-center">
+            &copy; 2026 Feswide Society Operations. All rights reserved.
         </div>
     </footer>
 
     <script>
+        // Disable Right-Click
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        // Disable Copy, Paste, Cut
         document.addEventListener('copy', e => e.preventDefault());
+        document.addEventListener('paste', e => e.preventDefault());
+        document.addEventListener('cut', e => e.preventDefault());
+
+        // Block Inspection Tools
         document.onkeydown = function (e) {
-            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) return false;
+            // F12
+            if (e.keyCode == 123) return false;
+            // Ctrl+Shift+I (Inspect), Ctrl+Shift+J (Console), Ctrl+Shift+C (Elements)
+            if (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) return false;
+            // Ctrl+U (Source)
+            if (e.ctrlKey && e.keyCode == 85) return false;
+            // Ctrl+S (Save)
+            if (e.ctrlKey && e.keyCode == 83) return false;
         };
     </script>
 </body>

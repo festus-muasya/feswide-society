@@ -8,7 +8,7 @@ db = SQLAlchemy()
 class User(db.Model):
     """
     Standard User Identity Model
-    Supports manual registration, password recovery, and Google SSO.
+    Supports manual registration, password recovery, and Google SSO simulation.
     """
     id = db.Column(db.Integer, primary_key=True)
     # Unique persistent identity starting with '698b'
@@ -44,7 +44,7 @@ class UserUpload(db.Model):
 class AdminUser(db.Model):
     """
     Command Center Access Control
-    Superadmin: FestusMaster2026!
+    Superadmin Credentials: FestusMaster2026!
     """
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
@@ -55,11 +55,12 @@ class Product(db.Model):
     """
     Verified Answer Repository
     Stores trajectories for Aether, Blackbeard, Kobra, etc.
+    Titles are Title Case; descriptions are removed.
     """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), nullable=False)
     filename = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.Text, nullable=True)
+    description = db.Column(db.Text, default="") # Descriptions removed per request
 
 class Opportunity(db.Model):
     """

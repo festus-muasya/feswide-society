@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Reset Password</title>
+    <title>RECOVERY</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -12,22 +12,26 @@
         }
 
         .glass {
-            background: rgba(10, 25, 47, 0.85);
-            backdrop-filter: blur(20px);
+            background: rgba(10, 25, 47, 0.9);
+            backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
 
 <body class="h-screen flex items-center justify-center p-6 select-none" oncontextmenu="return false;">
-    <div class="glass w-full max-w-md p-10 rounded-[2.5rem] shadow-2xl text-white">
-        <h2 class="text-2xl font-black text-center uppercase tracking-tighter mb-8">Set New Passkey</h2>
-        <form method="POST" class="space-y-4">
-            <input type="password" name="password" placeholder="NEW PASSWORD" required
-                class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-orange-500 transition-all">
+    <div class="glass w-full max-w-md p-12 rounded-[3rem] shadow-2xl text-white text-center">
+        <h2 class="text-3xl font-black uppercase tracking-tighter italic mb-4">Set New Passkey</h2>
+        <p class="text-xs text-gray-400 mb-10 leading-relaxed uppercase tracking-widest">Authorized Recovery Terminal
+        </p>
+
+        <form method="POST" class="space-y-6">
+            <input type="password" name="password" placeholder="NEW SECURE PASSKEY" required
+                class="w-full bg-white/5 border border-white/10 p-5 rounded-3xl outline-none focus:border-orange-500 transition-all text-center font-bold">
             <button type="submit"
-                class="w-full bg-orange-600 p-4 rounded-2xl font-bold uppercase tracking-widest">Update
-                Identity</button>
+                class="w-full bg-orange-600 hover:bg-orange-700 p-5 rounded-3xl font-black uppercase tracking-[0.2em] shadow-lg shadow-orange-900/30">
+                Update Identity
+            </button>
         </form>
     </div>
 </body>
