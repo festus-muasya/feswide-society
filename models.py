@@ -7,60 +7,64 @@ db = SQLAlchemy()
 
 class User(db.Model):
     """
-    Core User Identity Model
-    Supports standard registration and 'Continue with Google' auto-registration.
+    Standard User Identity Model
+    Supports manual registration, password recovery, and Google SSO.
     """
     id = db.Column(db.Integer, primary_key=True)
-    # Persistent hex ID starting with 698b
+    # Unique persistent identity starting with '698b'
     public_id = db.Column(db.String(50), unique=True, nullable=False) 
-    # google_id stores the unique identifier from Google SSO
+    # google_id used for 'Continue with Google' auto-registration
     google_id = db.Column(db.String(100), unique=True, nullable=True) 
     email = db.Column(db.String(120), unique=True, nullable=False)
-    # Password is nullable to support Google-only users
+    # Password remains nullable to support Google-exclusive logins
     password = db.Column(db.String(200), nullable=True) 
     full_name = db.Column(db.String(100))
-    is_confirmed = db.Column(db.Boolean, default=False)
+    is_confirmed = db.Column(db.Boolean, default=True)
     
-    # Relationship to track all AI answer submissions
-    uploads = db.relationship('UserUpload', backref='author', lazy=True)
-
-class Product(db.Model):
-    """
-    Verified Answer Repository
-    Stores the free-access trajectories for Aether, Blackbeard, Kobra, etc.
-    """
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False) # e.g., 'AETHER QUALITY CHECK'
-    filename = db.Column(db.String(255), nullable=False) # e.g., 'aether_qc.pdf'
-    description = db.Column(db.Text, nullable=True)
+    # Secure Password Recovery Tokens
+    reset_token = db.Column(db.String(100), nullable=True)
+    token_expiry = db.Column(db.DateTime, nullable=True)
+    
+    # Relationship to track all AI answer submissions per user
+    uploads = db.relationship('UserUpload', backref='owner', lazy=True)
 
 class UserUpload(db.Model):
     """
     AI Trajectory Submission Log
-    Links user-provided Handshake AI and Outlier AI answers to their User ID.
+    Links user-provided Handshake or Outlier answers to their unique User ID.
     """
     id = db.Column(db.Integer, primary_key=True)
-    # Linked to User.id to monitor specific contributor activity
+    # Linked to User.id for monitoring specific contributor activity
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     platform = db.Column(db.String(50)) # 'Handshake AI' or 'Outlier AI'
-    project_name = db.Column(db.String(100)) # Exact project name for admin review
+    project_name = db.Column(db.String(100), nullable=False) 
     filename = db.Column(db.String(255))
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 class AdminUser(db.Model):
     """
-    Administrative Access Controls
-    Superadmin: full control. Subadmin: monitoring and upload management.
+    Command Center Access Control
+    Superadmin: FestusMaster2026!
     """
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False) # superadmin: FestusMaster2026!
-    role = db.Column(db.String(20), default='subadmin')
+    password = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(20), default='subadmin') # 'superadmin' or 'subadmin'
+
+class Product(db.Model):
+    """
+    Verified Answer Repository
+    Stores trajectories for Aether, Blackbeard, Kobra, etc.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    filename = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text, nullable=True)
 
 class Opportunity(db.Model):
     """
-    Marketplace Postings
-    Used for the hiring board and redirect logic to multimango.com.
+    Marketplace and Hiring Board
+    Includes tasks and the redirect logic to multimango.com.
     """
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(20)) # 'Hiring' or 'Tasker'
@@ -72,8 +76,8 @@ class Opportunity(db.Model):
 
 class SiteConfig(db.Model):
     """
-    Frontend Configuration
-    Used by the Superadmin to update the Milky White hero text.
+    Global Frontend Settings
+    Allows Superadmin to update hero text and broadcast alerts.
     """
     id = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.String(50), unique=True, nullable=False)

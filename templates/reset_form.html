@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Reset Password</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .glass {
+            background: rgba(10, 25, 47, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body class="h-screen flex items-center justify-center p-6 select-none" oncontextmenu="return false;">
+    <div class="glass w-full max-w-md p-10 rounded-[2.5rem] shadow-2xl text-white">
+        <h2 class="text-2xl font-black text-center uppercase tracking-tighter mb-8">Set New Passkey</h2>
+        <form method="POST" class="space-y-4">
+            <input type="password" name="password" placeholder="NEW PASSWORD" required
+                class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-orange-500 transition-all">
+            <button type="submit"
+                class="w-full bg-orange-600 p-4 rounded-2xl font-bold uppercase tracking-widest">Update
+                Identity</button>
+        </form>
+    </div>
+</body>
+
+</html>
