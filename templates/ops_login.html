@@ -3,88 +3,22 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>COMMAND CENTER | {{ role|upper }}</title>
+    <title>OPS CENTER | FESWIDE</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 
-<body class="bg-gray-50 font-sans select-none" oncontextmenu="return false;">
-    <nav class="bg-slate-900 text-white p-6 border-b-4 border-orange-600 shadow-xl">
-        <div class="max-w-7xl mx-auto flex justify-between items-center px-4">
-            <h1 class="text-xl font-black italic tracking-tighter">FESWIDE <span class="text-orange-500">CONTROL</span>
-            </h1>
-            <div class="flex items-center gap-6 text-xs font-bold uppercase tracking-widest">
-                <span>ID: {{ username }} ({{ role }})</span>
-                <a href="/logout" class="text-red-500 hover:text-white transition-colors">[ TERMINATE SESSION ]</a>
-            </div>
-        </div>
-    </nav>
-
-    <main class="max-w-7xl mx-auto p-10 space-y-12">
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-200">
-                <h3 class="text-xl font-black uppercase tracking-tighter mb-8 border-b pb-4">Verified Repository
-                    Inventory</h3>
-                <table class="w-full text-left text-xs">
-                    <thead>
-                        <tr class="text-gray-400 uppercase tracking-widest">
-                            <th class="pb-4">Answer Name</th>
-                            <th class="pb-4">Status</th>
-                            <th class="pb-4">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y">
-                        {% for p in products %}
-                        <tr>
-                            <td class="py-4 font-bold">{{ p.name }}</td>
-                            <td><span
-                                    class="bg-green-100 text-green-700 px-3 py-1 rounded-full font-black uppercase">Active</span>
-                            </td>
-                            <td>
-                                {% if role == 'superadmin' %}
-                                <a href="/admin/del-answer/{{ p.id }}"
-                                    class="text-red-600 font-bold hover:underline">Delete</a>
-                                {% else %}
-                                <span class="text-gray-300 italic">Locked</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-200">
-                <h3 class="text-xl font-black uppercase tracking-tighter mb-8 border-b pb-4">AI Submission Log
-                    (Real-time)</h3>
-                <div class="overflow-y-auto max-h-[400px]">
-                    <table class="w-full text-left text-[10px]">
-                        <thead>
-                            <tr class="text-gray-400 uppercase tracking-widest">
-                                <th class="pb-4">User Identity</th>
-                                <th class="pb-4">Project</th>
-                                <th class="pb-4">Platform</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y font-mono">
-                            {% for sub, user in submissions %}
-                            <tr>
-                                <td class="py-3 text-orange-600 font-bold">{{ user.public_id }}</td>
-                                <td>{{ sub.project_name }}</td>
-                                <td>{{ sub.platform }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <footer class="text-center p-10 text-[10px] text-gray-400 uppercase tracking-widest">
-        Feswide Society Command | 12 Presnenskaya Naberezhnaya, Moscow, Russia
-    </footer>
+<body class="bg-slate-900 h-screen flex items-center justify-center select-none" oncontextmenu="return false;">
+    <div class="bg-white p-10 rounded-2xl w-full max-w-sm shadow-[20px_20px_0_#000] border-2 border-black">
+        <h2 class="text-2xl font-black text-slate-900 mb-6 uppercase italic">Operator Command Login</h2>
+        <form method="POST" class="space-y-4">
+            <input name="u" placeholder="OPERATOR ID" required
+                class="w-full border-2 border-slate-900 p-3 outline-none font-bold">
+            <input type="password" name="p" placeholder="OPERATOR PASSWORD" required
+                class="w-full border-2 border-slate-900 p-3 outline-none font-bold">
+            <button type="submit" class="w-full bg-slate-900 text-white p-4 font-bold uppercase tracking-widest">Access
+                Terminal</button>
+        </form>
+    </div>
 </body>
 
 </html>

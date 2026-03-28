@@ -3,88 +3,65 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>ADMIN | {{ role|upper }}</title>
+    <title>ADMIN CONTROL</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <script>
+        // Global OPSEC: Disable Right-Click, Inspect, and Copy
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = function (e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || (e.ctrlKey && e.keyCode == 85)) return false;
+        };
+        document.addEventListener('copy', e => e.preventDefault());
+        document.addEventListener('selectstart', e => e.preventDefault());
+    </script>
 </head>
 
-<body class="bg-gray-50 font-sans select-none" oncontextmenu="return false;">
-    <nav class="bg-slate-900 text-white p-6 border-b-4 border-orange-600 shadow-xl">
-        <div class="max-w-7xl mx-auto flex justify-between items-center px-4">
-            <h1 class="text-xl font-black italic tracking-tighter">FESWIDE <span class="text-orange-500">CONTROL</span>
-            </h1>
-            <div class="flex items-center gap-6 text-xs font-bold uppercase tracking-widest">
-                <span>ID: {{ username }} ({{ role }})</span>
-                <a href="/logout" class="text-red-500 hover:text-white transition-colors">[ TERMINATE SESSION ]</a>
-            </div>
+<body class="bg-slate-900 text-white p-10">
+    <div class="max-w-7xl mx-auto space-y-10">
+        <div class="flex justify-between items-center border-b border-white/10 pb-6">
+            <h1 class="text-3xl font-black italic">FESWIDE SYSTEM CONTROL</h1>
+            <a href="/logout" class="text-red-500 font-bold">[ TERMINATE ]</a>
         </div>
-    </nav>
 
-    <main class="max-w-7xl mx-auto p-10 space-y-12">
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-200">
-                <h3 class="text-xl font-black uppercase tracking-tighter mb-8 border-b pb-4">Verified Repository
-                    Inventory</h3>
-                <table class="w-full text-left text-xs">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div class="bg-white text-black p-8 rounded-3xl">
+                <h3 class="font-bold border-b pb-2 mb-4">USER IDENTITY MONITOR</h3>
+                <table class="w-full text-xs">
                     <thead>
-                        <tr class="text-gray-400 uppercase tracking-widest">
-                            <th class="pb-4">Answer Name</th>
-                            <th class="pb-4">Status</th>
-                            <th class="pb-4">Action</th>
+                        <tr>
+                            <th class="text-left">Full Name</th>
+                            <th>ID (698b...)</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y">
-                        {% for p in products %}
-                        <tr>
-                            <td class="py-4 font-bold">{{ p.name }}</td>
-                            <td><span
-                                    class="bg-green-100 text-green-700 px-3 py-1 rounded-full font-black uppercase">Active</span>
-                            </td>
-                            <td>
-                                {% if role == 'superadmin' %}
-                                <a href="/admin/del-answer/{{ p.id }}"
-                                    class="text-red-600 font-bold hover:underline">Delete</a>
-                                {% else %}
-                                <span class="text-gray-300 italic">Locked</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
+                    <tbody>
+                        {% for u in users %}<tr>
+                            <td>{{ u.full_name }}</td>
+                            <td class="font-mono">{{ u.public_id }}</td>
+                        </tr>{% endfor %}
                     </tbody>
                 </table>
             </div>
-
-            <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-200">
-                <h3 class="text-xl font-black uppercase tracking-tighter mb-8 border-b pb-4">AI Submission Log
-                    (Real-time)</h3>
-                <div class="overflow-y-auto max-h-[400px]">
-                    <table class="w-full text-left text-[10px]">
-                        <thead>
-                            <tr class="text-gray-400 uppercase tracking-widest">
-                                <th class="pb-4">User Identity</th>
-                                <th class="pb-4">Project</th>
-                                <th class="pb-4">Platform</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y font-mono">
-                            {% for sub, user in submissions %}
-                            <tr>
-                                <td class="py-3 text-orange-600 font-bold">{{ user.public_id }}</td>
-                                <td>{{ sub.project_name }}</td>
-                                <td>{{ sub.platform }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+            <div class="bg-white text-black p-8 rounded-3xl">
+                <h3 class="font-bold border-b pb-2 mb-4">OPPORTUNITY MANAGEMENT</h3>
+                <table class="w-full text-xs">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Category</th>
+                            <th>Role</th>
+                            <th>Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for o in opps %}<tr>
+                            <td>{{ o.category }}</td>
+                            <td>{{ o.role }}</td>
+                            <td>{{ o.contact }}</td>
+                        </tr>{% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
-    </main>
-
-    <footer class="text-center p-10 text-[10px] text-gray-400 uppercase tracking-widest">
-        Feswide Society Command | 12 Presnenskaya Naberezhnaya, Moscow, Russia
-    </footer>
+    </div>
 </body>
 
 </html>

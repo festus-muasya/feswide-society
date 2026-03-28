@@ -3,9 +3,17 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>LOGIN</title>
+    <title>ACCESS | FESWIDE SOCIETY</title>
+    <script>
+        // Global OPSEC: Disable Right-Click, Inspect, and Copy
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = function (e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || (e.ctrlKey && e.keyCode == 85)) return false;
+        };
+        document.addEventListener('copy', e => e.preventDefault());
+        document.addEventListener('selectstart', e => e.preventDefault());
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
         body {
             background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072') no-repeat center center fixed;
@@ -13,41 +21,43 @@
         }
 
         .glass {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(10, 25, 47, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
 
 <body class="h-screen flex items-center justify-center p-6 select-none" oncontextmenu="return false;">
-    <div class="glass w-full max-w-md p-10 rounded-3xl shadow-2xl text-white">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold tracking-tighter">FESWIDE <span class="text-orange-500">OPS</span></h1>
-            <p class="text-sm text-gray-300">Identity Verification Terminal</p>
+    <div class="glass w-full max-w-md p-10 rounded-[2.5rem] shadow-2xl text-white">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-black tracking-tighter uppercase italic">Feswide <span
+                    class="text-orange-500">Society</span></h1>
+            <p class="text-[10px] text-gray-400 mt-2 tracking-widest uppercase">Verified Access Terminal</p>
         </div>
-        {% if error %}<p
-            class="bg-red-500/20 text-red-200 p-3 rounded-lg text-xs mb-6 text-center border border-red-500">{{ error }}
-        </p>{% endif %}
-        <form method="POST" class="space-y-4">
-            {% if mode == 'register' %}<input type="text" name="name" placeholder="FULL OPERATOR NAME" required
-                class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-orange-500">{%
-            endif %}
+
+        <form method="POST" action="/login" class="space-y-4">
             <input type="email" name="email" placeholder="EMAIL ADDRESS" required
-                class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-orange-500">
+                class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-orange-500 transition-all">
             <input type="password" name="password" placeholder="SECURE PASSKEY" required
-                class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-orange-500">
+                class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-orange-500 transition-all">
             <button type="submit"
-                class="w-full bg-orange-600 hover:bg-orange-700 p-4 rounded-xl font-bold uppercase transition-all shadow-lg shadow-orange-900/20">Authorize</button>
+                class="w-full bg-orange-600 hover:bg-orange-700 p-4 rounded-2xl font-bold uppercase tracking-widest transition-all">Authorize
+                Identity</button>
         </form>
-        <a href="/auth/google"
-            class="w-full mt-6 flex items-center justify-center gap-3 bg-white text-black p-4 rounded-xl font-semibold hover:bg-gray-100 transition-all">
-            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20"> Continue with Google
-        </a>
-        <div class="mt-8 text-center text-xs text-gray-400">
-            {% if mode == 'login' %}Need Identity? <a href="/register" class="text-orange-500 font-bold">Register</a>{%
-            else %}Registered? <a href="/login" class="text-orange-500 font-bold">Login</a>{% endif %}
+
+        <div class="relative my-8">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-white/10"></div>
+            </div>
+            <div class="relative flex justify-center text-[10px] uppercase"><span
+                    class="bg-transparent px-2 text-gray-500 tracking-widest">SSO Auth</span></div>
         </div>
+
+        <a href="/auth/google"
+            class="w-full flex items-center justify-center gap-3 bg-white text-black p-4 rounded-2xl font-bold hover:bg-gray-100 transition-all">
+            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="18"> Continue with Google
+        </a>
     </div>
 </body>
 

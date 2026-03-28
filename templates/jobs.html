@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>JOBS | FESWIDE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Global OPSEC: Disable Right-Click, Inspect, and Copy
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = function (e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || (e.ctrlKey && e.keyCode == 85)) return false;
+        };
+        document.addEventListener('copy', e => e.preventDefault());
+        document.addEventListener('selectstart', e => e.preventDefault());
+    </script>
+</head>
+
+<body class="bg-slate-50 p-10">
+    <div class="max-w-7xl mx-auto space-y-12">
+        <h1 class="text-5xl font-black tracking-tighter italic">Hiring & Tasking Feed</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div class="space-y-6">
+                <h3 class="text-2xl font-black text-orange-600 uppercase">Available for Hire</h3>
+                {% for o in tasks %}
+                <div class="bg-white p-6 rounded-2xl border shadow-sm">
+                    <p class="text-xs font-bold text-gray-400 uppercase">{{ o.role }} | {{ o.platform }}</p>
+                    <p class="mt-2 font-medium">{{ o.description }}</p>
+                    <p class="mt-4 text-xs font-black text-orange-500">Contact: {{ o.contact }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="space-y-6">
+                <h3 class="text-2xl font-black text-[#0a192f] uppercase">Available Jobs</h3>
+                {% for o in hiring %}
+                <div class="bg-white p-6 rounded-2xl border shadow-sm">
+                    <p class="text-xs font-bold text-gray-400 uppercase">Hiring for: {{ o.platform }}</p>
+                    <p class="mt-2 font-medium">{{ o.description }}</p>
+                    <p class="mt-4 text-xs font-black text-orange-500">Apply: {{ o.contact }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
